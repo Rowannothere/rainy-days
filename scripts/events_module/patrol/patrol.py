@@ -28,6 +28,7 @@ from scripts.events_module.patrol.generate_patrol_list import (
     will_allow_outsider_patrols,
 )
 from scripts.events_module.patrol.patrol_event import PatrolEvent
+from scripts.events_module.patrol.patrol_option import PatrolOption
 from scripts.events_module.text_pool_event import handle_consequences
 from scripts.events_module.text_pool_event.check_general_constraints import (
     passes_general_constraints,
@@ -97,6 +98,7 @@ class Patrol:
         self.outcome_cats: TypedDict(
             "outcome_cats", {"success": dict[str, Cat], "failure": dict[str, Cat]}
         ) = {"success": {}, "failure": {}}
+        self.available_options: list[PatrolOption] = []
 
     def begin_patrol(self, patrol_cats: List[Cat], patrol_type: str) -> str:
         """
@@ -124,6 +126,7 @@ class Patrol:
 
         # Find valid patrol
         self.patrol_event = self._get_possible_patrol(patrol_type)
+        self.available_options = self.patrol_event.options
 
         # Return text adjusted patrol intro
         return event_text_adjust(
@@ -135,7 +138,9 @@ class Patrol:
         )
 
     def proceed_patrol(
-        self, path: PatrolChoice = PatrolChoice.PROCEED
+        self,
+        path: PatrolChoice = PatrolChoice.PROCEED,
+        selected_option: PatrolOption = None,
     ) -> Tuple[str, str, list, pygame.Surface | None]:
         """Proceed the patrol to the next step."""
 
@@ -159,7 +164,13 @@ class Patrol:
             else:
                 return "Error - no event chosen", "", [], None
 
-        return self.determine_outcome(antagonize=(path == PatrolChoice.ANTAGONIZE))
+        if selected_option is None and self.available_options:
+            raise ValueError("A patrol option must be selected before proceeding")
+
+        return self.determine_outcome(
+            antagonize=(path == PatrolChoice.ANTAGONIZE),
+            selected_option=selected_option,
+        )
 
     def _add_patrol_cats(self, patrol_cats: List[Cat]) -> None:
         """
@@ -506,7 +517,9 @@ class Patrol:
         return True
 
     def _find_allowed_outcomes(
-        self, antagonize: bool = False
+        self,
+        antagonize: bool = False,
+        selected_option: PatrolOption = None,
     ) -> tuple[TextPoolEvent, TextPoolEvent]:
         """
         Filters through possible outcomes to find appropriate outcomes for both failure and success
@@ -515,7 +528,10 @@ class Patrol:
         """
 
         # find which set of outcomes we'll be using based on if the player choose to antagonize
-        if antagonize:
+        if selected_option is not None:
+            success_outcomes = selected_option.success_outcomes
+            fail_outcomes = selected_option.fail_outcomes
+        elif antagonize:
             success_outcomes = self.patrol_event.antag_success_outcomes
             fail_outcomes = self.patrol_event.antag_fail_outcomes
         else:
@@ -599,14 +615,20 @@ class Patrol:
         return True
 
     def determine_outcome(
-        self, antagonize=False
+        self,
+        antagonize=False,
+        selected_option: PatrolOption = None,
     ) -> Tuple[str, str, list, pygame.Surface | None]:
         if self.patrol_event is None:
             raise Exception("No patrol event supplied")
 
-        success_outcome, fail_outcome = self._find_allowed_outcomes(antagonize)
+        success_outcome, fail_outcome = self._find_allowed_outcomes(
+            antagonize, selected_option
+        )
 
-        chosen_outcome, success = self.calculate_success(success_outcome, fail_outcome)
+        chosen_outcome, success = self.calculate_success(
+            success_outcome, fail_outcome, selected_option
+        )
 
         print(f"PATROL ID: {self.patrol_event.event_id} | SUCCESS: {success}")
         print(
@@ -617,14 +639,19 @@ class Patrol:
         )
 
         # Run the chosen outcome
-        return handle_consequences.execute_outcome(
+        result = handle_consequences.execute_outcome(
             chosen_outcome,
             self.outcome_cats["success" if success else "failure"],
             self.other_clan,
         ) + (self.get_patrol_art(chosen_outcome),)
+        self.available_options = chosen_outcome.options
+        return result
 
     def calculate_success(
-        self, success_outcome: TextPoolEvent, fail_outcome: TextPoolEvent
+        self,
+        success_outcome: TextPoolEvent,
+        fail_outcome: TextPoolEvent,
+        selected_option: PatrolOption = None,
     ) -> Tuple[TextPoolEvent, bool]:
         """Returns both the chosen outcome, and a boolean that's True if success, and False if failure."""
 
@@ -642,13 +669,19 @@ class Patrol:
             (1 + 0.10 * patrol_size) * total_exp / (patrol_size * gm_modifier * 2)
         )
 
-        success_chance = self.patrol_event.chance_of_success + int(exp_adjustment)
+        base_chance = (
+            selected_option.chance_of_success
+            if selected_option is not None
+            and selected_option.chance_of_success is not None
+            else self.patrol_event.chance_of_success
+        )
+        success_chance = base_chance + int(exp_adjustment)
         success_chance = min(success_chance, 90)
 
         # Now, apply success and fail skill
         print(
             "starting chance:",
-            self.patrol_event.chance_of_success,
+            base_chance,
             "| EX_updated chance:",
             success_chance,
         )

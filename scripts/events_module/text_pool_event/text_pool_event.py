@@ -60,8 +60,15 @@ class TextPoolEvent:
     lost: list[LostDict] = field(default_factory=list[dict])
     join: list[JoinDict] = field(default_factory=list[dict])
     future_event: list[FutureEventDict] = field(default_factory=list[dict])
+    options: list = field(default_factory=list)
 
     def __post_init__(self):
+        from scripts.events_module.patrol.patrol_option import PatrolOption
+
+        self.options = [
+            option if isinstance(option, PatrolOption) else PatrolOption(**option)
+            for option in self.options
+        ]
         self.weight = 1
         if self.location:
             self.weight += 4 * (len(constants.BIOME_TYPES) - len(self.location))
