@@ -951,8 +951,7 @@ class PatrolScreen(Screens):
     def _show_patrol_options(self, options):
         self.elements["proceed"].hide()
         self.elements["antagonize"].hide()
-        if self.patrol_obj.available_options != self.patrol_obj.patrol_event.options:
-            self.elements["not_proceed"].hide()
+        self.elements["not_proceed"].hide()
 
         self.option_buttons = {}
         for index, option in enumerate(options):
@@ -979,6 +978,8 @@ class PatrolScreen(Screens):
         if self.patrol_obj.available_options:
             self.open_patrol_event_screen()
         else:
+            for button in self.option_buttons:
+                button.disable()
             self.open_patrol_complete_screen()
 
     def open_patrol_complete_screen(self):
@@ -1451,6 +1452,9 @@ class PatrolScreen(Screens):
         for ele in self.elements:
             self.elements[ele].kill()
         self.elements = {}
+        for button in self.option_buttons:
+            button.kill()
+        self.option_buttons.clear()
 
     def clear_cat_buttons(self):
         for cat in self.cat_buttons:

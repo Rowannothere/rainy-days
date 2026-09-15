@@ -166,6 +166,8 @@ class Patrol:
 
         if selected_option is None and self.available_options:
             raise ValueError("A patrol option must be selected before proceeding")
+        if selected_option is not None and selected_option not in self.available_options:
+            raise ValueError("Selected patrol option is not currently available")
 
         return self.determine_outcome(
             antagonize=(path == PatrolChoice.ANTAGONIZE),
@@ -538,6 +540,9 @@ class Patrol:
             success_outcomes = self.patrol_event.success_outcomes
             fail_outcomes = self.patrol_event.fail_outcomes
 
+        success_outcomes = self._normalize_nested_outcomes(success_outcomes, "success")
+        fail_outcomes = self._normalize_nested_outcomes(fail_outcomes, "failure")
+
         # we'll get an outcome for both success and failure
         # FIND SUCCESS
         chosen_success, self.outcome_cats["success"] = get_valid_event(
@@ -575,6 +580,36 @@ class Patrol:
             )
 
         return chosen_success, chosen_failure
+
+    def _normalize_nested_outcomes(
+        self, outcomes: list[TextPoolEvent], outcome_type: str
+    ) -> list[TextPoolEvent]:
+        normalized = []
+        for index, outcome in enumerate(outcomes):
+            if isinstance(outcome, dict):
+                outcome = TextPoolEvent(**outcome)
+            if not outcome.event_id:
+                outcome.event_id = f"{self.patrol_event.event_id}_{outcome_type}_{index}"
+            self._normalize_nested_outcomes_for_event(outcome)
+            normalized.append(outcome)
+        return normalized
+
+    def _normalize_nested_outcomes_for_event(self, outcome: TextPoolEvent):
+        for option_index, option in enumerate(outcome.options):
+            for outcome_type, child_outcomes in (
+                ("success", option.success_outcomes),
+                ("failure", option.fail_outcomes),
+            ):
+                for child_index, child in enumerate(child_outcomes):
+                    if isinstance(child, dict):
+                        child = TextPoolEvent(**child)
+                        child_outcomes[child_index] = child
+                    if not child.event_id:
+                        child.event_id = (
+                            f"{outcome.event_id}_option{option_index}_"
+                            f"{outcome_type}_{child_index}"
+                        )
+                    self._normalize_nested_outcomes_for_event(child)
 
     def _check_outcome_constraints(
         self, outcome: TextPoolEvent, outcome_type: Literal["success", "failure"]

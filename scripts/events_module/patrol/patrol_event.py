@@ -26,9 +26,9 @@ class PatrolEvent:
     event_id: str
 
     intro_text: str
-    decline_text: str
-    success_outcomes: list[Union[dict, TextPoolEvent]]
-    fail_outcomes: list[Union[dict, TextPoolEvent]]
+    decline_text: str = ""
+    success_outcomes: list[Union[dict, TextPoolEvent]] = field(default_factory=list)
+    fail_outcomes: list[Union[dict, TextPoolEvent]] = field(default_factory=list)
     antag_success_outcomes: list[Union[dict, TextPoolEvent]] = field(
         default_factory=list
     )
