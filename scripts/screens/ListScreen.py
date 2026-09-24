@@ -279,14 +279,6 @@ class ListScreen(Screens):
         self.set_disabled_menu_buttons(["cats"])
         self.show_menu_buttons()
 
-        # LG
-        if not game.clan.your_cat.status.alive_in_player_clan and not game.clan.your_cat.dead:
-            self.living_group_names = ("general.your_clan", "general.your_group", "general.cotc")
-            if not game.last_list_forProfile:
-                self.current_group = "your_group"
-        else:
-            self.living_group_names = ("general.your_clan", "general.cotc")
-
         # SCREEN CONTAINER - everything should come back to here
         self.list_screen_container = pygame_gui.core.UIContainer(
             ui_scale(pygame.Rect((0, 0), (800, 700))),

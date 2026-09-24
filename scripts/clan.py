@@ -299,6 +299,7 @@ class Clan:
         created in the 'clan created' screen, not every time
         the program starts
         """
+        self.clan_age = clan_age
         game.reset_used_group_IDs()
         switch_set_value(Switch.clan_save_id, self.save_id)
         reset_loaded_clan_settings()
@@ -1096,7 +1097,7 @@ class Clan:
         """
 
         clan_data = {
-            "clancount_mode": self.clancount,
+            "clan_count_mode": self.clancount,
             "save_id": self.save_id,
             "displayname": self.prefix,
             "clanage": self.age,
@@ -1213,9 +1214,6 @@ class Clan:
             self.save_freshkill_pile(game.clan)
 
         safe_save(f"{get_save_dir()}/{self.save_id}/clan.json", clan_data)
-
-        if os.path.exists(f"{get_save_dir()}/{self.save_id}clan.json"):
-            os.remove(f"{get_save_dir()}/{self.save_id}clan.json")
 
     def load_clan(self):
         """
@@ -1381,7 +1379,7 @@ class Clan:
 
         game.clan.reputation = clan_data["reputation"]
 
-        game.clan.clancount = clan_data.get("clancount_mode", "singleclan")
+        game.clan.clancount = clan_data.get("clan_count_mode", "singleclan")
         game.clan.age = clan_data["clanage"]
         game.clan.starting_season = (
             clan_data["starting_season"]

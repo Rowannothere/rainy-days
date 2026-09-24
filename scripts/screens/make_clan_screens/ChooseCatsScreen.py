@@ -6,6 +6,7 @@ import pygame
 import pygame_gui
 from pygame_gui.core import ObjectID, UIContainer
 
+from scripts.game_structure import game
 from scripts.cat.cats import Cat
 from scripts.cat.enums import CatRank, CatAge
 from scripts.cat.factories.create_example_cat import create_example_cats
@@ -325,6 +326,7 @@ class ChooseCatsScreen(MakeClanScreenBase):
                     "clan_creation.rank_weights"
                 ),
                 max_cats=size_dict[self.clan_info.starting_size],
+                clan=game.clan
             ),
         )
         possible_cats = switch_get_value(Switch.future_clan_cats)
@@ -388,6 +390,8 @@ class ChooseCatsScreen(MakeClanScreenBase):
             self.update_head_display()
             self.refresh_cat_images_and_info()
             self.refresh_text_and_buttons()
+        for kitty in possible_cats:
+            Cat.all_cats_list.append(kitty)
 
     def exit_screen(self):
         self.selected_cat = None

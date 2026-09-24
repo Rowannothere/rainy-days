@@ -193,13 +193,19 @@
             "Rakes a claw across a cat's muzzle for debating against {PRONOUN/m_c/object}",
             "Is ready to tear off a cat's coat for c_n"
         ],
-        "main_trait_constraint": [
-            "bloodthirsty"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "bloodthirsty"
+                    ]
+                }
+            }
+        }
     },
     {
-        "id": "leader_bloodthirsty_goodintentions",
-        "thoughts": [
+        "event_id": "leader_bloodthirsty_goodintentions",
+        "strings": [
             "Insists violence is just another method to future peace",
             "Doesn't realize {PRONOUN/m_c/poss} stories are scaring the kittens and apprentices",
             "Instructs mentors to be strict and harsher on their apprentices to make them prepared for any future battles",

@@ -16,56 +16,85 @@
             "Laughs at the thought of dead cats 'watching over' c_n",
             "Debates if {PRONOUN/m_c/subject} should join c_n"
         ],
-        "random_status_constraint": [
-            "leader",
-            "deputy",
-            "medicine cat"
-        ],
-        "main_trait_constraint": [
-            "bloodthirsty"
-        ],
-        "random_outside_status": [
-            "clancat"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "bloodthirsty"
+                    ]
+                }
+            },
+            "r_c": {
+                "status": [
+                    "leader",
+                    "deputy",
+                    "medicine cat"
+                ]
+            }
+        }
     },
     {
-        "id": "vengeful_rogue",
-        "thoughts": [
+        "event_id": "vengeful_rogue",
+        "strings": [
             "Wants vengeance on {PRONOUN/m_c/poss} past Clan"
         ],
-        "main_trait_constraint": [
-            "vengeful"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "vengeful"
+                    ]
+                }
+            }
+        }
     },
     {
-        "id": "strange_rogue",
-        "thoughts": [
+        "event_id": "strange_rogue",
+        "strings": [
             "Crowns {PRONOUN/m_c/self} the ruler of all rogues"
         ],
-        "main_trait_constraint": [
-            "strange"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "strange"
+                    ]
+                }
+            }
+        }
     },
     {
-        "id": "shameless_rogue",
-        "thoughts": [
+        "event_id": "shameless_rogue",
+        "strings": [
             "Is eating kittypet kibble",
             "Stole some random kittypet's food",
             "Is eating dog food {PRONOUN/m_c/subject} found",
             "Is putting {PRONOUN/m_c/poss} own scent on c_n's clearly marked borders"
         ],
-        "main_trait_constraint": [
-            "shameless"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "shameless"
+                    ]
+                }
+            }
+        }
     },
     {
-        "id": "cold_rogue",
-        "thoughts": [
+        "event_id": "cold_rogue",
+        "strings": [
             "Thinks about how {PRONOUN/m_c/subject} {VERB/m_c/don't/doesn't} need anyone else"
         ],
-        "main_trait_constraint": [
-            "cold"
-        ]
+        "involved_cats": {
+            "m_c": {
+                "stat": {
+                    "trait": [
+                        "cold"
+                    ]
+                }
+            }
+        }
     },
     {
         "event_id": "rogue_to_other_rogues",
