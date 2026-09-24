@@ -1,11 +1,11 @@
 {
-    "Newleaf":{
+    "Newleaf": {
         "running nose": 2,
         "stomachache": 1,
         "tick fever": 1,
         "ear infection": 1
     },
-    "Greenleaf":{
+    "Greenleaf": {
         "fleas": 2,
         "stomachache":1,
         "heat exhaustion":3,

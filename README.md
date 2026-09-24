@@ -12,12 +12,14 @@
 A mod of the Clan-gen fan edit featuring cat genetics that get passed down from cat to cat, among a few little bonuses here and there!
 
 ## Description
-Fan-edit of the warrior cat clangen game built using Python and Pygame.
+A ClanGen mod where you control your own cat! Choose your path and live out your life as a warrior.
 
 ## Credits
 Original creator: just-some-cat.tumblr.com
 
 Fan-edit creator: SableSteel, and many others
+
+[LifeGen credits](https://docs.google.com/document/d/1XCm5Eo-y5VA6W9quDMbF3VNyKL7S8_9Tl4c2buuiA8g/edit?usp=sharing)
 
 ## Downloads
 Note: These are developer builds and are not guaranteed to work!
@@ -75,7 +77,4 @@ Finally, open the `main.py` file and click the play button in the top right corn
 
 
 ## Bug Reporting
-We have migrated to GitHub Issues for bug reporting and tracking. We no longer review bug reports from the retired Google Form.
-
-## Contributing
-If you'd like to contribute to Clangen, please read our [Contributing guide](https://github.com/ClanGenOfficial/clangen/blob/development/CONTRIBUTING.md).
+Please report any bugs on the LifeGen discord server: https://discord.gg/WqzdEcavcH

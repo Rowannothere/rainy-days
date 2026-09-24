@@ -15,7 +15,9 @@ from scripts.cat.personality import Personality
 from scripts.cat.skills import SkillPath
 from scripts.cat_relations.enums import rel_type_tiers
 from scripts.events_module.short.condition_events import Condition_Events
-
+from scripts.game_structure.game.settings import (
+    game_setting_get,
+)
 from scripts.events_module.short.scar_events import Scar_Events
 from scripts.game_structure import image_cache, constants
 from scripts.game_structure import game
@@ -284,7 +286,10 @@ class EventEditScreen(Screens):
         self.acc_button = {}
         self.acc_info: list = []
         """Loaded accessory tags"""
-        self.acc_categories = Pelt.acc_categories
+        if game_setting_get("lifegen_sprite_changes"):
+            self.acc_categories = Pelt.lifegen_acc_categories
+        else:
+            self.acc_categories = Pelt.clangen_acc_categories
         self.open_category: str = ""
         """Currently open acc category (wild, collar, ect.)"""
 
@@ -1531,7 +1536,10 @@ class EventEditScreen(Screens):
         self.acc_element = {}
         if not self.param_locks.get("acc"):
             self.acc_info = []
-        self.acc_categories = Pelt.acc_categories
+        if game_setting_get("lifegen_sprite_changes"):
+            self.acc_categories = Pelt.lifegen_acc_categories
+        else:
+            self.acc_categories = Pelt.clangen_acc_categories
         self.open_category = None
         self.acc_button = {}
         self.main_cat_editor = {}

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from random import choice
+from random import choice, choices, getrandbits, randint
 from re import sub
 from typing import Optional
 from uuid import uuid4
@@ -9,19 +9,19 @@ import pygame_gui
 
 from scripts.cat import save_load
 from scripts.cat.cats import Cat
+from scripts.cat.enums import CatAge, CatRank, CatSocial, CatGroup
+from scripts.cat.names import Name
+from scripts.cat.status import Status
 from scripts.clan import Clan
-from scripts.clan_package.settings import load_clan_settings
 from scripts.clan_package.clan_names import get_possible_clan_names
+from scripts.clan_package.settings import set_clan_setting, save_clan_settings
 from scripts.config import get_config
 from scripts.events_module.patrol.patrol import Patrol
-from scripts.game_structure import game
-from scripts.game_structure import constants
-from scripts.config import get_config
+from scripts.game_structure import game, constants
 from scripts.game_structure.game import switch_get_value, Switch, game_setting_get
 from scripts.game_structure.game.switches import switch_set_value
 from scripts.game_structure.screen_settings import MANAGER
 from scripts.screens.Screens import Screens
-from scripts.screens.EventsScreen import EventsScreen
 from scripts.screens.enums import GameScreen
 from scripts.screens.screens_core import screens_core
 from scripts.screens.screens_core.screens_core import rebuild_top_menu_buttons
@@ -53,18 +53,19 @@ class ClanInfo:
     leader: Optional[Cat] = None
     deputy: Optional[Cat] = None
     medicine_cat: Optional[Cat] = None
+    your_cat: Cat = None
+    social: CatSocial = (None,)
     starting_members: list = field(default_factory=list)
-    biome: str = ""
+    biome: str = "Forest"
     camp_bg: str = "camp1"
     symbol: str = ""
     starting_season: str = "Newleaf"
     game_mode: str = "classic"
-    clan_count_mode: str = "singleclan"
-    
     cruel_cards: list[str] = field(default_factory=list)
 
-    def __getitem__(self, name):
-        return getattr(self, name)
+    # LG
+    starting_size: str = "small"
+    clan_age: str = "new"
 
     def clear(self):
         """
@@ -74,25 +75,33 @@ class ClanInfo:
         self.leader = None
         self.deputy = None
         self.medicine_cat = None
+        self.your_cat = None
         self.starting_members = []
-        self.biome = ""
+        self.biome = "Forest"
         self.camp_bg = "camp1"
         self.symbol = ""
         self.starting_season = "Newleaf"
         self.game_mode = "classic"
-        self.clan_count_mode = "singleclan"
         self.cruel_cards = []
+
+        self.starting_size = "small"
+        self.clan_age = "new"
 
     def clear_cats(self):
         self.leader = None
         self.deputy = None
         self.medicine_cat = None
         self.starting_members = []
+        # LG
+        self.your_cat = None
 
     def update(self, saved_info: dict):
         self.display_name = saved_info["display_name"]
         self.leader = saved_info["leader"]
         self.deputy = saved_info["deputy"]
+        # LG
+        self.your_cat = saved_info["your_cat"]
+
         self.medicine_cat = saved_info["medicine_cat"]
         self.starting_members = saved_info["starting_members"]
         self.biome = saved_info["biome"]
@@ -100,8 +109,10 @@ class ClanInfo:
         self.symbol = saved_info["symbol"]
         self.starting_season = saved_info["starting_season"]
         self.game_mode = saved_info["game_mode"]
-        self.clan_count_mode = saved_info["clan_count_mode"]
         self.cruel_cards = saved_info["cruel_cards"]
+
+        self.starting_size = saved_info["starting_size"]
+        self.clan_age = saved_info["clan_age"]
 
     def get_dict(self) -> dict:
         """
@@ -111,6 +122,7 @@ class ClanInfo:
             "display_name": self.display_name,
             "leader": self.leader,
             "deputy": self.deputy,
+            "your_cat": self.your_cat,
             "medicine_cat": self.medicine_cat,
             "starting_members": self.starting_members,
             "biome": self.biome,
@@ -118,17 +130,13 @@ class ClanInfo:
             "symbol": self.symbol,
             "starting_season": self.starting_season,
             "game_mode": self.game_mode,
-            "clan_count_mode": self.clan_count_mode,
             "cruel_cards": self.cruel_cards,
+            "starting_size": self.starting_size,
+            "clan_age": self.clan_age,
         }
 
     def no_cats_chosen(self) -> bool:
-        return (
-            not self.leader
-            and not self.deputy
-            and not self.medicine_cat
-            and not self.starting_members
-        )
+        return not self.your_cat
 
     def has_minimum_cats(self) -> bool:
         return len(self.get_all_cats()) >= get_config(
@@ -164,7 +172,7 @@ class ClanInfo:
 
 
 class MakeClanScreenBase(Screens):
-    rolls_left = get_config("clan_creation.rerolls")
+    rolls_left = constants.CONFIG["clan_creation"]["rerolls"]
 
     def __init__(self, name="make_clan_screen"):
         super().__init__(name)
@@ -226,9 +234,9 @@ class MakeClanScreenBase(Screens):
         if event.type == pygame_gui.UI_BUTTON_START_PRESS:
             if event.ui_element == self.elements["main_menu"]:
                 self.set_mute_button_position("bottomright")
-                if switch_get_value(Switch.clan_list):
-                    load_clan_settings()
-                MakeClanScreenBase.rolls_left = get_config("clan_creation.rerolls")
+                MakeClanScreenBase.rolls_left = constants.CONFIG["clan_creation"][
+                    "rerolls"
+                ]
                 switch_set_value(Switch.possible_cats, [])
                 self.clan_info.clear()
                 self.change_screen(GameScreen.START)
@@ -251,8 +259,7 @@ class MakeClanScreenBase(Screens):
         game.just_died.clear()
         game.dead_cats_to_grieve.clear()
         save_load.faded_ids.clear()
-        Patrol.used_patrols["normal"].clear()
-        Patrol.used_patrols["romance"].clear()
+        Patrol.used_patrols.clear()
 
         # extra sanitization for filenames
         save_id = sub(r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", self.clan_info.display_name)
@@ -264,14 +271,31 @@ class MakeClanScreenBase(Screens):
             save_id=save_id,
             **self.clan_info.get_dict(),
         )
-        game.clan.create_clan(self.clan_info.clan_count_mode)
-        EventsScreen.current_clan = None
+        game.clan.create_clan(
+            your_cat=self.clan_info.your_cat,
+            clan_age=self.clan_info.clan_age,
+            unborn=True,
+        )
 
         game.cur_events_list.clear()
         game.herb_events_list.clear()
         game.clan.herb_supply.start_storage(len(self.clan_info.starting_members))
         game.clan.save_herb_supply(game.clan)
         game.clan.grief_strings.clear()
+
+        # LG: pick a couple unselected kits to add to the clan
+        possible_kits = [
+            c
+            for c in switch_get_value(Switch.possible_cats)
+            if c != self.clan_info.your_cat
+        ]
+        kit_num = choice([0, 0, 0, 0, 0, 1, 1, 1, 2])
+        for i in range(kit_num):
+            kit = choice(possible_kits)
+            possible_kits.remove(kit)
+            Cat.all_cats[kit.ID] = kit
+            Cat.all_cats_list.append(kit)
+
         Cat.sort_cats()
         rebuild_top_menu_buttons()
 
@@ -294,6 +318,15 @@ class MakeClanScreenBase(Screens):
             ]
 
         return choice(filtered_clan_names)
+
+    # LG
+    def random_mc_name(self):
+        self.clan_info.your_cat.name.give_prefix(
+            self.clan_info.your_cat.pelt.eye_colour,
+            self.clan_info.your_cat.pelt.colour,
+            game.clan.biome,
+        )
+        return self.clan_info.your_cat.name.prefix
 
     def random_card(self) -> str:
         """
@@ -327,13 +360,15 @@ class MakeClanScreenBase(Screens):
 
         return False
 
-    def get_camp_art_path(self, campnum) -> Optional[str]:
+    def get_camp_art_path(self, campnum, your_group="clancat") -> Optional[str]:
         if not campnum:
             return None
 
         leaf = self.clan_info.starting_season.replace("-", "")
-
-        camp_bg_base_dir = "resources/images/camp_bg/"
+        if your_group == "clancat":
+            camp_bg_base_dir = "resources/images/camp_bg/"
+        else:
+            camp_bg_base_dir = f"resources/images/camp_bg/{your_group}/"
         start_leave = leaf.casefold()
         light_dark = "dark" if game_setting_get("dark mode") else "light"
 

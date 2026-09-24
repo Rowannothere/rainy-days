@@ -1,3 +1,4 @@
+from pydoc import plain
 import random
 from random import choice, random, randint, shuffle
 
@@ -100,12 +101,173 @@ class Pelt:
         for sprite_list in sprites.COLLAR_DATA["sprite_list"]:
             collar_accessories.extend(sprite_list)
 
+    # LIFEGEN
+    aliveInsect_accessories = []
+    for sprite_list in sprites.ALIVEINSECT_DATA["sprite_list"]:
+        aliveInsect_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    deadInsect_accessories = []
+    for sprite_list in sprites.DEADINSECT_DATA["sprite_list"]:
+        deadInsect_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+    
+    plant2_accessories = []
+    for sprite_list in sprites.PLANT2_DATA["sprite_list"]:
+        plant2_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    sophisticated_accessories = []
+    for sprite_list in sprites.SOPHISTICATED_DATA["sprite_list"]:
+        sophisticated_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    fruit_accessories = []
+    for sprite_list in sprites.FRUIT_DATA["sprite_list"]:
+        fruit_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    flower_crown_accessories = []
+    for sprite_list in sprites.FLOWERCROWNS_DATA["sprite_list"]:
+        flower_crown_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    misc_accessories = []
+    for sprite_list in sprites.MISC_ACCS_DATA["sprite_list"]:
+        misc_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    misc2_accessories = []
+    for sprite_list in sprites.MISC2_ACCS_DATA["sprite_list"]:
+        misc2_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    harness_accessories = []
+    for sprite_list in sprites.HARNESS_DATA["sprite_list"]:
+        harness_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    smallanimals_accessories = []
+    for sprite_list in sprites.SMALLANIMALS_DATA["sprite_list"]:
+        smallanimals_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
+    wild2_accessories = []
+    for sprite_list in sprites.WILD2_DATA["sprite_list"]:
+        wild2_accessories.extend(sprite_list)
+        for sprite in sprite_list:
+            if sprite_list[sprite] == "tail":
+                tail_accessories.append(sprite)
+            elif sprite_list[sprite] == "body":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "head":
+                body_accessories.append(sprite)
+            elif sprite_list[sprite] == "paws":
+                paw_accessories.append(sprite)
+
     # this is used for acc-giving events, only change if you're adding a new category tag to the event filter
     # adding a category here will automatically update the event editor's options
-    acc_categories = {
+  
+    clangen_acc_categories = {
+        "PLANT": plant_accessories,
+        "WILD": wild_accessories,
+        "COLLAR": collar_accessories
+    }
+    lifegen_acc_categories = {
         "PLANT": plant_accessories,
         "WILD": wild_accessories,
         "COLLAR": collar_accessories,
+        "ALIVEINSECT": aliveInsect_accessories,
+        "DEADINSECT": deadInsect_accessories,
+        "PLANT2": plant2_accessories,
+        "SOPHISTICATED": sophisticated_accessories,
+        "FRUIT": fruit_accessories,
+        "FLOWERCROWN": flower_crown_accessories,
+        "MISC": misc_accessories,
+        "MISC2": misc2_accessories,
+        "HARNESS": harness_accessories,
+        "SMALLANIMALS": smallanimals_accessories,
+        "WILD2": wild2_accessories
     }
 
     maingame_white = {
@@ -141,6 +303,7 @@ class Pelt:
         phenotype:Phenotype,
         rusting:str = None,
         accessory:list=None,
+        inventory: list = [],
         paralyzed:bool=False,
         opacity:int=100,
         scars:list=None,
@@ -165,7 +328,8 @@ class Pelt:
         else:
             self.length = "hairless"
         self.rebuild_sprite = True
-        self._accessory = accessory
+        self.accessory = accessory  # route through setter to coerce to a tuple
+        self._inventory = inventory
         self._paralyzed = paralyzed
         self.opacity = opacity
         self._scars = (
@@ -219,7 +383,7 @@ class Pelt:
 
                 elif age == CatAge.NEWBORN:
                     self.cat_sprites[age] = (
-                        "newborn2" if "newborn2" in self.newborn_poses else "newborn0"
+                        f"newborn{pose}" if f"newborn{pose}" in self.newborn_poses else "newborn2"
                     )
                     continue
                 elif age == CatAge.KITTEN:
@@ -357,7 +521,22 @@ class Pelt:
     @accessory.setter
     def accessory(self, val):
         self.rebuild_sprite = True
+        if val is None:
+            val = tuple()
+        elif isinstance(val, str):
+            val = (val,)
+        elif not isinstance(val, tuple):
+            val = tuple(val)
         self._accessory = val
+
+    @property
+    def inventory(self):
+        return self._inventory
+
+    @inventory.setter
+    def inventory(self, val):
+        self.rebuild_sprite = True
+        self._inventory = val
 
     @property
     def scars(self):

@@ -62,3 +62,5 @@ class StatusDict(TypedDict, total=False):
     group_ID: Optional[str]
     rank: Optional[CatRank]
     age: Optional[CatAge]
+    is_shunned: bool
+    is_forgiven: bool

@@ -2,6 +2,8 @@ import random
 from random import choice
 from typing import Literal
 
+import ujson
+from scripts.ui.windows.mate_prompt import MateWindow
 import i18n
 
 from scripts.cat.cats import Cat

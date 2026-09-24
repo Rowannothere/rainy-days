@@ -7,6 +7,7 @@ TODO: Docs
 """
 import logging
 import random
+from copy import deepcopy
 
 from scripts.cat.microservices.add_to_clan import add_dependents_to_clan, add_to_clan
 from scripts.cat_relations.cat_handle_funcs import create_relationships_new_cat
@@ -16,6 +17,10 @@ from scripts.config import get_config
 import traceback
 
 import i18n
+import ujson
+from enum import Enum
+
+import re
 
 from scripts.cat.cats import Cat, cat_class
 from scripts.cat.constants import BACKSTORIES
@@ -29,6 +34,7 @@ from scripts.cat.enums import (
 from scripts.cat.names import Name
 from scripts.cat.save_load import save_cats, add_cat_to_fade_id
 from scripts.clan_package.settings import get_clan_setting, set_clan_setting
+from scripts.game_structure.game.settings import game_setting_get
 from scripts.clan_resources.freshkill import FRESHKILL_EVENT_ACTIVE
 from scripts.conditions import (
     medicine_cats_can_cover_clan,
@@ -59,6 +65,10 @@ from scripts.game_structure.game.switches import (
     Switch,
     switch_get_value,
     switch_set_value,
+    switch_append_list_value
+)
+from scripts.events_module.consequences import (
+    create_new_cat
 )
 from scripts.game_structure import game
 from scripts.game_structure.localization import load_lang_resource
@@ -68,7 +78,10 @@ from scripts.events_module.text_adjust import (
     event_text_adjust,
     adjust_list_text,
     history_text_adjust,
+    pronoun_repl,
+    process_text
 )
+
 from scripts.events_module.consequences import unpack_rel_block
 from scripts.clan_package.cotc import (
     change_clan_reputation,
@@ -80,8 +93,58 @@ from scripts.clan_package.get_clan_cats import (
     get_living_clan_cat_count,
 )
 
+from scripts.events_module.filter_random_cats import choose_random_cats
+
+from scripts.lifegen_utility import get_cluster, check_achievements, get_your_cat_group_count
+
 logger = logging.getLogger(__name__)
 
+class BirthType(Enum):
+    NO_PARENTS = "birth_no_parents"
+    ONE_PARENT = "birth_one_parent"
+    TWO_PARENTS = "birth_two_parents"
+    ONE_ADOPTIVE_PARENT = "birth_one_adoptive_parent"
+    TWO_ADOPTIVE_PARENTS = "birth_two_adoptive_parents"
+    ONE_OUTSIDER_PARENT = "birth_one_parent_outsider"
+    TWO_OUTSIDER_PARENTS = "birth_two_parent_outsiders"
+    ALONE = "birth_alone"
+    # LG: outsider-pair birth types for MCs who start as kittypet / loner / rogue
+    TWO_KITTYPET_PARENTS = "birth_two_kittypet_parents"
+    TWO_LONER_PARENTS = "birth_two_loner_parents"
+    TWO_ROGUE_PARENTS = "birth_two_rogue_parents"
+    MIXED_OUTSIDER_PARENTS = "birth_mixed_outsider_parents"
+
+    def birth_type_weights(self, mc_group=None):
+        # Base weights, used as-is for clan MCs
+        weights = {
+            BirthType.NO_PARENTS: 2,
+            BirthType.ONE_PARENT: 2,
+            BirthType.TWO_PARENTS: 3,
+            BirthType.ONE_ADOPTIVE_PARENT: 3,
+            BirthType.TWO_ADOPTIVE_PARENTS: 3,
+            BirthType.ONE_OUTSIDER_PARENT: 2,
+            BirthType.TWO_OUTSIDER_PARENTS: 1
+        }
+
+        # For outsider MCs: replace the generic outsider-parent types with group-specific ones, biased towards parents matching the player cat's group.
+        outsider_match = {
+            CatGroup.HOUSEHOLD_ID: BirthType.TWO_KITTYPET_PARENTS,
+            CatGroup.LONER_GROUP_ID: BirthType.TWO_LONER_PARENTS,
+            CatGroup.ROGUE_GROUP_ID: BirthType.TWO_ROGUE_PARENTS,
+        }
+        if mc_group in outsider_match:
+            del weights[BirthType.ONE_OUTSIDER_PARENT]
+            del weights[BirthType.TWO_OUTSIDER_PARENTS]
+            matching = outsider_match[mc_group]
+            for bt in (
+                BirthType.TWO_KITTYPET_PARENTS,
+                BirthType.TWO_LONER_PARENTS,
+                BirthType.TWO_ROGUE_PARENTS,
+            ):
+                weights[bt] = 6 if bt == matching else 1
+            weights[BirthType.MIXED_OUTSIDER_PARENTS] = 2
+
+        return weights
 
 all_events = {}
 new_cat_invited = False
@@ -97,6 +160,7 @@ def one_moon():
     game.herb_events_list = []
     game.freshkill_event_list = []
     game.mediated = []
+    game.told_story = []
     switch_set_value(Switch.saved_clan, False)
     new_cat_invited = False
     relation_events.clear_trigger_dict()
@@ -104,13 +168,7 @@ def one_moon():
     Patrol.used_patrols["romance"].clear()
     game.patrolled.clear()
     game.just_died.clear()
-
-    if any(
-        cat.status.rank.is_active_clan_rank() and cat.status.alive_in_player_clan
-        for cat in Cat.all_cats.values()
-    ):
-        # todo: this links nowhere, can it be removed?
-        switch_set_value(Switch.no_able_left, False)
+    game.dated_cats.clear()
 
     # age up the clan, set current season
     game.clan.age += 1
@@ -126,7 +184,7 @@ def one_moon():
         # feed the cats and update the nutrient status
         relevant_cats = list(
             filter(
-                lambda _cat: _cat.status.alive_in_player_clan,
+                lambda _cat: _cat.status.alive_in_your_cat_group,
                 Cat.all_cats.values(),
             )
         )
@@ -212,6 +270,7 @@ def one_moon():
                     game.cur_events_list.append(
                         EventInformation(text, ["birth_death", "relation"], cats, clan=Cat.fetch_cat(cat_id).status.group_ID)
                     )
+                    Cat.fetch_cat(cat_id).faith -= round(random.uniform(-1,0), 2)
 
         game.clan.grief_strings.clear()
 
@@ -333,15 +392,31 @@ def one_moon():
     handle_focus()
 
     # handle the herb supply for the moon
-    game.clan.herb_supply.handle_moon(
-        clan_size=get_living_clan_cat_count(Cat),
-        clan_cats=[c for c in Cat.all_cats_list if c.status.alive_in_player_clan],
-        med_cats=find_alive_cats_with_rank(
-            Cat,
-            ranks=[CatRank.MEDICINE_CAT, CatRank.MEDICINE_APPRENTICE],
-            working=True,
-        ),
-    )
+    mc = game.clan.your_cat
+    mc_group = mc.status.group if mc else CatGroup.NONE
+    if mc and not mc_group.is_any_clan_group():
+        # the herb supply follows the player group when they're an
+        # outsider, same as the freshkill pile. Kittypets are cared for by
+        # Twolegs and don't need herbs, can change possibly
+        if mc_group != CatGroup.HOUSEHOLD:
+            group_cats = [
+                c for c in Cat.all_cats_list if c.status.alive_in_your_cat_group
+            ]
+            game.clan.herb_supply.handle_moon(
+                clan_size=len(group_cats),
+                clan_cats=group_cats,
+                med_cats=[mc] if mc.status.alive_in_your_cat_group else [],
+            )
+    else:
+        game.clan.herb_supply.handle_moon(
+            clan_size=get_living_clan_cat_count(Cat),
+            clan_cats=[c for c in Cat.all_cats_list if c.status.alive_in_player_clan],
+            med_cats=find_alive_cats_with_rank(
+                Cat,
+                ranks=[CatRank.MEDICINE_CAT, CatRank.MEDICINE_APPRENTICE],
+                working=True,
+            ),
+        )
 
     if game.clan.game_mode in ("expanded", "cruel_season"):
         amount_per_med = get_amount_cat_for_one_medic()
@@ -405,6 +480,123 @@ def one_moon():
             game.save_events()
         except:
             SaveErrorWindow(traceback.format_exc())
+
+    if game.clan.your_cat.status.alive_in_your_cat_group:
+        if game.clan.your_cat.moons == 0:
+            generate_birth_event()
+        elif game.clan.your_cat.moons < 6:
+            generate_kit_events()
+        elif game.clan.your_cat.status.is_outsider:
+            # Outsiders (kittypet/loner/rogue) don't get Clan ceremonies
+            # show a short message when they reach a new age
+            if game.clan.your_cat.moons in (6, 12, 120):
+                generate_outsider_age_ceremony()
+            else:
+                generate_lifegen_events()
+        elif game.clan.your_cat.moons == 6:
+            generate_app_ceremony()
+        elif game.clan.your_cat.status.rank.is_any_apprentice_rank():
+            generate_lifegen_events()
+        elif (
+            game.clan.your_cat.status.rank in (
+                CatRank.WARRIOR,
+                CatRank.MEDICINE_CAT,
+                CatRank.MEDIATOR,
+                CatRank.QUEEN
+                ) and
+                not game.clan.your_cat.w_done and
+                not game.clan.your_cat.status.is_shunned()
+                ):
+            generate_ceremony()
+        elif game.clan.your_cat.status.rank != CatRank.ELDER and game.clan.your_cat.moons != 119:
+            generate_lifegen_events()
+        elif (
+            game.clan.your_cat.moons == 119 and
+            game.clan.your_cat.status.alive_in_player_clan and
+            not game.clan.your_cat.status.is_shunned()
+            ):
+            if 'retire' not in switch_get_value(Switch.windows_dict):
+                switch_append_list_value(Switch.windows_dict, 'retire')
+        elif (
+            game.clan.your_cat.moons == 120 and
+            game.clan.your_cat.status.rank == CatRank.ELDER and
+            game.clan.your_cat.status.alive_in_player_clan and
+            not game.clan.your_cat.status.is_shunned()
+            ):
+            generate_elder_ceremony()
+        elif game.clan.your_cat.status.rank == CatRank.ELDER:
+            generate_lifegen_events()
+
+        if game.clan.your_cat.moons >= 12:
+            if not game.clan.your_cat.status.is_shunned():
+                check_gain_app(checks)
+            check_gain_mate(checks)
+            check_gain_kits(checks)
+            if not game.clan.your_cat.status.is_shunned():
+                check_retire()
+
+        if not int(random.random() * 10) and game.clan.your_cat.status.rank != CatRank.NEWBORN:
+            gain_acc()
+
+    elif game.clan.your_cat.dead and game.clan.your_cat.dead_for == 0:
+        generate_death_event()
+    elif game.clan.your_cat.dead:
+        generate_lifegen_events()
+        
+    # LIFEGEN
+    # murdered dict clears after six moons of no murder attempts
+    if "moon" in game.clan.murdered:
+        if game.clan.age - game.clan.murdered["moon"] >= 6:
+            game.clan.murdered = {}
+
+    game.clan.affair = False
+    game.clan.exile_return = False
+
+    generate_dialogue_focus()
+    checks = [
+        len(game.clan.your_cat.apprentice),
+        len(game.clan.your_cat.mate),
+        len(game.clan.your_cat.inheritance.get_blood_kits()) if game.clan.your_cat.inheritance else 0,
+        None
+        ]
+    if game.clan.leader:
+        checks[3] = game.clan.leader.ID
+        
+    # Resort
+    if switch_get_value(Switch.sort_type) != "id":
+        Cat.sort_cats()
+
+    # Clear all the loaded event dicts.
+    GenerateEvents.clear_loaded_events()
+
+    # autosave
+    if get_clan_setting("autosave") and game.clan.age % 5 == 0:
+        try:
+            save_cats(switch_get_value(Switch.clan_name), Cat, game)
+            game.clan.save_clan()
+            game.clan.save_pregnancy(game.clan)
+            game.save_events()
+        except:
+            SaveErrorWindow(traceback.format_exc())
+
+    # ACHIEVEMENTS
+    new_achievements = check_achievements(Cat, eventspage=True)
+
+    achievements_list = []
+    all_achievements = load_lang_resource("achievements.json")
+    for item in new_achievements:
+        achievements_list.append(f"<b>{all_achievements[item][0]}</b>")
+
+    
+    if achievements_list:
+        if len(achievements_list) == 1:
+            pre_string = "You've earned an achievement this moon: "
+        else:
+            pre_string = f"You've earned {len(achievements_list)} achievements this moon: "
+
+        string = adjust_list_text(achievements_list)
+        game.cur_events_list.insert(0, Single_Event((pre_string + string + "!"), "alert"))
+    # ---
 
 
 def update_afterlife_temper():
@@ -682,6 +874,14 @@ def handle_lead_den_event():
         set_clan_setting("lead_den_outsider_event", {})
 
     set_clan_setting("lead_den_interaction", False)
+    
+def auto_freshkill():
+    """Adds amount of freshkill needed for the Clan"""
+    # auto freshkill toggle btw
+    # TODO: use this function to update the freshkill pile when
+    # the MC switches groups
+    if not game.clan.freshkill_pile:
+        game.clan.freshkill_pile = FreshkillPile()
 
 def get_moon_freshkill():
     """Adding auto freshkill for the current moon."""
@@ -1019,6 +1219,7 @@ def handle_fading(cat, clan, forced=False):
             * (1 - (cat.dead_for / age_to_fade) ** fading_speed)
             + opacity_at_fade
         )
+        cat.pelt.rebuild_sprite = True
 
         # Deal with fading the cat if they are old enough.
         if forced or cat.dead_for > age_to_fade or (get_clan_setting('modded_kits') and cat.moons < 6 and cat.dead_for > kitten_fade):
@@ -1075,11 +1276,22 @@ def one_moon_outside_cat(cat):
 
     handle_outside_EX(cat)
 
+    # LG
+    if (
+        cat.status.is_exiled(CatGroup.PLAYER_CLAN_ID) and
+        cat.ID != game.clan.your_cat.ID and
+        not int(random.random() * 30)
+        ):
+        if cat.return_home():
+            return
+    # ---
+
     # handling the rank changes for Other Clan cats
     # this is SUPER rudimentary rn, really just a temp patch to handle our current little edge-cases
     if cat.status.is_other_clancat:
         # kitten to apprentice - for now it's going to be limited to warrior apprentices
-        if cat.moons == cat_class.age_moons[CatAge.ADOLESCENT][0]:
+        # use >= (with a kitten guard) so kittens past 6 moons still get promoted
+        if cat.moons >= cat_class.age_moons[CatAge.ADOLESCENT][0] and cat.status.rank == CatRank.KITTEN:
             cat.status._change_rank(CatRank.APPRENTICE)
             # we aren't going to worry about sourcing a mentor, we're gonna pretend it's "hidden" from the player
         # apprentice to full
@@ -1098,6 +1310,9 @@ def one_moon_outside_cat(cat):
             # exclude the roles that don't really retire
             if cat.status.rank not in (CatRank.LEADER, CatRank.MEDICINE_CAT):
                 cat.status._change_rank(CatRank.ELDER)
+
+        if cat.mentor and not cat.status.rank.is_any_apprentice_rank():
+            cat.update_mentor()
 
     # skill progression needs to be after rank progression
     cat.skills.progress_skill(cat)
@@ -1130,7 +1345,7 @@ def kit_deaths(cats, clan=None):
     fading_kit_names = []
 
     if len(find_alive_cats_with_rank(Cat, [CatRank.KITTEN], clan=clan.group_ID)):
-        clan_queens = len(find_alive_cats_with_rank(Cat, [CatRank.QUEEN], working=True, clan=clan.group_ID))*3 + len(find_alive_cats_with_rank(Cat, [CatRank.QUEEN_APPRENTICE], working=True, clan=clan.group_ID))
+        clan_queens = len(find_alive_cats_with_rank(Cat, [CatRank.QUEEN], working=True, clan=clan.group_ID))*3 + len(find_alive_cats_with_rank(Cat, [CatRank.QUEENS_APPRENTICE], working=True, clan=clan.group_ID))
         clan_queens = min(clan_queens/len(find_alive_cats_with_rank(Cat, [CatRank.KITTEN], clan=clan.group_ID)), 1)
         clan_queens *= get_config("death_related.max_queen_influence")
 
@@ -1179,7 +1394,7 @@ def queen_influence(cat):
     """Queens and queen apprentices can influence kits every moon"""
 
     personality = cat.personality.trait
-    queens = find_alive_cats_with_rank(Cat, [CatRank.QUEEN, CatRank.QUEEN_APPRENTICE], clan=cat.status.group_ID)
+    queens = find_alive_cats_with_rank(Cat, [CatRank.QUEEN, CatRank.QUEENS_APPRENTICE], clan=cat.status.group_ID)
     has_rel = []
     values = {}
     for c in queens:
@@ -1262,6 +1477,13 @@ def one_moon_cat(cat, clan):
         elif debug_type_override == "new_cat":
             invite_new_cats(cat, clan)
 
+    
+    # LIFEGEN: handle faith events
+    # they only get a faith event if they hit the chance. that chance being 8 rn
+    if not int(random.random() * 8):
+        generate_faith_events(cat)
+    # ---
+
     # handle nutrition amount
     # (CARE: the cats have to be fed before this happens - should be handled in "one_moon" function)
     if (
@@ -1276,6 +1498,11 @@ def one_moon_cat(cat, clan):
         if cat.dead:
             return
 
+    cat.talked_to = False
+    cat.insulted = False
+    cat.flirted = False
+    cat.did_activity = False
+    
     # prevent injured or sick cats from unrealistic Clan events
     if cat.is_ill() or cat.is_injured():
         if cat.is_ill() and cat.is_injured():
@@ -1334,7 +1561,6 @@ def one_moon_cat(cat, clan):
     other_interactions(cat, clan)
     gain_accessories(cat, clan)
 
-    # switches between the two death handles
     if random.getrandbits(1):
         if not handle_injuries_or_general_death(cat, clan):
             handle_illnesses_or_illness_deaths(cat, clan)
@@ -1529,7 +1755,15 @@ def gain_accessories(cat, clan):
 
     if cat.status.group_ID != clan.group_ID:
         return
+    
+    if get_clan_setting('all accessories'):
+        return
 
+    # check if cat already has acc
+    # if cat.pelt.accessory:
+    #     ceremony_accessory = False
+    #     return
+    # old ^^
     # check if cat already has max acc
     if cat.pelt.accessory and len(cat.pelt.accessory) == 3:
         switch_set_value(Switch.ceremony_accessory, False)
@@ -2184,6 +2418,73 @@ def handle_outbreaks(cat, clan):
             # game.health_events_list.append(event)
             break
 
+def change_group_events(new_group_ID):
+    """
+    LG: Events for when the MC successfully switches groups.
+    """
+    event = "You have joined a new group: " + game.used_group_IDs[new_group_ID]
+    game.cur_events_list.append(
+        Single_Event(event, "alert", [game.clan.your_cat.ID])
+    )
+
+def exile_or_forgive(cat):
+    """
+    LG: a shunned cat becoming exiled or forgiven
+    """
+    involved_cats = []
+    involved_cats.append(cat.ID)
+
+    is_your_cat = game.clan.your_cat is not None and game.clan.your_cat.ID == cat.ID
+
+    if is_your_cat:
+        fate = int((constants.CONFIG["lifegen"]["shunned_cat"]["exile_chance"][cat.age.replace(' ', '_')]) * 1.75)
+    else:
+        fate = int(constants.CONFIG["lifegen"]["shunned_cat"]["exile_chance"][cat.age.replace(' ', '_')])
+
+    if not int(random.random() * fate):
+        cat.status.exile_from_group()
+        text = event_text_adjust(
+            Cat,
+            text=(
+                "You have been exiled from c_n."
+                if is_your_cat
+                else "m_c has been exiled from c_n."
+                ),
+            main_cat=cat,
+            clan=game.clan
+        )
+    else:
+        cat.status.unshun_from_group(cat.status.group_ID)
+        text = event_text_adjust(
+            Cat,
+            text=(
+                "You have been unshunned and welcomed back into c_n."
+                if is_your_cat
+                else "m_c has been unshunned and welcomed back into c_n."
+                ),
+            main_cat=cat,
+            clan=game.clan
+        )
+
+
+    game.cur_events_list.insert(0, Single_Event(text, ["alert", "misc"], involved_cats))
+
+def generate_faith_events(cat):
+    """ yay """
+    if (
+        cat.status.is_outsider or
+        cat.dead or
+        cat.moons < 1
+    ):
+        return
+    
+    random_cat = random.choice(get_living_cats())
+
+    create_short_event(event_type="faith",
+                            main_cat=cat,
+                            random_cat=random_cat,
+                            sub_type=[])
+    
 
 def check_leader(clan):
     """Checks if leader is missing."""

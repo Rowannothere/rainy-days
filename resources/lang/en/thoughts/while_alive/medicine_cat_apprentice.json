@@ -18,7 +18,15 @@
             "Is learning the early signs of infection",
             "Is memorizing all the places catmint grows",
             "Wonders if StarClan will send {PRONOUN/m_c/object} a practice sign before a real one",
-            "Is neatly stacking bundles of herbs after drying"
+            "Is neatly stacking bundles of herbs after drying",
+            "Helps apply a poultice to a small wound",
+            "Is counting the numbers of herbs left",
+            "Rounding out rowdy kits from the medicine den",
+            "Patching up a Clanmate's wounds",
+            "Having a debate with r_c about {PRONOUN/r_c/poss} latest dreams"
+        ],
+        "random_living_status": [
+            "living"
         ]
     },
     {
@@ -57,7 +65,9 @@
             "Is making sure r_c is breathing okay",
             "Is hoping to make r_c feel younger today",
             "Is learning how to relieve r_c's joint pain",
-            "Is studying the effects of aging with r_c's reluctant help"
+            "Is studying the effects of aging with r_c's reluctant help",
+            "Asks r_c if it's okay to practice injury questions on {PRONOUN/r_c/poss}",
+            "Is a bit nervous waking r_c up from {PRONOUN/r_c/poss} nap for a check-up"
         ],
         "involved_cats": {
             "r_c": {
@@ -79,7 +89,11 @@
             "Is asking r_c for guidance about a recent dream",
             "Asks r_c how to tell something is a sign from StarClan",
             "Hopes to learn from r_c's expertise",
-            "Asks r_c how to tell the difference between a sprain and a dislocated joint"
+            "Asks r_c how to tell the difference between a sprain and a dislocated joint",
+            "Enjoys trekking through the territory for herbs with r_c",
+            "Is learning how to bind a pouch to carry {PRONOUN/m_c/poss} herbs by watching r_c",
+            "Asks r_c why c_n doesn't use certain plants as herbs",
+            "Wonders if r_c would ever allow {PRONOUN/m_c/object} to experiment with different plants to see if they have herb affects"
         ],
         "involved_cats": {
             "r_c": {
@@ -101,7 +115,15 @@
             "Is terrified of misdiagnosing something serious",
             "Isn't sure if {PRONOUN/m_c/subject} can handle the stress of caring for the Clan",
             "Is holding back tears after using the wrong herbs",
-            "Is upset after {PRONOUN/m_c/subject} froze at the sight of blood from a minor wound"
+            "Is upset after {PRONOUN/m_c/subject} froze at the sight of blood from a minor wound",
+            "Flattens {PRONOUN/m_c/poss} ears hearing the other apprentices having more fun than {PRONOUN/m_c/object}",
+            "Is frightened about {PRONOUN/m_c/poss} role, but even more frightened about ever switching to a warrior",
+            "Feels like StarClan made a mistake picking {PRONOUN/m_c/object} for this role",
+            "Scurries out of the medicine den at the sight of blood",
+            "Is worrying about misinterpreting a sign that might endanger the Clan",
+            "Is frightened by the constant ghostly voices",
+            "Was overthinking hoarding herbs for a hypothetical crisis",
+            "Was startled awake from a frightening dream of an unfamiliar landscape"
         ],
         "involved_cats": {
             "m_c": {
@@ -123,7 +145,8 @@
             "Is wondering if StarClan uses greencough to weed out the weaker members of the Clan",
             "Doesn't understand the point of keeping sickly old elders healthy with precious herbs",
             "Is seen secretly leaving camp to wash {PRONOUN/m_c/poss} paws in a creek",
-            "Is studying the effects of deathberries"
+            "Is studying the effects of deathberries",
+            "Purposely gave a Clanmate bitter herbs for bothering {PRONOUN/m_c/object}"
         ],
         "involved_cats": {
             "m_c": {

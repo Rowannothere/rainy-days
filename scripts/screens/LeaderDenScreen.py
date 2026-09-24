@@ -32,11 +32,14 @@ from scripts.clan_package.get_clan_cats import (
     find_alive_cats_with_rank,
     get_living_clan_cat_count,
 )
+from scripts.clan_package.settings import get_clan_setting
 
 
 class LeaderDenScreen(Screens):
     def __init__(self, name=None):
         super().__init__(name)
+
+        self.fav = {}
 
         self.current_page = 1
         self.help_button = None
@@ -381,6 +384,10 @@ class LeaderDenScreen(Screens):
 
         for ele in self.screen_elements:
             self.screen_elements[ele].kill()
+
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
 
         # killing containers kills all inner elements as well
         self.focus_frame_container.kill()
@@ -1127,6 +1134,9 @@ class LeaderDenScreen(Screens):
         for ele in self.outsider_cat_buttons:
             self.outsider_cat_buttons[ele].kill()
         self.outsider_cat_buttons = {}
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
 
         pos_x = 0
         pos_y = 0

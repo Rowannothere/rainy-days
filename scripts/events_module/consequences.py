@@ -172,8 +172,12 @@ def create_new_cat_block(
             if index >= i:
                 continue
 
+            candidate_parent = event.new_cats[index][0]
+            if not candidate_parent.age.can_have_mate():
+                continue
+
             if parent1 is None:
-                parent1 = event.new_cats[index][0]
+                parent1 = candidate_parent
             else:
                 parent2 = event.new_cats[index][0]
         for index in sibling_indexes:
@@ -1292,7 +1296,10 @@ def create_new_cat(
             if new_cat.status.social is not CatSocial.CLANCAT:
                 new_cat.name.suffix = ""
         if not alive:
-            new_cat.die()
+            # new_cat.die()
+            # LG change. dont grieve cats who weren't known in life
+            # this will only affect pre-dead cats when making established clans
+            new_cat.die(grief_allowed=False)
 
         # newbie thought
         new_cat.assign_thought(thought)
@@ -1359,6 +1366,12 @@ def gather_cat_objects(
             found_cat = extra_cat if extra_cat else event.main_cat
         elif abbr == "r_c":
             found_cat = event.random_cat
+
+        # LG
+        if dialogue_dict:
+            if abbr in dialogue_dict:
+                found_cat = dialogue_dict[abbr]
+        # ---
 
         # add/remove cat if found and then continue for loop
         if is_exclusionary and found_cat:
@@ -1473,7 +1486,7 @@ def unpack_rel_block(
     for block in relationship_effects:
         cats_from = block.get("cats_from", [])
         cats_to = block.get("cats_to", [])
-        amount = block.get("amount")
+        amount = block.get("amount", 0) or 0
         values = [x for x in block.get("values", ()) if x in possible_values]
 
         # if this is a reaction from the entire clan, we need to know for later
@@ -1488,11 +1501,9 @@ def unpack_rel_block(
         )
         cats_to_ob = gather_cat_objects(Cat, cats_to, event, extra_cat, involved_cats, clan=clan)
 
-        # Remove any "None" that might have snuck in
-        if None in cats_from_ob:
-            cats_from_ob.remove(None)
-        if None in cats_to_ob:
-            cats_to_ob.remove(None)
+        # get rid of any Nones that might have snuck in 
+        cats_from_ob = [c for c in cats_from_ob if c is not None]
+        cats_to_ob = [c for c in cats_to_ob if c is not None]
 
         relationship_info = get_config("relationship")
 

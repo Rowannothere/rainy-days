@@ -1,7 +1,15 @@
+import pygame
+
+from scripts.cat.cats import Cat
+from scripts.game_structure import image_cache
+import pygame_gui
+
+from scripts.ui.windows.retire_prompt import RetireWindow
+from scripts.ui.windows.mate_prompt import MateWindow
+from scripts.game_structure.propagating_thread import PropagatingThread
 from threading import current_thread
 from typing import Dict, Optional, Union
 
-import pygame
 import pygame_gui
 from pygame_gui.core import UIElement
 import ujson
@@ -22,6 +30,7 @@ from scripts.game_structure.game.switches import (
     switch_set_value,
     switch_get_value,
     Switch,
+    switch_remove_list_value
 )
 from scripts.game_structure.propagating_thread import PropagatingThread
 from scripts.game_structure.screen_settings import (
@@ -34,6 +43,8 @@ from scripts.ui.windows.freshkill import FreshkillManagementWindow
 from scripts.ui.windows.herbs import HerbManagementWindow
 from scripts.ui.windows.save_check import SaveCheckWindow
 from scripts.ui.event_load_animation import EventLoadingAnimation
+from scripts.ui.windows.choose_deputy import ChooseDeputyWindow
+from scripts.ui.windows.name_kits import NameKitsWindow
 from scripts.screens.enums import GameScreen
 from scripts.ui.scale import ui_scale_blit
 from scripts.game_structure import game
@@ -99,6 +110,8 @@ class Screens:
             GameScreen.MEDIATION,
             GameScreen.CHANGE_GENDER,
             GameScreen.FAMILY_TREE,
+
+            GameScreen.ELDER_STORY,
         ]:
             self.current_page = 1
         if new_screen in [
@@ -206,7 +219,22 @@ class Screens:
             self.work_done.pop(work_thread.name)
 
             final_actions()
+            switch_set_value(Switch.window_open, False)
 
+        
+        if len(switch_get_value(Switch.windows_dict)) > 0:
+            if 'name kits' in switch_get_value(Switch.windows_dict) and not switch_get_value(Switch.window_open):
+                NameKitsWindow('events screen')
+                switch_remove_list_value(Switch.windows_dict, 'name kits')
+            elif 'retire' in switch_get_value(Switch.windows_dict) and not switch_get_value(Switch.window_open):
+                RetireWindow('events screen')
+                switch_remove_list_value(Switch.windows_dict, 'retire')
+            elif 'deputy' in switch_get_value(Switch.windows_dict) and not switch_get_value(Switch.window_open):
+                ChooseDeputyWindow('events screen')
+                switch_remove_list_value(Switch.windows_dict, 'deputy')
+            elif 'mate' in switch_get_value(Switch.windows_dict) and not switch_get_value(Switch.window_open):
+                MateWindow('events screen')
+                switch_remove_list_value(Switch.windows_dict, 'mate')
         return
 
     def on_use(self):
@@ -594,6 +622,10 @@ class Screens:
 
         if theme is None:
             theme = self.theme
+        if not self.active_bg:
+            self.active_bg = "default"
+        blur_bg = None
+        bg = None
 
         # make the right string to pull the correct camp image
         try:
@@ -624,10 +656,6 @@ class Screens:
             bg = scripts.screens.screens_core.screens_core.default_game_bgs[theme][
                 self.active_bg
             ]
-        else:
-            raise Exception(
-                f"Selected game background not recognised! '{self.active_bg}' not in default or custom bgs"
-            )
 
         if self.active_blur_bg == "default" or self.active_blur_bg == season:
             blur_bg = season_bg
@@ -649,10 +677,6 @@ class Screens:
             blur_bg = scripts.screens.screens_core.screens_core.default_fullscreen_bgs[
                 theme
             ][self.active_blur_bg]
-        else:
-            raise Exception(
-                f"Selected fullscreen background not recognised! '{self.active_blur_bg}' not in default or custom bgs"
-            )
 
         if (
             self.previous_season != season
@@ -675,14 +699,14 @@ class Screens:
                 self.bg_transition = False
 
             # actually run the transition
-            if self.bg_transition_time > 0:
+            if self.bg_transition_time > 0 and blur_bg:
                 temp = blur_bg.copy()
                 temp.set_alpha(
                     255 // self.bg_transition_time
                 )  # this determines the actual fade rate
                 scripts.game_structure.screen_settings.screen.blit(temp, (0, 0))
                 self.bg_transition_time -= 1
-            else:
+            elif blur_bg:
                 # if we've done the transition, just blit the full-alpha version on top to remove artifacts.
                 scripts.game_structure.screen_settings.screen.blit(blur_bg, (0, 0))
         # now blit the foreground.

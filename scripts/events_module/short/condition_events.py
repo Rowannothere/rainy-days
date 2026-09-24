@@ -277,6 +277,8 @@ class Condition_Events:
         event_string = None
         cat_dict = {"m_c": cat}
 
+        prev_lives = game.clan.leader_lives
+
         if cat.is_ill():
             event_string, cat_dict = Condition_Events.handle_already_ill(cat, clan)
         else:
@@ -402,7 +404,7 @@ class Condition_Events:
         # if an event happened, then add event to cur_event_list and save death if it happened.
         if event_string:
             types = ["health"]
-            if cat.dead:
+            if cat.dead or game.clan.leader_lives < prev_lives:
                 types.append("birth_death")
             game.cur_events_list.append(
                 EventInformation(event_string, types, cat_dict=cat_dict, clan=clan.group_ID)
@@ -700,7 +702,10 @@ class Condition_Events:
                 cat.history.remove_possible_history(illness)
                 switch_append_list_value(Switch.skip_conditions, illness)
                 # gather potential event strings for healed illness
-                possible_string_list = Condition_Events.ILLNESS_HEALED_STRINGS[illness]
+                try:
+                    possible_string_list = Condition_Events.ILLNESS_HEALED_STRINGS[illness]
+                except:
+                    print("couldn't find illness")
 
                 event = Condition_Events.get_valid_string_from_list(
                     possible_string_list, cat, clan
@@ -708,8 +713,10 @@ class Condition_Events:
 
                 event_list.append(event)
                 game.herb_events_list.append(event)
-
-                cat.illnesses.pop(illness)
+                try:
+                    cat.illnesses.pop(illness)
+                except:
+                    print("ERROR: removing illness")
                 # make sure complications get reset if infection or fester were healed
                 if illness in ("an infected wound", "a festering wound"):
                     for injury in cat.injuries:
@@ -932,6 +939,11 @@ class Condition_Events:
                     else:
                         accepted_events = possible_string_list
 
+                    if not accepted_events:
+                        accepted_events = possible_string_list
+                    if not accepted_events:
+                        continue
+
                     random_index = random.randrange(0, len(accepted_events))
                     event = accepted_events[random_index]
 
@@ -964,7 +976,7 @@ class Condition_Events:
 
         if event_string:
             types = ["health"]
-            if cat.dead:
+            if cat.dead or game.clan.leader_lives < starting_life_count:
                 types.append("birth_death")
             game.cur_events_list.append(
                 EventInformation(event_string, types, cat_dict=cat_dict, clan=clan.group_ID)
@@ -1208,7 +1220,11 @@ class Condition_Events:
                             clan=clan.group_ID
                         )
                     )
+                    if cat.ID == game.clan.your_cat.ID:
+                        if 'retire' not in switch_get_value(Switch.windows_dict):
+                            switch_append_list_value(Switch.windows_dict, 'retire')
 
+                            
     @staticmethod
     def give_risks(
         cat, event_list, cat_dict, condition, progression, conditions, dictionary, clan=game.clan

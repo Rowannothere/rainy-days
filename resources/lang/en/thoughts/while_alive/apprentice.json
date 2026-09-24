@@ -162,7 +162,7 @@
             "Is watching and learning from r_c",
             "Is asking r_c questions about warrior life",
             "Is re-enacting a move that {PRONOUN/m_c/subject} saw r_c do",
-            "Got caught trying to sneak out of camp without a warrior",
+            "Got caught by r_c while trying to sneak out of camp without a warrior",
             "Asks r_c for some advice",
             "Asks r_c for hunting tips",
             "Asks r_c for advice on passing an assessment",
@@ -264,6 +264,11 @@
             "Asks r_c to quiz {PRONOUN/m_c/object} on types of hunting techniques",
             "Asks r_c to quiz {PRONOUN/m_c/object} on types of battle moves",
             "Asks r_c to train with {PRONOUN/m_c/object} soon",
+            "Is showing r_c a crazy, new trick {PRONOUN/m_c/subject} created for future battles",
+            "Is chatting with r_c while on patrol together",
+            "Is showing r_c a new fighting move {PRONOUN/m_c/subject} learned from {PRONOUN/m_c/poss} mentor",
+            "Is teasing r_c for oversleeping and missing out on today's training",
+            "Is debating with r_c on who should take the blame for a backfired prank",
             "Is in a squabble about the best time to hunt"
         ],
         "involved_cats": {
@@ -308,7 +313,7 @@
             "Is picking ticks off of r_c",
             "Listens to a story from r_c",
             "Is making sure the elders are comfortable",
-            "Is asking r_c how things have changed since {PRONOUN/m_c/subject} {VERB/m_c/were/was} a 'paw",
+            "Is asking r_c how things have changed since {PRONOUN/r_c/subject} {VERB/r_c/were/was} a 'paw",
             "Appreciates r_c's words of wisdom",
             "Doesn't mind taking care of the elders",
             "Is cleaning out the elders' den today",
@@ -424,7 +429,9 @@
             "Isn't planning on asking for permission",
             "Tells {PRONOUN/m_c/poss} mentor {PRONOUN/m_c/subject} {VERB/m_c/are/is} doing battle training today",
             "Tells {PRONOUN/m_c/poss} mentor {PRONOUN/m_c/subject} {VERB/m_c/are/is} going hunting instead of training",
-            "Tells {PRONOUN/m_c/poss} mentor {PRONOUN/m_c/subject} {VERB/m_c/are/is} going on patrol without {PRONOUN/r_c/object}"
+            "Tells {PRONOUN/m_c/poss} mentor {PRONOUN/m_c/subject} {VERB/m_c/are/is} going on patrol without {PRONOUN/r_c/object}",
+            "Playfully smacks a venomous snake",
+            "Is claiming {PRONOUN/m_c/subject} can take on an entire Clan"
         ],
         "involved_cats": {
             "m_c": {
@@ -544,8 +551,16 @@
             "Asks if {PRONOUN/m_c/subject} can chase pretty bugs instead of prey",
             "Isn't paying attention to the lesson... again",
             "Overslept and missed the dawn patrol",
-            "Says {PRONOUN/m_c/subject} {VERB/m_c/don't/doesn't} want to do anything today",
-            "Is not allowed to leave camp without asking first"
+            "Says {PRONOUN/m_c/subject} {VERB/m_c/do/does}n't want to do anything today",
+            "Is not allowed to leave camp without asking first",
+            "Is making silly faces",
+            "Is this moon's class clown",
+            "Tells terrible jokes on patrol",
+            "Knows the best ways to cheer up a Clanmate",
+            "Is currently chasing a butterfly",
+            "Was chasing a butterfly before promptly tripping over {PRONOUN/m_c/poss} paws",
+            "Is battling a Clanmate's tail",
+            "Was recently chastised by {PRONOUN/m_c/poss} mentor for goofing off during training"
         ],
         "involved_cats": {
             "m_c": {

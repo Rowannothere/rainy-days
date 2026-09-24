@@ -129,6 +129,7 @@ def create_short_event(
         events = find_needed_events(
             frequency,
             event_type,
+            main_cat=main_cat,
         )
 
         chosen_event, random_cat = filter_events(
@@ -175,15 +176,16 @@ def create_short_event(
 
     else:
         # this doesn't necessarily mean there's a problem, but can be helpful for narrowing down possibilities
-        print(f"WARNING: no {event_type}: {sub_types} events found for {main_cat.name}")
+        # print(f"WARNING: no {event_type}: {sub_types} events found for {main_cat.name}")
         return
 
 
-def find_needed_events(frequency, event_type=None) -> list:
+def find_needed_events(frequency, event_type=None, main_cat=None) -> list:
     """
     Handles detecting the biome and collecting all events possible for biome and type
     :param frequency: The event frequency to look for
     :param event_type: The type of event to pull
+    :param main_cat: The main cat for this event
     """
     event_list = []
 
@@ -207,11 +209,12 @@ def find_needed_events(frequency, event_type=None) -> list:
 
     biome = temp_biome.lower()
 
-    # biome specific events
-    event_list.extend(generate_event_objects(event_type, biome, frequency))
+    if main_cat is None or main_cat.status.alive_in_player_clan:
+        # biome specific events
+        event_list.extend(generate_event_objects(event_type, biome, frequency))
 
-    # any biome events
-    event_list.extend(generate_event_objects(event_type, "general", frequency))
+        # general (non-biome) events 
+        event_list.extend(generate_event_objects(event_type, "general", frequency))
 
     return event_list
 
@@ -255,6 +258,12 @@ def generate_event_objects(event_triggered, biome, frequency) -> list:
     file_path = f"{event_triggered}/{biome}.json"
     load_name = f"{file_path}_{frequency}"
 
+    # LG
+    if event_triggered != "faith":
+        file_path = f"{event_triggered}/{biome}.json"
+    else:
+        file_path = f"{event_triggered}.json"
+
     try:
         if file_path in loaded_events:
             return loaded_events[file_path]
@@ -268,6 +277,12 @@ def generate_event_objects(event_triggered, biome, frequency) -> list:
                 return event_list
             for event in events_dict:
                 event_text = event["event_text"] if "event_text" in event else None
+
+                # LG: this is for faith events
+                if isinstance(event_text, list):
+                    event_text = random.choice(event_text)
+                # ---
+
                 event_frequency = event["frequency"] if "frequency" in event else 4
 
                 if not event_text:
@@ -277,6 +292,7 @@ def generate_event_objects(event_triggered, biome, frequency) -> list:
                     print(
                         f"WARNING: some events resources which are used in generate_events have no 'event_text'."
                     )
+                    print("TYPE:", event_triggered)
                 if frequency != event_frequency:
                     continue
 

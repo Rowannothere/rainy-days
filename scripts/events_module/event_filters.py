@@ -29,6 +29,7 @@ from scripts.clan_package.get_clan_cats import (
     get_possible_mates,
 )
 from scripts.game_structure import game
+from scripts.lifegen_utility import get_cluster
 
 ALL_BACKSTORIES_LIST = set(
     [story for s in BACKSTORIES["backstory_categories"].values() for story in s]
@@ -1064,6 +1065,15 @@ def _check_cat_backstory(cat, backstories: list) -> bool:
 
     return is_exclusionary
 
+def _check_cat_faith(cat, min_max_faith: list) -> bool:
+    if cat.faith < min_max_faith[0] or cat.faith > min_max_faith[1]:
+        return False
+    return True
+
+def _check_cat_cluster(cat, clusters: list) -> bool:
+    if any(cluster in get_cluster(cat.personality.trait) for cluster in clusters):
+        return True
+    return False
 
 def _check_cat_gender(cat, genders: list) -> bool:
     """
@@ -1450,7 +1460,7 @@ def _get_cats_with_status(cat_list: list, statuses: list[str]) -> list:
     if "any_fighter" in statuses:
         statuses += [CatRank.WARRIOR, CatRank.DEPUTY, CatRank.LEADER, CatRank.APPRENTICE]
     if "any_apprentice" in statuses:
-        statuses += [CatRank.QUEEN_APPRENTICE, CatRank.MEDIATOR_APPRENTICE, CatRank.MEDICINE_APPRENTICE, CatRank.APPRENTICE]
+        statuses += [CatRank.QUEENS_APPRENTICE, CatRank.MEDIATOR_APPRENTICE, CatRank.MEDICINE_APPRENTICE, CatRank.APPRENTICE]
 
     is_exclusionary = _check_for_exclusionary_value(statuses)
 
@@ -1499,7 +1509,8 @@ def _get_cats_with_skill(cat_list: list, skills: list[str]) -> list:
     if is_exclusionary:
         skills = [x.replace("-", "") for x in skills]
 
-    for kitty in cat_list.copy():
+    result = []
+    for kitty in cat_list:
         has_skill = False
         for _skill in skills:
             split_skill = _skill.split(",")
@@ -1513,13 +1524,10 @@ def _get_cats_with_skill(cat_list: list, skills: list[str]) -> list:
             ):
                 has_skill = True
 
-        if has_skill and is_exclusionary:
-            cat_list.remove(kitty)
+        if has_skill != is_exclusionary:
+            result.append(kitty)
 
-        if not has_skill and not is_exclusionary:
-            cat_list.remove(kitty)
-
-    return cat_list
+    return result
 
 
 def _get_cats_with_trait(cat_list: list, traits: list[str]) -> list:
@@ -2131,8 +2139,18 @@ def filter_relationship_type(group: list, filter_types: List[str], patrol_leader
                         return False
                 if "mates" in exclusionary_values and not qualifies:
                     return False
-
         filter_types.remove("mates")
+    # LG
+    if "not_mates" in filter_types:
+        if not all([test_cat.ID in inter_cat.mate for inter_cat in testing_cats]):
+            if "not_mates" in exclusionary_values:
+                qualifies = True
+            else:
+                return False
+        if "not_mates" in exclusionary_values and not qualifies:
+            return False
+        filter_types.remove("not_mates")
+    # ---
 
     # Check if the cats are in a parent/child relationship
     if "parent/child" in filter_types:
@@ -2194,6 +2212,28 @@ def filter_relationship_type(group: list, filter_types: List[str], patrol_leader
         if "app/mentor" in exclusionary_values and not qualifies:
             return False
         filter_types.remove("app/mentor")
+    
+    # LG
+    if "df_app/df_mentor" in filter_types:
+        if len(group) != 2:
+            return False
+        if not group[0].ID in group[1].df_apprentices:
+            return False
+        filter_types.remove("df_app/df_mentor")
+
+    if "df_mentor/df_app" in filter_types:
+        if len(group) != 2:
+            return False
+        if not group[1].ID in group[0].df_apprentices:
+            return False
+        filter_types.remove("df_mentor/df_app")
+
+    if "strangers" in filter_types and len(group) == 2:
+        relationship = group[0].relationships[group[1].ID]
+        if relationship and (relationship.like < 1 or relationship.romance < 1):
+            return False
+    elif "strangers" in filter_types:
+        return False
 
     # return early if there's nothing left to check
     if not filter_types:

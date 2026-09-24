@@ -158,7 +158,7 @@ def check_for_ceremony(main_cat: Cat, clan):
                 trigger_ceremony(main_cat, CatRank.MEDIATOR_APPRENTICE)
                 return
             elif _is_suitable_queen_app(main_cat, clan):
-                trigger_ceremony(main_cat, CatRank.QUEEN_APPRENTICE)
+                trigger_ceremony(main_cat, CatRank.QUEENS_APPRENTICE)
                 return
             else:
                 trigger_ceremony(main_cat, CatRank.APPRENTICE)
@@ -187,7 +187,7 @@ def check_for_ceremony(main_cat: Cat, clan):
             elif main_cat.status.rank == CatRank.MEDIATOR_APPRENTICE:
                 trigger_ceremony(main_cat, CatRank.MEDIATOR)
 
-            elif main_cat.status.rank == CatRank.QUEEN_APPRENTICE:
+            elif main_cat.status.rank == CatRank.QUEENS_APPRENTICE:
                 trigger_ceremony(main_cat, CatRank.QUEEN)
 
 def get_leaders_kits(clan):

@@ -7,6 +7,15 @@ from .ChooseMateScreen import ChooseMateScreen
 from .ChooseMentorScreen import ChooseMentorScreen
 from .ClanScreen import ClanScreen
 from .ClanSettingsScreen import ClanSettingsScreen
+from .TalkScreen import TalkScreen
+from .ChooseRebornScreen import ChooseRebornScreen
+from .AchievementScreen import AchievementScreen
+from .MurderScreen import MurderScreen
+from .DeputyScreen import DeputyScreen
+from .NameKitsScreen import NameKitsScreen
+from .AffairScreen import AffairScreen
+from .QueenScreen import QueenScreen
+from .MoonplaceScreen import MoonplaceScreen
 from .EventEditScreen import EventEditScreen
 from .EventsScreen import EventsScreen
 from .FamilyTreeScreen import FamilyTreeScreen
@@ -34,6 +43,10 @@ from .make_clan_screens.ChooseClancountScreen import ChooseClancountScreen
 from .make_clan_screens.ChooseNameScreen import ChooseNameScreen
 from .make_clan_screens.ChooseSymbolScreen import ChooseSymbolScreen
 from .make_clan_screens.ClanCreatedScreen import ClanCreatedScreen
+from .make_clan_screens.ChooseYourNameScreen import ChooseYourNameScreen
+from .make_clan_screens.CustomCatScreen import CustomCatScreen
+from  .GiftScreen import GiftScreen
+from .ElderStoryScreen import ElderStoryScreen
 
 # ---------------------------------------------------------------------------- #
 #                                  UI RULES                                    #
@@ -76,6 +89,8 @@ def rebuild_all_screens():
         GameScreen.MAKE_CLAN_CHOOSE_CAMP: ChooseCampScreen,
         GameScreen.MAKE_CLAN_CHOOSE_SYMBOL: ChooseSymbolScreen,
         GameScreen.MAKE_CLAN_CLAN_CREATED: ClanCreatedScreen,
+        GameScreen.MAKE_CLAN_YOUR_NAME: ChooseYourNameScreen,
+        GameScreen.MAKE_CLAN_CUSTOM_CAT: CustomCatScreen,
         GameScreen.ALLEGIANCES: AllegiancesScreen,
         GameScreen.CAMP: ClanScreen,
         GameScreen.LIST: ListScreen,
@@ -96,6 +111,18 @@ def rebuild_all_screens():
         GameScreen.MEDIATION: MediationScreen,
         GameScreen.CHANGE_GENDER: ChangeGenderScreen,
         GameScreen.EVENT_EDIT: EventEditScreen,
+
+        GameScreen.MURDER: MurderScreen,
+        GameScreen.AFFAIR: AffairScreen,
+        GameScreen.GIFT: GiftScreen,
+        GameScreen.TALK: TalkScreen,
+        GameScreen.MOONPLACE: MoonplaceScreen,
+        GameScreen.NAME_KITS: NameKitsScreen,
+        GameScreen.CHOOSE_REBORN: ChooseRebornScreen,
+        GameScreen.CHOOSE_DEPUTY: DeputyScreen,
+        GameScreen.ACHIEVEMENTS: AchievementScreen,
+        GameScreen.ELDER_STORY: ElderStoryScreen,
+        GameScreen.QUEEN: QueenScreen,
     }
 
     for enum, classobj in enum_to_class.items():

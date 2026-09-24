@@ -111,7 +111,7 @@ class RoleScreen(Screens):
                 self.the_cat.rank_change(CatRank.MEDIATOR_APPRENTICE, resort=True)
                 self.update_selected_cat()
             elif event.ui_element == self.switch_queen_app:
-                self.the_cat.rank_change(CatRank.QUEEN_APPRENTICE, resort=True)
+                self.the_cat.rank_change(CatRank.QUEENS_APPRENTICE, resort=True)
                 self.update_selected_cat()
 
         elif event.type == pygame.KEYDOWN:
@@ -302,18 +302,20 @@ class RoleScreen(Screens):
                 )
             )
 
-        if self.the_cat.apprentice:
+        current_apprentices = [
+            Cat.fetch_cat(x)
+            for x in self.the_cat.apprentice
+            if Cat.fetch_cat(x)
+            and Cat.fetch_cat(x).status.rank.is_any_apprentice_rank()
+        ]
+        if current_apprentices:
             apprentices = adjust_list_text(
-                [
-                    str(Cat.fetch_cat(x).name)
-                    for x in self.the_cat.apprentice
-                    if Cat.fetch_cat(x)
-                ]
+                [str(app.name) for app in current_apprentices]
             )
             text.append(
                 i18n.t(
                     "general.apprentice_label",
-                    count=len(self.the_cat.apprentice),
+                    count=len(current_apprentices),
                     apprentices=apprentices,
                 )
             )
@@ -342,7 +344,7 @@ class RoleScreen(Screens):
             CatRank.MEDIATOR: "icon_mediator.png",
             CatRank.MEDIATOR_APPRENTICE: "icon_mediator_app.png",
             CatRank.QUEEN: "icon_mediator.png",
-            CatRank.QUEEN_APPRENTICE: "icon_mediator_app.png",
+            CatRank.QUEENS_APPRENTICE: "icon_mediator_app.png",
             CatRank.WARRIOR: "icon_warrior.png",
             CatRank.APPRENTICE: "icon_warrior_app.png",
             CatRank.KITTEN: "icon_kit.png",
@@ -563,7 +565,7 @@ class RoleScreen(Screens):
             self.switch_warrior_app.enable()
             self.switch_mediator_app.disable()
             self.switch_queen_app.enable()
-        elif self.the_cat.status.rank == CatRank.QUEEN_APPRENTICE:
+        elif self.the_cat.status.rank == CatRank.QUEENS_APPRENTICE:
             self.promote_leader.disable()
             self.promote_deputy.disable()
 
@@ -633,7 +635,7 @@ class RoleScreen(Screens):
             output = "screens.role.blurb_medcat_app"
         elif self.the_cat.status.rank == CatRank.MEDIATOR_APPRENTICE:
             output = "screens.role.blurb_mediator_app"
-        elif self.the_cat.status.rank == CatRank.QUEEN_APPRENTICE:
+        elif self.the_cat.status.rank == CatRank.QUEENS_APPRENTICE:
             output = "screens.role.blurb_queen_app"
         elif self.the_cat.status.rank == CatRank.KITTEN:
             output = "screens.role.blurb_kitten"

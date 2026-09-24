@@ -52,6 +52,7 @@ class Sprites:
         if pose == "":
             empty_indexes.append(i)
 
+    # ACCESSORIES
     with open(
         "sprites/dicts/collar_sprite_data.json", "r", encoding="utf-8"
     ) as read_file:
@@ -67,6 +68,53 @@ class Sprites:
     ) as read_file:
         PLANT_DATA = ujson.loads(read_file.read())
 
+    # LG
+    with open(
+        "sprites/dicts/alive_insect_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        ALIVEINSECT_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/dead_insect_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        DEADINSECT_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/plant2_sprite_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        PLANT2_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/sophisticated_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        SOPHISTICATED_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/fruit_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        FRUIT_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/flowercrowns_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        FLOWERCROWNS_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/misc_accs_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        MISC_ACCS_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/misc2_accs_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        MISC2_ACCS_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/harness_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        HARNESS_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/smallanimals_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        SMALLANIMALS_DATA = ujson.loads(read_file.read())
+    with open(
+        "sprites/dicts/wild2_sprite_data.json", "r", encoding="utf-8"
+    ) as read_file:
+        WILD2_DATA = ujson.loads(read_file.read())
+
+    # SCARS
     with open(
         "sprites/dicts/scar_sprite_data.json", "r", encoding="utf-8"
     ) as read_file:
@@ -224,7 +272,7 @@ class Sprites:
                         self.size,
                     )
 
-                except ValueError:
+                except ValueError as e:
                     # Fallback for non-existent sprites
                     if "CRYPTIC" not in full_name:
                         print(f"WARNING: nonexistent sprite - {full_name}")
@@ -471,6 +519,18 @@ class Sprites:
             self.PLANT_DATA,
             self.WILD_DATA,
             self.COLLAR_DATA,
+
+            self.ALIVEINSECT_DATA,
+            self.DEADINSECT_DATA,
+            self.PLANT2_DATA,
+            self.SOPHISTICATED_DATA,
+            self.FRUIT_DATA,
+            self.FLOWERCROWNS_DATA,
+            self.MISC_ACCS_DATA,
+            self.MISC2_ACCS_DATA,
+            self.HARNESS_DATA,
+            self.SMALLANIMALS_DATA,
+            self.WILD2_DATA,
         )
 
         # data jsons that have multiple associated spritesheets

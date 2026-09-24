@@ -25,6 +25,9 @@ event_editing = False
 max_name_length = 10
 
 mediated = []  # Keep track of which couples have been mediated this moon.
+# LG
+told_story = []  # keeps track of who has been told a story by the elders this moon
+# ---
 just_died = []  # keeps track of which cats died this moon via die()
 dead_cats_to_grieve = [] # keeps track of the cats who died and need a clan grieving message
 cur_events_list = []
@@ -47,11 +50,20 @@ patrol_cats = {}
 updated_afterlife_cats = set()
 patrolled = []
 
+# LG
+dated_cats = []
+# ---
+
 used_group_IDs: dict = {
     CatGroup.PLAYER_CLAN_ID: CatGroup.PLAYER_CLAN,
     CatGroup.STARCLAN_ID: CatGroup.STARCLAN,
     CatGroup.UNKNOWN_RESIDENCE_ID: CatGroup.UNKNOWN_RESIDENCE,
     CatGroup.DARK_FOREST_ID: CatGroup.DARK_FOREST,
+
+    # LG
+    CatGroup.ROGUE_GROUP_ID: CatGroup.ROGUE_GROUP,
+    CatGroup.LONER_GROUP_ID: CatGroup.LONER_GROUP,
+    CatGroup.HOUSEHOLD_ID: CatGroup.HOUSEHOLD,
 }
 
 def reset_group_IDs():
@@ -174,7 +186,7 @@ def add_faded_offspring_to_faded_cat(parent, offspring):
         print("ERROR: loading faded cat")
         return False
 
-    cat_info["faded_offspring"].append(offspring)
+    cat_info.setdefault("faded_offspring", []).append(offspring)
 
     safe_save(path, cat_info)
 
@@ -226,6 +238,11 @@ def reset_used_group_IDs():
             CatGroup.STARCLAN,
             CatGroup.DARK_FOREST,
             CatGroup.UNKNOWN_RESIDENCE,
+
+            # LG
+            CatGroup.ROGUE_GROUP,
+            CatGroup.LONER_GROUP,
+            CatGroup.HOUSEHOLD
         ):
             used_group_IDs.pop(ID)
 

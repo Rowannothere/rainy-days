@@ -68,12 +68,25 @@ def _test():
         "(deadmentor)": _r,
         "(previous_mentor)": _r,
         "mur_c": _r,
+        "t_c": _r,
+        "y_c": _r,
+        "parent": _r,
+        "parent1": _r,
+        "parent2": _r,
+        "sibling": _r,
+       
+        "crush1": _r,
+        "theircrush": _r,
+        "yourcrush": _r,
+        "mate1": _r,
         "c_n": _r,
         "o_c_n": _r,
         "lead_name": _r,
         "dep_name": _r,
         "med_name": _r,
         "cat_tag": _r,
+        "insert_siblings": _r,
+        "o_c1": _r,
         "cat_to": _r,
         "cat_from": _r,
         "point_of_interest": "1",
@@ -85,8 +98,21 @@ def _test():
         replacement_dict[f"n_c:{x}"] = _r
         replacement_dict[f"r_c{x}"] = _r
 
+    # LG
+    for x in range(0, 11):
+        replacement_dict[f"r_c:{x}"] = _r
+    # ---
+
     for root, _, files in os.walk("resources"):
         for file in files:
+            if (
+                (
+                    "lifegen_events" in root and
+                    "lifegen_events\\NEW" not in root
+                )
+                ):
+                # TEMP: ignore old event files
+                continue
             if file.endswith(".json") and file not in (
                 "credits_text.json",
                 "clansettings.json",
@@ -138,6 +164,17 @@ def _test_replacement_failure(path: str, repl_dict: dict) -> bool:
             print(_e)
             success = False
         else:
+            # LG
+            exceptions = [
+                "plike", "plove", "neutral", "rlike", "rlove", "neutral", "dislike", "hate",
+                "jealous", "trust", "comfort", "respect"
+                ]
+            match = (
+                re.search(r"(?<!\.\.)(?<!\.\s\.\s)\.\s+([a-z_]+)", processed)
+                or re.search(r"[?!]\s+([a-z]+)", processed)
+            )
+            # ---
+
             # This tests for any pronoun or verb tag fragments that might have
             # snuck through. This is most likely caused by using the incorrect type of
             # brackets

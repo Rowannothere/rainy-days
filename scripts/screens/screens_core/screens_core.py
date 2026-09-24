@@ -29,6 +29,7 @@ from scripts.ui.scale import (
     ui_scale_value,
     ui_scale_blit,
 )
+from scripts.lifegen_utility import get_current_camp
 
 game_frame: Optional[pygame.Surface] = None
 core_vignette = pygame.image.load("resources/images/vignette.png")
@@ -75,8 +76,8 @@ def rebuild_core(*, should_rebuild_bgs=True):
 
     if get_version_info().is_source_build:
         dev_watermark = pygame_gui.elements.UILabel(
-            ui_scale(pygame.Rect((525, 660), (300, 50))),
-            "screens.core.dev_watermark",
+            ui_scale(pygame.Rect((545, 660), (300, 50))),
+            "LifeGen: " + version_number.text,
             object_id="#dev_watermark",
             text_kwargs={"ver": version_number.text},
         )
@@ -479,6 +480,27 @@ def rebuild_mute(location: str):
         anchors=anchors,
     )
 
+def get_red_bg(dark_mode=False):
+    if dark_mode:
+        b = 50
+        b_alter = 3
+    else:
+        b = 194
+        b_alter = 4
+    if game.clan:
+        if game.clan.your_cat:
+            if not game.clan.your_cat.history:
+                game.clan.your_cat.load_history()
+            if game.clan.your_cat.history:
+                if game.clan.your_cat.history.murder:
+                    if "is_murderer" in game.clan.your_cat.history.murder:
+                        if len(game.clan.your_cat.history.murder["is_murderer"]) > 0:
+                            for m in range(len(game.clan.your_cat.history.murder["is_murderer"])):
+                                b -= b_alter
+    if dark_mode:
+        return [57, max(36,b), 36]
+    else:
+        return [206, max(b, 167), 168]
 
 def rebuild_bgs():
     global default_fullscreen_bgs
@@ -610,14 +632,14 @@ def rebuild_bgs():
 
 
 def get_camp_bgs():
-    camp_bg_base_dir = "resources/images/camp_bg/"
     leaves = ["newleaf", "greenleaf", "leafbare", "leaffall"]
     available_biome = ["forest", "mountainous", "plains", "beach"]
 
     try:
-        camp_nr = game.clan.camp_bg
+        camp_bg_base_dir, camp_nr = get_current_camp()
         biome = game.clan.biome.lower()
     except AttributeError:
+        camp_bg_base_dir = "resources/images/camp_bg/clancat/"
         camp_nr = "camp1"
         biome = available_biome[0]
 

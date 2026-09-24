@@ -56,7 +56,7 @@ def get_new_thought(
     clan = main_cat.status.fetch_clan_object(game.clan)
 
     if not other_cat:
-        other_cat = _get_other_cat_for_thought(
+        other_cat = get_other_cat_for_thought(
             cat_list=cat_list,
             main_cat=main_cat,
         )
@@ -161,54 +161,38 @@ def _new_thought(
     return chosen_thought
 
 
-def _get_other_cat_for_thought(
+def get_other_cat_for_thought(
     cat_list: list["Cat"], main_cat: "Cat"
 ) -> Optional["Cat"]:
     """
     Returns a cat object selected from the given cat_list. This will be a cat acceptable as the subject of main_cat's thought.
     """
-    if main_cat in cat_list:
-        cat_list.remove(main_cat)
-
-    cat_list = [c for c in cat_list if not c.faded]
-
     if not cat_list:
         return None
-
-    other_cat = choice(cat_list)
 
     # sometimes cats can think about a dead cat
     thinking_of_dead_cat = getrandbits(4) == 1
 
     # dead cats think of anyone
     if main_cat.status.group.is_afterlife():
-        return other_cat
-
-    else:
-        # count and give up if we don't find a suitable cat within 100 checks
-        i = 0
-        while cat_list and (
-            (other_cat.dead and not thinking_of_dead_cat)
-              # dead and thought isn't about dead cat
-            or not main_cat.relationships.get(
-                other_cat.ID
-            )  # no existing relationship at all
-            or (
-                main_cat.relationships[other_cat.ID].total_relationship_value == 0
-            )  # the two cats have no existing relationship
-            or other_cat.status.is_lost()  # other cat is lost
-            or other_cat.status.get_last_living_group() != main_cat.status.group_ID
-        ):
-            cat_list.remove(other_cat)
-
-            i += 1
-            if i > 100 or not cat_list:
-                other_cat = None
-                break
-
+        for _ in range(10):
             other_cat = choice(cat_list)
+            if other_cat.ID != main_cat.ID:
+                return other_cat
+        return None
 
-    return other_cat
+    valid = [
+        other_cat
+        for other_cat in cat_list
+        if other_cat.ID != main_cat.ID
+        and (not other_cat.dead or thinking_of_dead_cat)
+        and main_cat.relationships.get(other_cat.ID)
+        and main_cat.relationships[other_cat.ID].total_relationship_value != 0
+        and not other_cat.status.is_lost()
+        and other_cat.status.group_ID == main_cat.status.group_ID
+    ]
+
+    return choice(valid) if valid else None
 
 
 def _load_allowed_thoughts(thought_type: CatThought, main_cat: Cat, ageup=False):
@@ -325,6 +309,10 @@ def _get_exiled_and_former(main_cat: Cat, path) -> list:
     Checks if cat needs exiled or former clancat thoughts and returns loaded resources
     """
     thoughts = []
+
+    if main_cat.age == CatAge.NEWBORN:
+        return thoughts
+
     # make sure exiled thoughts are included
     if main_cat.status.is_exiled(CatGroup.PLAYER_CLAN):
         thoughts.extend(load_text_pool_events(f"{path}/exiled.json"))

@@ -13,19 +13,18 @@
       "leadership through the darkest times", "loyalty to their Clan", "the strength to overcome their fears",
       "tireless energy"]
   },
-
-
   "intros": {
     "default": {
       "tags": [],
       "lead_trait": [],
       "text": [
         "m_c leaves to speak with the Dark Forest. {PRONOUN/m_c/subject/CAP} {VERB/m_c/shut/shuts} {PRONOUN/m_c/poss} eyes and {VERB/m_c/are/is} immediately surrounded by {PRONOUN/m_c/poss} loved ones, friends, and Clanmates who have passed on. Murk and shadows cling to their pelts like frost, and their eyes gleam dangerously as they greet the new leader."
-
       ]
     },
     "new_clan": {
-      "tags": ["new_clan"],
+      "tags": [
+        "new_clan"
+      ],
       "lead_trait": [],
       "text": [
         "As m_c dreams that night, {PRONOUN/m_c/subject} {VERB/m_c/find/finds} {PRONOUN/m_c/self} walking through darkness, mud and muck sticking to {PRONOUN/m_c/poss} paws. The world around {PRONOUN/m_c/object} is devoid of light, and bare branches claw at the empty sky above. A single, foreboding cat sits within a clearing."
@@ -33,35 +32,143 @@
     },
     "bloodthirsty": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "text": [
-            "m_c leaves to speak with the Dark Forest. {PRONOUN/m_c/subject/CAP} {VERB/m_c/shut/shuts} {PRONOUN/m_c/poss} eyes and {VERB/m_c/awaken/awakens} under an oppressing darkness, devoid of the stars {PRONOUN/m_c/subject} left behind. {PRONOUN/m_c/subject/CAP} {VERB/m_c/turn/turns} around to see a shadowy group of cats approaching, triumph in their eyes."
+        "m_c leaves to speak with the Dark Forest. {PRONOUN/m_c/subject/CAP} {VERB/m_c/shut/shuts} {PRONOUN/m_c/poss} eyes and {VERB/m_c/awaken/awakens} under an oppressing darkness, devoid of the stars {PRONOUN/m_c/subject} left behind. {PRONOUN/m_c/subject/CAP} {VERB/m_c/turn/turns} around to see a shadowy group of cats approaching, triumph in their eyes."
       ]
-
     }
   },
-
   "default_life": {
-          "text": "r_c stalks forward, eyes flashing. \"With this life, I grant you [virtue].\" {PRONOUN/r_c/subject} {VERB/r_c/meow/meows}, before disappearing back into the darkness.",
-          "virtue": ["energy", "strength", "determination"]
-        },
-
+    "text": "r_c stalks forward, eyes flashing. \"With this life, I grant you [virtue].\" {PRONOUN/r_c/subject} {VERB/r_c/meow/meows}, before disappearing back into the darkness.",
+    "virtue": [
+      "energy",
+      "strength",
+      "determination"
+    ]
+  },
   "lives": {
+    "default_outsider": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": [],
+      "rank": ["loner", "rogue", "kittypet"],
+      "life_giving": [
+        {
+          "text": "r_c slinks out of the shadows, eyes gleaming, and forces a life for [virtue] upon m_c, snarling that it's inevitable that the Clans will cast cats like {PRONOUN/r_c/object} aside.",
+          "virtue": ["ruthlessness", "cunning", "self-reliance", "spite", "ambition", "survival", "cold resolve", "defiance", "wariness", "independence"]
+        },
+        {
+          "text": "r_c swipes a claw against m_c's shoulder. Pain lances through m_c as {PRONOUN/m_c/subject} {VERB/m_c/receive/receives} a life for [virtue].",
+          "virtue": ["ruthlessness", "cunning", "self-reliance", "spite", "ambition", "survival", "cold resolve", "defiance", "wariness", "independence"]
+        }
+      ]
+    },
+
+    "aloof_gloomy_stoic_reserved": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["aloof", "gloomy", "stoic", "reserved"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c lingers at the edge of the shadows, silent, before forcing a life for [virtue] into m_c. {PRONOUN/r_c/poss/CAP} cold silence unsettles m_c more than any snarl.",
+          "virtue": ["cold resolve", "detachment", "intimidation", "control", "hardness", "silence"]
+        }
+      ]
+    },
+
+    "cowardly_meek_emotional_humble": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["cowardly", "meek", "emotional", "humble"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c flinches at every shifting shadow, yet still hurries to press a life for [virtue] upon m_c.",
+          "virtue": ["wariness", "caution", "self-preservation", "vigilance", "distrust", "survival"]
+        }
+      ]
+    },
+
+    "bouncy_energetic": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["bouncy", "energetic", "spontaneous"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c circles m_c with restless, frantic energy before slamming a life for [virtue] into {PRONOUN/m_c/object}.",
+          "virtue": ["relentless energy", "recklessness", "aggression", "momentum", "ferocity", "drive"]
+        }
+      ]
+    },
+
+    "cunning": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["cunning", "witty", "flexible", "mellow"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c pads up with a sharp smile and forces a life for [virtue] upon m_c.",
+          "virtue": ["cunning", "manipulation", "deceit", "guile", "opportunism", "wit"]
+        }
+      ]
+    },
+
+    "justified": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["justified", "methodical", "disciplined", "patient", "obsessive"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c slinks forward, smooth admist the muck, to bestow a life for [virtue] upon m_c.",
+          "virtue": ["cold patience", "obsession", "control", "calculation", "relentlessness", "discipline"]
+        }
+      ]
+    },
+
+    "trusting": {
+      "tags": [],
+      "lead_trait": [],
+      "star_trait": ["trusting", "sincere", "oblivious"],
+      "rank": [],
+      "life_giving": [
+        {
+          "text": "r_c fixes m_c with an unblinking stare and bestows a life for [virtue] upon {PRONOUN/m_c/object}.",
+          "virtue": ["hard-won wariness", "conviction", "single-mindedness", "certainty", "resolve", "zeal"]
+        }
+      ]
+    },
+
     "only_guide": {
-      "tags": ["new_clan", "guide"],
+      "tags": [
+        "new_clan",
+        "guide"
+      ],
       "lead_trait": [],
       "star_trait": [],
       "rank": [],
       "life_giving": [
         {
           "text": "The cat stands and stalks towards m_c, circling {PRONOUN/m_c/object} as though a hunter appraising their next meal. \"You come here, ignorant to the lands you walk, expecting a gift? A boon? You'll all wallow here in the darkness with me one day,\" the cat's eyes pierce into m_c's pelt, \"You'll remember me as r_c, and you'll remember that I've granted you a life for [virtue]. And one day, we'll speak again.\"",
-          "virtue": ["strength unending", "ruthless efficiency", "never-ending ambition", "righteous anger", "brutality in the face of opposition"]
+          "virtue": [
+            "strength unending",
+            "ruthless efficiency",
+            "never-ending ambition",
+            "righteous anger",
+            "brutality in the face of opposition"
+          ]
         }
       ]
     },
-
     "unknown_ghosts": {
-      "tags": ["unknown_blessing"],
+      "tags": [
+        "unknown_blessing"
+      ],
       "lead_trait": [],
       "star_trait": [],
       "rank": [],
@@ -72,7 +179,6 @@
         }
       ]
     },
-
     "benevolent_adult": {
       "tags": [],
       "lead_trait": [],
@@ -81,12 +187,22 @@
       "life_giving": [
         {
           "text": "Despite looking quite out of place among the battle-hardened shadows, r_c still places {PRONOUN/r_c/poss} muzzle harshly against the new leader's head. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue], hoping that {PRONOUN/m_c/subject} will remember {PRONOUN/m_c/poss} own kindness.",
-          "virtue": ["affection", "compassion", "empathy", "duty", "protection", "pride", "hope", "regret", "inspiration", "shaping their own future", "wisdom to know what's right"]
-
+          "virtue": [
+            "affection",
+            "compassion",
+            "empathy",
+            "duty",
+            "protection",
+            "pride",
+            "hope",
+            "regret",
+            "inspiration",
+            "shaping their own future",
+            "wisdom to know what's right"
+          ]
         }
       ]
     },
-
     "abrasive_adult": {
       "tags": [],
       "lead_trait": [],
@@ -95,12 +211,21 @@
       "life_giving": [
         {
           "text": "r_c stalks up to the new leader, eyes burning with the increasingly familiar Dark Forest ferocity. {PRONOUN/r_c/subject/CAP} {VERB/r_c/touch/touches} {PRONOUN/r_c/poss} nose to m_c's head, giving {PRONOUN/m_c/object} a life for [virtue]. m_c reels back with the emotion of the life that courses through {PRONOUN/m_c/object}.",
-          "virtue": ["resilience", "harsh judgement", "brutality", "duty", "protection", "pride", "hunger for battle", "greed", "authority", "disdain for the weak-willed"]
-
+          "virtue": [
+            "resilience",
+            "harsh judgement",
+            "brutality",
+            "duty",
+            "protection",
+            "pride",
+            "hunger for battle",
+            "greed",
+            "authority",
+            "disdain for the weak-willed"
+          ]
         }
       ]
     },
-
     "outgoing_adult": {
       "tags": [],
       "lead_trait": [],
@@ -109,12 +234,19 @@
       "life_giving": [
         {
           "text": "r_c jovially jaunts up to the new leader. The dark murk on {PRONOUN/r_c/poss} fur or the red eyes did not seem to dampen {PRONOUN/r_c/poss} spirit one bit. {PRONOUN/r_c/subject/CAP} {VERB/r_c/touch/touches} {PRONOUN/r_c/poss} nose to m_c's head, giving {PRONOUN/m_c/object} a life for [virtue]. When m_c looks up, r_c is walking away from the scene in high spirits.",
-          "virtue": ["humor", "seeing the brighter side of a dark situation", "adventure", "confidence", "daring to do what must be done", "humor", "inspiring obedience", "authority"]
-
+          "virtue": [
+            "humor",
+            "seeing the brighter side of a dark situation",
+            "adventure",
+            "confidence",
+            "daring to do what must be done",
+            "humor",
+            "inspiring obedience",
+            "authority"
+          ]
         }
       ]
     },
-
     "reserved_adult": {
       "tags": [],
       "lead_trait": [],
@@ -725,10 +857,11 @@
         }
       ]
     },
-
     "bloodthirsty_warrior": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -740,10 +873,11 @@
         }
       ]
     },
-
     "adventurous_warrior": {
       "tags": [],
-      "lead_trait": ["adventurous"],
+      "lead_trait": [
+        "adventurous"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -761,10 +895,11 @@
         }
       ]
     },
-
     "ambitious_warrior": {
       "tags": [],
-      "lead_trait": ["ambitious"],
+      "lead_trait": [
+        "ambitious"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -782,10 +917,11 @@
         }
       ]
     },
-  
-  	"bold_warrior": {
+    "bold_warrior": {
       "tags": [],
-      "lead_trait": ["bold"],
+      "lead_trait": [
+        "bold"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -803,10 +939,11 @@
         }
       ]
     },
-  
     "calm_warrior": {
       "tags": [],
-      "lead_trait": ["calm"],
+      "lead_trait": [
+        "calm"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -818,10 +955,11 @@
         }
       ]
     },
-  
     "careful_warrior": {
       "tags": [],
-      "lead_trait": ["careful"],
+      "lead_trait": [
+        "careful"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -833,10 +971,11 @@
           }
       ]
     },
-  
     "charismatic_warrior": {
       "tags": [],
-      "lead_trait": ["charismatic"],
+      "lead_trait": [
+        "charismatic"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -854,10 +993,11 @@
         }
       ]
     },
-  
     "childish_warrior": {
       "tags": [],
-      "lead_trait": ["childish"],
+      "lead_trait": [
+        "childish"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -875,10 +1015,11 @@
         }
       ]
     },
-
     "cold_warrior": {
       "tags": [],
-      "lead_trait": ["cold"],
+      "lead_trait": [
+        "cold"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -890,10 +1031,11 @@
         }
       ]
     },
-
     "compassionate_warrior": {
       "tags": [],
-      "lead_trait": ["compassionate"],
+      "lead_trait": [
+        "compassionate"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -923,10 +1065,11 @@
         }
       ]
     },
-
     "confident_warrior": {
       "tags": [],
-      "lead_trait": ["confident"],
+      "lead_trait": [
+        "confident"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -944,10 +1087,11 @@
         }
       ]
     },
-  
     "daring_warrior": {
       "tags": [],
-      "lead_trait": ["daring"],
+      "lead_trait": [
+        "daring"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -957,10 +1101,11 @@
         }
       ]
     },
-  
     "faithful_warrior": {
       "tags": [],
-      "lead_trait": ["faithful"],
+      "lead_trait": [
+        "faithful"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -972,10 +1117,11 @@
         }
       ]
     },
-  
     "fierce_warrior": {
       "tags": [],
-      "lead_trait": ["fierce"],
+      "lead_trait": [
+        "fierce"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -987,10 +1133,11 @@
         }
       ]
     },
-  
     "insecure_warrior": {
       "tags": [],
-      "lead_trait": ["insecure"],
+      "lead_trait": [
+        "insecure"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1014,10 +1161,11 @@
         }
       ]
     },
-  
     "lonesome_warrior": {
       "tags": [],
-      "lead_trait": ["lonesome"],
+      "lead_trait": [
+        "lonesome"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1032,7 +1180,9 @@
   
     "loving_warrior": {
       "tags": [],
-      "lead_trait": ["loving"],
+      "lead_trait": [
+        "loving"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1044,10 +1194,11 @@
         }
       ]
     },
-  
-  	"loyal_warrior": {
+    "loyal_warrior": {
       "tags": [],
-      "lead_trait": ["loyal"],
+      "lead_trait": [
+        "loyal"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1059,10 +1210,11 @@
         }
       ]
     },
-
     "nervous_warrior": {
       "tags": [],
-      "lead_trait": ["nervous"],
+      "lead_trait": [
+        "nervous"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1080,10 +1232,11 @@
         }
       ]
     },
-  
     "playful_warrior": {
       "tags": [],
-      "lead_trait": ["playful"],
+      "lead_trait": [
+        "playful"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1095,17 +1248,32 @@
         }
       ]
     },
-  
-  	"responsible_warrior": {
+    "responsible_warrior": {
       "tags": [],
-      "lead_trait": ["responsible"],
+      "lead_trait": [
+        "responsible"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "deputy", "mediator apprentice"],
       "life_giving": [
         {
           "text": "m_c's eyes glide to where r_c pads out of the gloom. The shadowy cat's eyes light up in surprise before darkening once more. {PRONOUN/r_c/subject/CAP} {VERB/r_c/scoff/scoffs}, remarking that {PRONOUN/r_c/subject} never thought {PRONOUN/r_c/subject}'d see m_c in these dark woods before giving a life for [virtue].",
-          "virtue": ["ambition", "determination", "endurance", "farsightedness", "instincts", "strength", "ferocity", "cunning", 
-          "shamelessness", "zealotry", "bloodlust", "restless energy", "stubbornness", "authority"]
+          "virtue": [
+            "ambition",
+            "determination",
+            "endurance",
+            "farsightedness",
+            "instincts",
+            "strength",
+            "ferocity",
+            "cunning",
+            "shamelessness",
+            "zealotry",
+            "bloodlust",
+            "restless energy",
+            "stubbornness",
+            "authority"
+          ]
         },
         {
           "text": "A cold prickle passes through m_c's pelt as r_c slinks into view. {PRONOUN/r_c/subject/CAP} {VERB/r_c/let/lets} out a shrill hiss that turns into a cackle. {PRONOUN/r_c/subject/CAP} didn't know that code-following kitties could show up here, {PRONOUN/r_c/subject} {VERB/r_c/scoff/scoffs}. The life for [virtue] that {PRONOUN/r_c/subject} {VERB/r_c/offer/offers} rushes through m_c like a lightning bolt.",
@@ -1115,14 +1283,20 @@
         },
         {
           "text": "m_c feels {PRONOUN/m_c/poss} pelt prickle with apprehension as r_c stalks closer. The dark form snorts derisively before sweeping {PRONOUN/r_c/poss} tail across m_c's whiskers, giving a life for [virtue]. m_c wobbles as a sickening feeling spreads through {PRONOUN/m_c/object}, but it's gone as soon as it began.",
-          "virtue": ["ruthlessness", "indifference", "single-mindedness", "authority"]
+          "virtue": [
+            "ruthlessness",
+            "indifference",
+            "single-mindedness",
+            "authority"
+          ]
         }
       ]
     },
-
     "righteous_warrior": {
       "tags": [],
-      "lead_trait": ["righteous"],
+      "lead_trait": [
+        "righteous"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1132,14 +1306,18 @@
         },
         {
           "text": "m_c keeps {PRONOUN/m_c/poss} eyes slitted as r_c pads up. The dark cat regards {PRONOUN/m_c/object} coldly, mewing that {PRONOUN/m_c/poss} righteousness is a sure way to gain authority in c_n. {PRONOUN/r_c/subject/CAP} briefly {VERB/r_c/brush/brushes} {PRONOUN/r_c/poss} muzzle against m_c's, a life for [virtue] ripping through {PRONOUN/m_c/poss} body with the intensity of a fire.",
-          "virtue": ["sharp claws", "sharp fangs"]
+          "virtue": [
+            "sharp claws",
+            "sharp fangs"
+          ]
         }
       ]
     },
-  
     "shameless_warrior": {
       "tags": [],
-      "lead_trait": ["shameless"],
+      "lead_trait": [
+        "shameless"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1172,10 +1350,11 @@
         }
       ]
     },
-  
     "strange_warrior": {
       "tags": [],
-      "lead_trait": ["strange"],
+      "lead_trait": [
+        "strange"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1193,10 +1372,11 @@
         }
       ]
     },
-  
     "strict_warrior": {
       "tags": [],
-      "lead_trait": ["strict"],
+      "lead_trait": [
+        "strict"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1214,10 +1394,11 @@
         }
       ]
     },
-  
     "thoughtful_warrior": {
       "tags": [],
-      "lead_trait": ["thoughtful"],
+      "lead_trait": [
+        "thoughtful"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1229,10 +1410,11 @@
         }
       ]
     },
-
-  	"troublesome_warrior": {
+    "troublesome_warrior": {
       "tags": [],
-      "lead_trait": ["troublesome"],
+      "lead_trait": [
+        "troublesome"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1247,7 +1429,9 @@
   
     "vengeful_warrior": {
       "tags": [],
-      "lead_trait": ["vengeful"],
+      "lead_trait": [
+        "vengeful"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1259,10 +1443,11 @@
         }
       ]
     },
-  
     "wise_warrior": {
       "tags": [],
-      "lead_trait": ["wise"],
+      "lead_trait": [
+        "wise"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy", "healer apprentice", "mediator apprentice"],
       "life_giving": [
@@ -1282,7 +1467,9 @@
     },
     "arrogant_warrior": {
       "tags": [],
-      "lead_trait": ["arrogant"],
+      "lead_trait": [
+        "arrogant"
+      ],
       "star_trait": [],
       "rank": ["warrior", "elder", "healer", "mediator", "apprentice", "deputy"],
       "life_giving": [
@@ -1296,9 +1483,14 @@
     },
     "competitive_warrior": {
       "tags": [],
-      "lead_trait": ["competitive"],
+      "lead_trait": [
+        "competitive"
+      ],
       "star_trait": [],
-      "rank": ["warrior", "deputy"],
+      "rank": [
+        "warrior",
+        "deputy"
+      ],
       "life_giving": [
         {
           "text": "r_c approaches m_c, a flare of challenge in {PRONOUN/r_c/poss} dark eyes. m_c straightens up and puffs out {PRONOUN/m_c/poss} chest. With a whisper about other great leaders, r_c challenges m_c to be greater, more powerful, more feared than them all. Visions of glory dance in m_c's mind as r_c gives {PRONOUN/m_c/object} a life for [virtue].",
@@ -1308,11 +1500,16 @@
         }
       ]
     },
-        "flamboyant_warrior": {
+    "flamboyant_warrior": {
       "tags": [],
-      "lead_trait": ["flamboyant"],
+      "lead_trait": [
+        "flamboyant"
+      ],
       "star_trait": [],
-      "rank": ["warrior", "deputy"],
+      "rank": [
+        "warrior",
+        "deputy"
+      ],
       "life_giving": [
         {
             "text": "m_c's dramatic attitude has no place in the Dark Forest. Still, the gloom-covered spirit of r_c gives m_c a life for [virtue] with silent contempt in {PRONOUN/r_c/poss} eyes, regardless of {PRONOUN/r_c/poss} feelings on the matter.",
@@ -1324,9 +1521,14 @@
     },
     "grumpy_warrior": {
       "tags": [],
-      "lead_trait": ["grumpy"],
+      "lead_trait": [
+        "grumpy"
+      ],
       "star_trait": [],
-      "rank": ["warrior", "deputy"],
+      "rank": [
+        "warrior",
+        "deputy"
+      ],
       "life_giving": [
         {
             "text": "r_c wonders if m_c's grumpy attitude is from anger and bloodlust, or a general spite towards the world. The shadowy spirit gives the new leader a life for [virtue].",
@@ -1338,9 +1540,14 @@
     },
     "rebellious_warrior": {
       "tags": [],
-      "lead_trait": ["Rebellious"],
+      "lead_trait": [
+        "Rebellious"
+      ],
       "star_trait": [],
-      "rank": ["warrior", "deputy"],
+      "rank": [
+        "warrior",
+        "deputy"
+      ],
       "life_giving": [
         {
             "text": "So long as m_c uses {PRONOUN/m_c/poss} rebellious ways to destroy the hold StarClan has on the world, r_c can't give a rat's tail what the new leader does with the life for [virtue].",
@@ -1352,9 +1559,14 @@
     },
     "sincere_warrior": {
       "tags": [],
-      "lead_trait": ["sincere"],
+      "lead_trait": [
+        "sincere"
+      ],
       "star_trait": [],
-      "rank": ["warrior", "deputy"],
+      "rank": [
+        "warrior",
+        "deputy"
+      ],
       "life_giving": [
         {
             "text": "Is this a joke? The murk-covered form of r_c can't believe that m_c has been chosen to be leader. r_c rolls {PRONOUN/r_c/poss} eyes and gives a life for [virtue] with an incredulous sigh.",
@@ -1368,20 +1580,30 @@
       "tags": [],
       "lead_trait": [],
       "star_trait": [],
-      "rank": ["kitten"],
+      "rank": [
+        "kitten"
+      ],
       "life_giving": [
         {
           "text": "r_c bounds up to the new leader, reaching up on {PRONOUN/r_c/poss} hind legs to give {PRONOUN/m_c/object} a new life for [virtue]. {PRONOUN/r_c/subject/CAP} {VERB/r_c/flick/flicks} {PRONOUN/r_c/poss} muck-covered tail and {VERB/r_c/run/runs} back to the line of shadows.",
-          "virtue": ["adventure", "curiosity", "perspective", "protection"]
+          "virtue": [
+            "adventure",
+            "curiosity",
+            "perspective",
+            "protection"
+          ]
         }
       ]
     },
-
     "bloodthirsty_kit": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
-      "rank": ["kitten"],
+      "rank": [
+        "kitten"
+      ],
       "life_giving": [
         {
             "text": "r_c giddily approaches the new leader, reaching up on {PRONOUN/r_c/poss} hind legs to give {PRONOUN/m_c/object} a new life for [virtue]. {PRONOUN/r_c/subject/CAP} {VERB/r_c/lash/lashes} {PRONOUN/r_c/poss} tail and {VERB/r_c/head/heads} back to make room for the next cat.",
@@ -1389,7 +1611,6 @@
         }
       ]
     },
-
     "default_app": {
       "tags": [],
       "lead_trait": [],
@@ -1398,50 +1619,80 @@
       "life_giving": [
         {
           "text": "A young cat is next to give a life. Crimson gloom reflects off {PRONOUN/r_c/poss} youthful eyes. r_c stretches up to give a life for [virtue].",
-          "virtue": ["happiness", "honesty", "humor", "justice", "mentoring", "trust"]
+          "virtue": [
+            "happiness",
+            "honesty",
+            "humor",
+            "justice",
+            "mentoring",
+            "trust"
+          ]
         }
       ]
     },
-
     "bloodthirsty_app": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
       "rank": ["apprentice", "healer apprentice", "mediator apprentice"],
       "life_giving": [
         {
           "text": "A young cat is next to give a life. {PRONOUN/r_c/subject/CAP} {VERB/r_c/hesitate/hesitates}, before an older cat shoves {PRONOUN/r_c/object} forward, growling in {PRONOUN/r_c/poss} ear. r_c stretches up to give a life for [virtue].",
-          "virtue": ["happiness", "honesty", "humor", "justice", "mentoring", "trust"]
+          "virtue": [
+            "happiness",
+            "honesty",
+            "humor",
+            "justice",
+            "mentoring",
+            "trust"
+          ]
         }
       ]
     },
-
     "default_elder": {
       "tags": [],
       "lead_trait": [],
       "star_trait": [],
-      "rank": ["elder"],
+      "rank": [
+        "elder"
+      ],
       "life_giving": [
         {
           "text": "r_c strides forward, an energy in {PRONOUN/r_c/poss} steps that wasn't present in {PRONOUN/r_c/poss} last moments. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue].",
-          "virtue": ["grace", "humility", "integrity", "persistence", "resilience"]
+          "virtue": [
+            "grace",
+            "humility",
+            "integrity",
+            "persistence",
+            "resilience"
+          ]
         }
       ]
     },
-
     "bloodthirsty_elder": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
-      "rank": ["elder"],
+      "rank": [
+        "elder"
+      ],
       "life_giving": [
         {
           "text": "r_c pads forward with a savage expression. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue].",
-          "virtue": ["grace", "humility", "integrity", "persistence", "resilience"]
+          "virtue": [
+            "grace",
+            "humility",
+            "integrity",
+            "persistence",
+            "resilience"
+          ]
         }
       ]
     },
-
     "default_med": {
       "tags": [],
       "lead_trait": [],
@@ -1454,72 +1705,120 @@
         }
       ]
     },
-
     "bloodthirsty_med": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
       "rank": ["healer"],
       "life_giving": [
         {
           "text": "r_c approaches next, a dark expression on {PRONOUN/r_c/poss} face. {PRONOUN/r_c/subject/CAP} {VERB/r_c/offer/offers} a life for [virtue], whispering to inspire true loyalty through fear of punishment.",
-          "virtue": ["clear sight", "devotion", "faith", "healing", "patience", "wisdom"]
+          "virtue": [
+            "clear sight",
+            "devotion",
+            "faith",
+            "healing",
+            "patience",
+            "wisdom"
+          ]
         }
       ]
     },
-
     "default_leader": {
       "tags": [],
       "lead_trait": [],
       "star_trait": [],
-      "rank": ["leader"],
+      "rank": [
+        "leader"
+      ],
       "life_giving": [
         {
           "text": "Finally, r_c steps forward. The gloom and murk across {PRONOUN/r_c/poss} pelt shows the future that m_c will endure one day. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue].",
-          "virtue": ["endurance in the face of hardship", "knowing when to fight and when to choose to lay in wait", "leadership through the darkest times", "loyalty to their Clan", "the strength to overcome their fears", "tireless energy"]
+          "virtue": [
+            "endurance in the face of hardship",
+            "knowing when to fight and when to choose to lay in wait",
+            "leadership through the darkest times",
+            "loyalty to their Clan",
+            "the strength to overcome their fears",
+            "tireless energy"
+          ]
         }
       ]
     },
     "default_leader_ancient": {
-      "tags": ["old_leader"],
+      "tags": [
+        "old_leader"
+      ],
       "lead_trait": [],
       "star_trait": [],
-      "rank": ["leader"],
+      "rank": [
+        "leader"
+      ],
       "life_giving": [
         {
           "text": "Finally, r_c steps forward. The dark shadows across the clearing could not hide the corrupted satisfaction in {PRONOUN/r_c/poss} eyes. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue].",
-          "virtue": ["endurance in the face of hardship", "knowing when to fight and when to choose to lay in wait", "leadership through the darkest times", "loyalty to their Clan", "the strength to overcome their fears", "tireless energy"]
+          "virtue": [
+            "endurance in the face of hardship",
+            "knowing when to fight and when to choose to lay in wait",
+            "leadership through the darkest times",
+            "loyalty to their Clan",
+            "the strength to overcome their fears",
+            "tireless energy"
+          ]
         }
       ]
     },
-
     "bloodthirsty_leader": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
-      "rank": ["leader"],
+      "rank": [
+        "leader"
+      ],
       "life_giving": [
         {
           "text": "Finally, r_c steps forward. The dark shadows across the clearing could not hide the corrupted satisfaction in {PRONOUN/r_c/poss} eyes. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a life for [virtue].",
-          "virtue": ["endurance in the face of hardship", "knowing when to fight and when to choose to lay in wait", "leadership through the darkest times", "loyalty to their Clan", "the strength to overcome their fears", "tireless energy"]
+          "virtue": [
+            "endurance in the face of hardship",
+            "knowing when to fight and when to choose to lay in wait",
+            "leadership through the darkest times",
+            "loyalty to their Clan",
+            "the strength to overcome their fears",
+            "tireless energy"
+          ]
         }
       ]
     },
     "bloodthirsty_leader_ancient": {
-      "tags": ["old_leader"],
-      "lead_trait": ["bloodthirsty"],
+      "tags": [
+        "old_leader"
+      ],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "star_trait": [],
-      "rank": ["leader"],
+      "rank": [
+        "leader"
+      ],
       "life_giving": [
         {
           "text": "r_c, one of the Dark Forest's oldest leaders, looks at the new leader with a triumphant expression. {PRONOUN/r_c/subject/CAP} {VERB/r_c/give/gives} a last life, the gift of [virtue].",
-          "virtue": ["endurance in the face of hardship", "knowing when to fight and when to choose to lay in wait", "leadership through the darkest times", "loyalty to their Clan", "the strength to overcome their fears", "tireless energy"]
+          "virtue": [
+            "endurance in the face of hardship",
+            "knowing when to fight and when to choose to lay in wait",
+            "leadership through the darkest times",
+            "loyalty to their Clan",
+            "the strength to overcome their fears",
+            "tireless energy"
+          ]
         }
       ]
     }
   },
-
-
   "outros": {
     "default": {
       "tags": [],
@@ -1530,7 +1829,9 @@
       ]
     },
     "new_clan": {
-      "tags": ["new_clan"],
+      "tags": [
+        "new_clan"
+      ],
       "lead_trait": [],
       "text": [
         "m_c_star wakes, a hissing echo of {PRONOUN/m_c/poss} new name lingering in the air."
@@ -1538,7 +1839,9 @@
     },
     "bloodthirsty": {
       "tags": [],
-      "lead_trait": ["bloodthirsty"],
+      "lead_trait": [
+        "bloodthirsty"
+      ],
       "text": [
           "r_c hails m_c by {PRONOUN/m_c/poss} new name, m_c_star, telling {PRONOUN/m_c/object} that {PRONOUN/m_c/poss} old pathetic life is no more. {PRONOUN/m_c/subject/CAP} {VERB/m_c/are/is} granted guardianship of c_n, and {VERB/m_c/are/is} told to use {PRONOUN/m_c/poss} new power however {PRONOUN/m_c/subject} {VERB/m_c/wish/wishes}. The Dark Forest's hissing and yowls echo in the dusky clearing as the new leader begins to wake up. m_c_star stands, feeling a new strength within {PRONOUN/m_c/poss} body, and grins."
       ]

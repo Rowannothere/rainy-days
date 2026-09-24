@@ -35,6 +35,7 @@ misc_wetlands = []
 misc_desert = []
 
 
+
 def reformat(path):
     if "Copy" not in path:
         return

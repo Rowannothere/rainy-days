@@ -10,6 +10,7 @@ from scripts.cat.cats import Cat
 from scripts.cat.enums import CatRank, CatAge
 from scripts.cat.factories.create_example_cat import create_example_cats
 from scripts.config import get_config
+from scripts.game_structure import constants
 from scripts.game_structure.game import Switch, switch_get_value
 from scripts.game_structure.game.switches import switch_set_value
 from scripts.game_structure.screen_settings import MANAGER
@@ -59,15 +60,30 @@ class ChooseCatsScreen(MakeClanScreenBase):
         super().__init__(name)
 
         self.selected_cat: Optional[Cat] = None
-        self.rank_override = None
-        self.rank_overrides = ["leader", "deputy", "medicine_cat", "warrior"]
 
         self.need_leader = True
         self.need_deputy = True
         self.need_med = True
 
+        self.your_cat = None
+
     def screen_switches(self):
         super().screen_switches()
+
+        # LG
+        # if customising a new life u need to make possilbe cats here
+        if not switch_get_value(Switch.possible_cats):
+            switch_set_value(
+                Switch.possible_cats,
+                create_example_cats(
+                    majority_rank=self.get_config_during_creation(
+                        "clan_creation.majority_rank"
+                    ),
+                    rank_weights=self.get_config_during_creation(
+                        "clan_creation.rank_weights"
+                    )
+                ),
+            )
 
         # determine ranks needed
         self.need_leader = self.get_config_during_creation(
@@ -86,6 +102,18 @@ class ChooseCatsScreen(MakeClanScreenBase):
             ui_scale_dimensions((253, 400))
         )
         self.elements["next_step"].set_relative_position(ui_scale_dimensions((0, 400)))
+
+        # LG
+        self.elements["custom_cat"] = UISurfaceImageButton(
+            ui_scale(pygame.Rect((50, 90), (110, 34))),
+            "customize",
+            get_button_dict(ButtonStyles.SQUOVAL, (110, 34)),
+            object_id="@buttonstyles_squoval",
+            manager=MANAGER,
+        )
+        self.clan_info.your_cat = None
+        switch_set_value(Switch.future_clan_cats, [])
+        # resetting your cat when you resturn from the customiser
 
         # create background pizzazz
         self.elements["background"] = UIModifiedImage(
@@ -147,13 +175,13 @@ class ChooseCatsScreen(MakeClanScreenBase):
         # set to infinite or higher than typical
         if (
             MakeClanScreenBase.rolls_left == -1
-            or get_config("clan_creation.rerolls") > 3
+            or constants.CONFIG["clan_creation"]["rerolls"] > 3
         ):
             # hide top and bottom so only center remains
             self.elements["roll1"].hide()
             self.elements["roll3"].hide()
         # add a counter for this one
-        if get_config("clan_creation.rerolls"):
+        if constants.CONFIG["clan_creation"]["rerolls"]:
             self.elements["reroll_count"] = pygame_gui.elements.UILabel(
                 ui_scale(pygame.Rect((0, 0), (30, 30))),
                 str(MakeClanScreenBase.rolls_left),
@@ -163,7 +191,7 @@ class ChooseCatsScreen(MakeClanScreenBase):
                 manager=MANAGER,
             )
 
-        if get_config("clan_creation.rerolls") == 3:
+        if constants.CONFIG["clan_creation"]["rerolls"] == 3:
             if MakeClanScreenBase.rolls_left <= 2:
                 self.elements["roll1"].disable()
             if MakeClanScreenBase.rolls_left <= 1:
@@ -179,52 +207,15 @@ class ChooseCatsScreen(MakeClanScreenBase):
 
         self.create_cat_info()
 
-        # select cat buttons
-        self.elements["random_cats"] = UISurfaceImageButton(
-            ui_scale(pygame.Rect((313, 360), (175, 30))),
-            "screens.make_clan.choose_random",
-            get_button_dict(ButtonStyles.SQUOVAL, (175, 30)),
-            object_id="@buttonstyles_squoval",
-            starting_height=2,
-            manager=MANAGER,
-        )
-
         self.elements["select_cat"] = UIImageButton(
             ui_scale(pygame.Rect((234, 348), (332, 52))),
-            i18n.t(
-                "screens.make_clan.choose_leader",
-                count=get_config(
-                    "death_related.max_leader_lives",
-                    creating_clan=True,
-                    card_list_override=self.clan_info.cruel_cards,
-                ),
-            ),
+            "screens.make_clan.recruit",
             object_id="#nine_lives_button",
             starting_height=2,
             visible=False,
             manager=MANAGER,
             text_kwargs={"m_c": self.selected_cat},
         )
-
-        # rank override buttons
-        self.elements["rank_override_left"] = UISurfaceImageButton(
-            ui_scale(pygame.Rect((-50, 360), (34, 34))),
-            Icon.ARROW_LEFT,
-            get_button_dict(ButtonStyles.ICON, (34, 34)),
-            object_id="@buttonstyles_icon",
-            manager=MANAGER,
-            anchors={"right_target": self.elements["select_cat"], "left": "right"}
-        )
-        self.elements["rank_override_left"].change_layer(2)
-        self.elements["rank_override_right"] = UISurfaceImageButton(
-            ui_scale(pygame.Rect((15, 360), (34, 34))),
-            Icon.ARROW_RIGHT,
-            get_button_dict(ButtonStyles.ICON, (34, 34)),
-            object_id="@buttonstyles_icon",
-            manager=MANAGER,
-            anchors={"left_target": self.elements["select_cat"], "right": "left"}
-        )
-        self.elements["rank_override_right"].change_layer(2)
 
         # Error message, to appear if you can't choose that cat.
         self.elements["error_message"] = pygame_gui.elements.UITextBox(
@@ -247,13 +238,16 @@ class ChooseCatsScreen(MakeClanScreenBase):
                 self.elements["roll2"],
                 self.elements["roll3"],
             ):
-                self.elements["select_cat"].kill()
                 # create new cats
                 switch_set_value(
                     Switch.possible_cats,
                     create_example_cats(
-                        majority_rank=self.get_config_during_creation("clan_creation.majority_rank"),
-                        rank_weights=self.get_config_during_creation("clan_creation.rank_weights"),
+                        majority_rank=self.get_config_during_creation(
+                            "clan_creation.majority_rank"
+                        ),
+                        rank_weights=self.get_config_during_creation(
+                            "clan_creation.rank_weights"
+                        )
                     ),
                 )
                 self.selected_cat = None
@@ -267,7 +261,7 @@ class ChooseCatsScreen(MakeClanScreenBase):
                 self.refresh_text_and_buttons()
                 self.update_head_display()
                 MakeClanScreenBase.rolls_left -= 1
-                if get_config("clan_creation.rerolls") == 3:
+                if constants.CONFIG["clan_creation"]["rerolls"] == 3:
                     event.ui_element.disable()
                 else:
                     self.elements["reroll_count"].set_text(
@@ -275,58 +269,32 @@ class ChooseCatsScreen(MakeClanScreenBase):
                     )
                     if MakeClanScreenBase.rolls_left == 0:
                         event.ui_element.disable()
-                # PICK RANDOM CATS
-            elif event.ui_element == self.elements["random_cats"]:
-                self.choose_random_cats()
 
-                # CLICKING CAT SPRITE
+            # CLICKING CAT SPRITE
             elif event.ui_element in (
                 self.elements["cat" + str(u)] for u in range(0, 12)
             ):
                 self.elements["roll_container"].hide()
 
-                if event.ui_element.return_cat_object() == self.selected_cat:
-                    self.selected_cat = None
-                else:
-                    self.selected_cat = event.ui_element.return_cat_object()
-                    if self.selected_cat in self.clan_info.starting_members:
-                        self.clan_info.starting_members.remove(self.selected_cat)
-                    elif self.selected_cat == self.clan_info.leader:
-                        self.clan_info.leader = None
-                    elif self.selected_cat == self.clan_info.deputy:
-                        self.clan_info.deputy = None
-                    elif self.selected_cat == self.clan_info.medicine_cat:
-                        self.clan_info.medicine_cat = None
+                self.selected_cat = event.ui_element.return_cat_object()
+                if self.selected_cat in self.clan_info.starting_members:
+                    self.clan_info.starting_members.remove(self.selected_cat)
+                elif self.selected_cat == self.clan_info.leader:
+                    self.clan_info.leader = None
+                elif self.selected_cat == self.clan_info.deputy:
+                    self.clan_info.deputy = None
+                elif self.selected_cat == self.clan_info.medicine_cat:
+                    self.clan_info.medicine_cat = None
 
                 self.refresh_cat_images_and_info(self.selected_cat)
                 self.refresh_text_and_buttons()
                 self.update_head_display()
                 self.refresh_text_and_buttons()
-                # SELECTING CAT
+            # SELECTING CAT
             elif event.ui_element == self.elements["select_cat"]:
                 self._assign_cat()
                 self.selected_cat = None
-                self.update_head_display()
-                self.refresh_cat_images_and_info()
-                self.refresh_text_and_buttons()
-                # RANK OVERRIDES
-            elif event.ui_element == self.elements["rank_override_left"]:
-                overrides = [o for o in self.rank_overrides if o in ["warrior", None] or self.clan_info[o] is None]
-                if self.rank_override in [None, self.rank_overrides[0]] or self.rank_override not in overrides:
-                    self.rank_override = overrides[-1]
-                else:
-                    self.rank_override = overrides[overrides.index(self.rank_override)-1]
-                self.refresh_cat_images_and_info(self.selected_cat)
-                self.refresh_text_and_buttons()
-            elif event.ui_element == self.elements["rank_override_right"]:
-                overrides = [o for o in self.rank_overrides if o in ["warrior", None] or self.clan_info[o] is None]
-                if self.rank_override in [None, self.rank_overrides[-1]] or self.rank_override not in overrides:
-                    self.rank_override = overrides[0]
-                else:
-                    self.rank_override = overrides[overrides.index(self.rank_override)+1]
-                self.refresh_cat_images_and_info(self.selected_cat)
-                self.refresh_text_and_buttons()
-                # GOING BACK
+            # GOING BACK
             elif event.ui_element == self.elements["previous_step"]:
                 if self.selected_cat:
                     self.selected_cat = None
@@ -335,12 +303,32 @@ class ChooseCatsScreen(MakeClanScreenBase):
                 else:
                     self.change_screen(GameScreen.MAKE_CLAN_CHOOSE_NAME)
             elif event.ui_element == self.elements["next_step"]:
-                self.change_screen(GameScreen.MAKE_CLAN_CHOOSE_CAMP)
+                self.change_screen(GameScreen.MAKE_CLAN_YOUR_NAME)
+            elif event.ui_element == self.elements["custom_cat"]:
+                if self.selected_cat:
+                    switch_set_value(Switch.cat, self.selected_cat.ID)
+                self.change_screen(GameScreen.MAKE_CLAN_CUSTOM_CAT)
 
         return super().handle_event(event)
 
-    def choose_random_cats(self):
-        possible_cats = switch_get_value(Switch.possible_cats)
+    def create_clan_members(self):
+        # EDITED FOR LG: used to be choose_random_cats
+        # now creates the rest of the clan
+        size_dict = {"small": 10, "medium": 15, "large": 20}
+        switch_set_value(
+            Switch.future_clan_cats,
+            create_example_cats(
+                majority_rank=self.get_config_during_creation(
+                    "clan_creation.majority_rank"
+                ),
+                rank_weights=self.get_config_during_creation(
+                    "clan_creation.rank_weights"
+                ),
+                max_cats=size_dict[self.clan_info.starting_size],
+            ),
+        )
+        possible_cats = switch_get_value(Switch.future_clan_cats)
+        print("Upcoming Clan Cats:", possible_cats)
         if self.need_leader:
             self.clan_info.leader = choice(
                 [
@@ -371,28 +359,32 @@ class ChooseCatsScreen(MakeClanScreenBase):
                 ]
             )
         self.clan_info.starting_members = []
-        minimum_needed = max(self.get_config_during_creation(
+        minimum_needed = self.get_config_during_creation(
             "clan_creation.minimum_membership"
-        ) - len(self.clan_info.get_all_cats()), 0)
+        ) - len(self.clan_info.get_all_cats())
         maximum_needed = self.get_config_during_creation(
             "clan_creation.maximum_membership"
         ) - len(self.clan_info.get_all_cats())
         for _ in range(randint(minimum_needed, maximum_needed)):
-            self.clan_info.starting_members.append(
-                choice(
-                    [
-                        c
-                        for c in possible_cats
-                        if c
-                        not in [
-                            self.clan_info.leader,
-                            self.clan_info.deputy,
-                            self.clan_info.medicine_cat,
+            try:
+                self.clan_info.starting_members.append(
+                    choice(
+                        [
+                            c
+                            for c in possible_cats
+                            if c
+                            not in [
+                                self.clan_info.leader,
+                                self.clan_info.deputy,
+                                self.clan_info.medicine_cat,
+                            ]
+                            and c not in self.clan_info.starting_members
                         ]
-                        and c not in self.clan_info.starting_members
-                    ]
+                    )
                 )
-            )
+            except Exception as e:
+                print(f"LG: Failed to add Clan member #{_}")
+                print(e)
             self.update_head_display()
             self.refresh_cat_images_and_info()
             self.refresh_text_and_buttons()
@@ -415,36 +407,18 @@ class ChooseCatsScreen(MakeClanScreenBase):
 
     def _assign_cat(self):
         """Assigns the selected cat to the next required role"""
-        cat = self.selected_cat
-        if not self.clan_info.leader and (self.need_leader and self.rank_override not in ["deputy", "medicine_cat", "warrior"]):
-            self.clan_info.leader = cat
-        elif not self.clan_info.deputy and (self.need_deputy and self.rank_override not in ["leader", "medicine_cat", "warrior"]):
-            self.clan_info.deputy = cat
-        elif not self.clan_info.medicine_cat and (self.need_med and self.rank_override not in ["deputy", "leader", "warrior"]):
-            self.clan_info.medicine_cat = cat
-        else:
-            if not self.clan_info.starting_members:
-                self.clan_info.starting_members = [cat]
-            else:
-                self.clan_info.starting_members.append(cat)
+        self.clan_info.your_cat = self.selected_cat
+        self.create_clan_members()
+        self.change_screen(GameScreen.MAKE_CLAN_YOUR_NAME)
 
     def refresh_text_and_buttons(self):
         """Refreshes the button states and text boxes"""
-
-        # refresh random button
-        if self.clan_info.no_cats_chosen():
-            self.elements["random_cats"].show()
-        else:
-            self.elements["random_cats"].hide()
-
-        if self.selected_cat:
-            self.elements["random_cats"].hide()
 
         # refresh dice and remove error text
         if not self.selected_cat:
             self.elements["error_message"].hide()
             self.elements["roll_container"].show()
-            if get_config("clan_creation.rerolls") == 3:
+            if constants.CONFIG["clan_creation"]["rerolls"] == 3:
                 self.elements["reroll_count"].hide()
             else:
                 self.elements["roll1"].hide()
@@ -456,96 +430,15 @@ class ChooseCatsScreen(MakeClanScreenBase):
         else:
             self.elements["next_step"].disable()
 
-        if self.clan_info.has_high_ranks_filled():
-            self.rank_override = None
-            self.elements["rank_override_left"].hide()
-            self.elements["rank_override_right"].hide()
-        else:
-            self.elements["rank_override_left"].show()
-            self.elements["rank_override_right"].show()
-
         # disable further recruitment
         if self.clan_info.has_maximum_cats():
-            # set to normal recruit button
-            self.elements["select_cat"].kill()
-            self.elements["select_cat"] = UISurfaceImageButton(
-                ui_scale(pygame.Rect((353, 360), (95, 30))),
-                "screens.make_clan.recruit",
-                get_button_dict(ButtonStyles.SQUOVAL, (95, 30)),
-                object_id="@buttonstyles_squoval",
-                starting_height=2,
-                manager=MANAGER,
-            )
-            # then disable
             self.elements["select_cat"].disable()
 
         # hide select button
-        elif not self.selected_cat:
+        if not self.selected_cat:
             self.elements["select_cat"].hide()
-            self.elements["error_message"].hide()
-
-        # Show the error message if you try to choose a child for leader, deputy, or med cat.
-        elif self.selected_cat and not self._age_valid_for_role() and self.rank_override != "warrior":
-            self.elements["select_cat"].hide()
-            self.elements["error_message"].show()
-
-        # show selected cat and update the select button according to rank
         else:
             self.elements["select_cat"].show()
-            self.elements["error_message"].hide()
-
-            # Change button text for different ranks
-            # LEAD
-            if not self.clan_info.leader and (self.need_leader and self.rank_override not in ["deputy", "medicine_cat", "warrior"]):
-                self.elements["select_cat"].kill()
-                self.elements["select_cat"] = UIImageButton(
-                    ui_scale(pygame.Rect((234, 348), (332, 52))),
-                    i18n.t(
-                        "screens.make_clan.choose_leader",
-                        count=get_config(
-                            "death_related.max_leader_lives",
-                            creating_clan=True,
-                            card_list_override=self.clan_info.cruel_cards,
-                        ),
-                    ),
-                    object_id="#nine_lives_button",
-                    starting_height=2,
-                    manager=MANAGER,
-                    text_kwargs={"m_c": self.selected_cat},
-                )
-            # DEP
-            elif not self.clan_info.deputy and (self.need_deputy and self.rank_override not in ["leader", "medicine_cat", "warrior"]):
-                self.elements["select_cat"].kill()
-                self.elements["select_cat"] = UIImageButton(
-                    ui_scale(pygame.Rect((209, 348), (384, 52))),
-                    "screens.make_clan.choose_deputy",
-                    object_id="#support_leader_button",
-                    starting_height=2,
-                    manager=MANAGER,
-                )
-            # MED
-            elif not self.clan_info.medicine_cat and (self.need_med and self.rank_override not in ["deputy", "leader", "warrior"]):
-                self.elements["select_cat"].kill()
-                self.elements["select_cat"] = UIImageButton(
-                    ui_scale(pygame.Rect((260, 342), (306, 58))),
-                    i18n.t("screens.make_clan.choose_medcat")
-                    + "    ",  # it's necessary for centering...
-                    object_id="#aid_clan_button",
-                    starting_height=2,
-                    manager=MANAGER,
-                )
-            # NORMIES
-            else:
-                self.elements["select_cat"].kill()
-
-                self.elements["select_cat"] = UISurfaceImageButton(
-                    ui_scale(pygame.Rect((353, 360), (95, 30))),
-                    "screens.make_clan.recruit",
-                    get_button_dict(ButtonStyles.SQUOVAL, (95, 30)),
-                    object_id="@buttonstyles_squoval",
-                    starting_height=2,
-                    manager=MANAGER,
-                )
 
     def _age_valid_for_role(self) -> bool:
         """
@@ -662,36 +555,8 @@ class ChooseCatsScreen(MakeClanScreenBase):
             )
 
         # SET TEXT - this is the text displayed below the heads
-        if not self.clan_info.leader and self.need_leader:
-            self.elements["title"].set_text("screens.make_clan.leader_title")
-        elif not self.clan_info.deputy and self.need_deputy:
-            self.elements["title"].set_text("screens.make_clan.deputy_title")
-        elif not self.clan_info.medicine_cat and self.need_med:
-            self.elements["title"].set_text("screens.make_clan.medcat_title")
-        elif not self.clan_info.has_maximum_cats():
-            min_cats = max(
-                1,
-                self.get_config_during_creation("clan_creation.minimum_membership")
-                - len(self.clan_info.get_high_ranks()),
-            )
-            max_cats = max(
-                1,
-                self.get_config_during_creation("clan_creation.maximum_membership")
-                - len(self.clan_info.get_high_ranks()),
-            )
-            if min_cats == max_cats:
-                text = "screens.make_clan.recruit_title_single"
-                kwargs = {"count": min_cats}
-            else:
-                text = "screens.make_clan.recruit_title_range"
-                kwargs = {
-                    "min": min_cats,
-                    "max": max_cats,
-                }
-
-            self.elements["title"].set_text(text, text_kwargs=kwargs)
-        else:
-            self.elements["title"].set_text("screens.make_clan.done_title")
+        # LG edit
+        self.elements["title"].set_text("screens.make_clan.choose_your_cat_title")
 
         # TOGGLE HEAD VISIBLE - we hide them all to begin with, to give us a blank canvas
         for head in [
@@ -874,11 +739,6 @@ class ChooseCatsScreen(MakeClanScreenBase):
         self._refresh_selected_cat_info(selected)
 
         possible_cats = switch_get_value(Switch.possible_cats)
-        chosen_cats = [
-            self.clan_info.leader,
-            self.clan_info.deputy,
-            self.clan_info.medicine_cat,
-        ] + self.clan_info.starting_members
 
         # CAT IMAGES
         selected_cat_index: Optional[int] = None
@@ -894,21 +754,9 @@ class ChooseCatsScreen(MakeClanScreenBase):
                     manager=MANAGER,
                 )
 
-            if not self.elements.get("chosen1_container"):
-                self.elements["chosen1_container"] = UIContainer(
-                    ui_scale(pygame.Rect((650, 130), (50, 300))),
-                    manager=MANAGER,
-                )
-
             # locate selected cat
             if possible_cats[u] == selected:
                 selected_cat_index = u
-
-            # place chosen cat
-            elif possible_cats[u] in chosen_cats:
-                self._add_to_cat_column(
-                    possible_cats[u], u, self.elements["chosen1_container"], u
-                )
 
             # place possible cat
             else:
@@ -927,21 +775,9 @@ class ChooseCatsScreen(MakeClanScreenBase):
                     manager=MANAGER,
                 )
 
-            if not self.elements.get("chosen2_container"):
-                self.elements["chosen2_container"] = UIContainer(
-                    ui_scale(pygame.Rect((700, 130), (50, 300))),
-                    manager=MANAGER,
-                )
-
             # locate selected cat
             if possible_cats[u] == selected:
                 selected_cat_index = u
-
-            # place chosen cat
-            elif possible_cats[u] in chosen_cats:
-                self._add_to_cat_column(
-                    possible_cats[u], u, self.elements["chosen2_container"], u - 6
-                )
 
             # place possible cat
             else:
@@ -960,9 +796,6 @@ class ChooseCatsScreen(MakeClanScreenBase):
                     possible_cats[i].sprite, ui_scale_dimensions((150, 150))
                 ),
                 cat_object=possible_cats[i],
-                object_id="#offspring_predict_cat",
-                tool_tip_text=selected.create_genelist(),
-                manager=MANAGER,
             )
 
     def _refresh_selected_cat_info(self, selected: Optional[Cat] = None):
@@ -975,22 +808,8 @@ class ChooseCatsScreen(MakeClanScreenBase):
             self.elements["cat_info"].hide()
             self.elements["cat_name"].hide()
             return
-
-        # if we need a leader OR the clan cat only have one cat and the chosen cat could be a leader
-        if not self.clan_info.leader and (
-            self.need_leader
-            or (
-                self.get_config_during_creation("clan_creation.maximum_membership") == 1
-                and selected.age not in (CatAge.KITTEN, CatAge.ADOLESCENT)
-            )
-        ) and self.rank_override not in ["deputy", "medicine_cat", "warrior"]:
-            self.elements["cat_name"].set_text(
-                str(selected.name)
-                + " --> "
-                + selected.name.get_specsuffix_name(CatRank.LEADER)
-            )
-        else:
-            self.elements["cat_name"].set_text(str(selected.name))
+        # lg edited
+        self.elements["cat_name"].set_text(str(selected.name))
 
         self.elements["select_cat"].set_text(
             self.elements["select_cat"].text, text_kwargs={"m_c": selected}

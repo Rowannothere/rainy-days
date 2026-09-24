@@ -27,6 +27,8 @@
             "many": "%{cats} ghosts now wander."
         },
         "met_outsider": "The patrol met %{cats}.",
+        "met_first_encountered": "You have met %{cats}.",
+        "met_encountered": "You have spoken with %{cats}.",
         "new_outsider": "%{cats} joined the Clan.",
         "lost_cats": {
             "one": "%{cats} has been lost.",

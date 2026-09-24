@@ -34,6 +34,7 @@ from operator import xor
 class ChooseMateScreen(Screens):
     def __init__(self, name=None):
         super().__init__(name)
+        self.fav = {}
         self.list_frame_image = None
         self.next_cat = None
         self.previous_cat = None
@@ -492,6 +493,10 @@ class ChooseMateScreen(Screens):
             self.mates_cat_buttons[ele].kill()
         self.mates_cat_buttons = {}
 
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
+
         # Different layout for a single mate - they are just big in the center
         if len(self.all_mates) == 1 and len(self.all_mates[0]) == 1:
             # TODO disable both next and previous page buttons
@@ -549,6 +554,16 @@ class ChooseMateScreen(Screens):
         pos_y = 0
         i = 0
         for _mate in display_cats:
+            if get_clan_setting("show fav")  and _mate.favourite != 0:
+                self.fav[str(i)] = pygame_gui.elements.UIImage(
+                    ui_scale(pygame.Rect((pos_x, pos_y), (50, 50))),
+                    pygame.transform.scale(
+                        pygame.image.load(
+                            f"resources/images/fav_marker_{_mate.favourite}.png").convert_alpha(),
+                        (50, 50)),
+                        container=self.mates_container,
+                )
+                self.fav[str(i)].disable()
             self.mates_cat_buttons["cat" + str(i)] = UISpriteButton(
                 ui_scale(pygame.Rect((pos_x, pos_y), (50, 50))),
                 _mate.sprite,
@@ -793,6 +808,10 @@ class ChooseMateScreen(Screens):
         for ele in self.current_cat_elements:
             self.current_cat_elements[ele].kill()
         self.current_cat_elements = {}
+
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
 
         for ele in self.selected_cat_elements:
             self.selected_cat_elements[ele].kill()
@@ -1263,6 +1282,7 @@ class ChooseMateScreen(Screens):
             i
             for i in Cat.all_cats_list
             if not i.faded
+            and i.moons >= 12
             and self.the_cat.is_potential_mate(
                 i, for_love_interest=False, age_restriction=False, ignore_no_mates=True, outsider=self.show_all
             )

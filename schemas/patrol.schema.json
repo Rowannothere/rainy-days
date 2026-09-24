@@ -265,7 +265,7 @@
           "$ref": "#/$defs/CatEnum"
         },
         {
-          "pattern": "^n_c:[0-9]+$",
+          "pattern": "^(n_c:|r_c:|o_c)[0-9]+$",
           "type": "string"
         }
       ],
@@ -1320,7 +1320,21 @@
         "bossy",
         "-bossy",
         "noisy",
-        "-noisy"
+        "-noisy",
+        "smug",
+        "-smug",
+        "secretive",
+        "-secretive",
+        "manipulative",
+        "-manipulative",
+        "leader-like",
+        "-leader-like",
+        "passionate",
+        "-passionate",
+        "rebellious",
+        "-rebellious",
+        "honest",
+        "-honest"
       ],
       "title": "KitTrait",
       "type": "string"
@@ -1710,6 +1724,21 @@
           "title": "Required Cat Types",
           "type": "object"
         },
+        "random_cats": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "description": "LIFEGNE: Randomly mentioned cats.",
+          "title": "Random Cats",
+          "type": "object"
+        },
+        "relationships": {
+          "description": "LIFEGEN: Specified relationships between randomly mentioned cats.",
+          "items": {},
+          "title": "Relationships",
+          "type": "array"
+        },
         "frequency": {
           "default": 4,
           "description": "Controls how common a patrol is. 4 is the most common, 1 is the least.",
@@ -1814,7 +1843,10 @@
         "hunting",
         "herb_gathering",
         "border",
-        "training"
+        "training",
+        "lifegen",
+        "df",
+        "date"
       ],
       "title": "PatrolType",
       "type": "string"
@@ -2345,6 +2377,10 @@
         "-leader",
         "elder",
         "-elder",
+        "queen",
+        "queen's apprentice",
+        "-queen",
+        "-queen's apprentice",
         "any",
         "kittypet",
         "-kittypet",
@@ -2581,7 +2617,45 @@
         "-gloomy",
         "-sincere",
         "-flamboyant",
-        "-rebellious"
+        "-rebellious",
+        "mellow",
+        "flexible",
+        "stoic",
+        "witty",
+        "methodical",
+        "aloof",
+        "justified",
+        "reserved",
+        "meek",
+        "cowardly",
+        "emotional",
+        "spontaneous",
+        "energetic",
+        "bouncy",
+        "trusting",
+        "disciplined",
+        "patient",
+        "humble",
+        "obsessive",
+        "-mellow",
+        "-flexible",
+        "-stoic",
+        "-witty",
+        "-methodical",
+        "-aloof",
+        "-justified",
+        "-reserved",
+        "-meek",
+        "-cowardly",
+        "-emotional",
+        "-spontaneous",
+        "-energetic",
+        "-bouncy",
+        "-trusting",
+        "-disciplined",
+        "-patient",
+        "-humble",
+        "-obsessive"
       ],
       "title": "Trait",
       "type": "string"

@@ -25,6 +25,8 @@ from scripts.game_structure import localization, game
 from scripts.game_structure.game import switch_get_value, Switch
 from scripts.game_structure.localization import load_lang_resource, get_lang_config
 
+from scripts.screens.enums import GameScreen
+
 if TYPE_CHECKING:
     from scripts.cat.cats import Cat
 
@@ -52,6 +54,11 @@ def pronoun_repl(m, cat_pronouns_dict, raise_exception=False, clan=None):
         return m.group(0)
     if m.group(0) == "{surrogate}":
         return m.group(0)
+
+    # LG
+    if m.group(0) == "{cap_insert}":
+        return m.group(0)
+    # ---
 
     inner_details = m.group(1).split("/")
     out = None
@@ -360,6 +367,7 @@ def event_text_adjust(
     other_clan = None,
     chosen_herb: str = None,
     chosen_poi: str = None,
+    chosen_lifegen_cats: list = None,
 ):
     """
     handles finding abbreviations in the text and replacing them appropriately, returns the adjusted text
@@ -382,6 +390,10 @@ def event_text_adjust(
 
     if clan is None:
         clan = game.clan
+
+    # LG
+    if not chosen_lifegen_cats:
+        chosen_lifegen_cats = []
 
     if not text:
         text = "This should not appear, report as a bug please! Tried to adjust the text, but no text was provided."
@@ -499,6 +511,10 @@ def event_text_adjust(
                 clan_name = i18n.t("general.clan", name="Test")
 
         text = _replace_clan_name(text, "c_n", clan_name)
+
+    # war enemy Clan
+    if "w_c" in text and game.clan and game.clan.war.get("enemy"):
+        text = text.replace("w_c", str(game.clan.war["enemy"]))
 
     # prey lists
     text = adjust_prey_abbr(text)

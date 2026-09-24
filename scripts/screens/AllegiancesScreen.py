@@ -280,6 +280,10 @@ class AllegiancesScreen(Screens):
                 )
             )
             self.names_boxes[-1].disable()
+            allegiances_height += 1
+        
+        self.scroll_container.set_scrollable_area_dimensions((715, 470 + allegiances_height*20))
+
 
     @staticmethod
     def generate_one_entry(cat, extra_details=""):
@@ -311,6 +315,7 @@ class AllegiancesScreen(Screens):
         living_queens = []
         living_warriors = []
         living_apprentices = []
+        living_queens = []
         living_kits = []
         living_elders = []
         for cat in living_cats:
@@ -485,7 +490,10 @@ class AllegiancesScreen(Screens):
                     )
                 all_entries.append(self.generate_one_entry(queen, kittens))
 
-            # Now kittens without carers
+            for k in living_queens:
+                if k.ID not in queen_dict.keys():
+                    all_entries.append(self.generate_one_entry(k))
+            #Now kittens without carers
             for k in living_kits:
                 all_entries.append([str(k.name).upper(), k.ID, event_text_adjust(
                         Cat,

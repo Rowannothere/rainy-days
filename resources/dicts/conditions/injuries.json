@@ -44,8 +44,7 @@
             ]
         }
     },
-
-    "bite-wound":{
+    "bite-wound": {
         "duration": 3,
         "severity": "major",
         "medicine_duration": 2,
@@ -58,8 +57,7 @@
             "senior adult": 60,
             "senior": 15
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
@@ -103,8 +101,7 @@
             "senior adult": 60,
             "senior": 15
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
@@ -134,8 +131,7 @@
             ]
         }
     },
-
-    "beak bite":{
+    "beak bite": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 1,
@@ -148,8 +144,7 @@
             "senior adult": 60,
             "senior": 15
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
@@ -179,8 +174,7 @@
             ]
         }
     },
-
-    "snake bite":{
+    "snake bite": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 1,
@@ -193,8 +187,7 @@
             "senior adult": 60,
             "senior": 15
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
@@ -224,8 +217,7 @@
             ]
         }
     },
-
-    "rat bite":{
+    "rat bite": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 1,
@@ -278,8 +270,7 @@
             ]
         }
     },
-
-    "tick bites":{
+    "tick bites": {
         "duration": 2,
         "severity": "minor",
         "medicine_duration": 1,
@@ -315,8 +306,7 @@
             ]
         }
     },
-
-    "blood loss":{
+    "blood loss": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -330,8 +320,7 @@
             "senior": 15
         },
         "illness_infectiousness": [],
-        "risks": [
-        ],
+        "risks": [],
         "also_got": [
             "shock"
         ],
@@ -354,8 +343,7 @@
             ]
         }
     },
-
-    "broken jaw":{
+    "broken jaw": {
         "duration": 4,
         "severity": "severe",
         "medicine_duration": 3,
@@ -402,8 +390,7 @@
             ]
         }
     },
-
-    "broken bone":{
+    "broken bone": {
         "duration": 5,
         "severity": "severe",
         "medicine_duration": 3,
@@ -452,8 +439,7 @@
             ]
         }
     },
-
-    "mangled leg":{
+    "mangled leg": {
         "duration": 3,
         "severity": "severe",
         "medicine_duration": 3,
@@ -505,8 +491,7 @@
             ]
         }
     },
-
-    "dislocated joint":{
+    "dislocated joint": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 1,
@@ -543,8 +528,7 @@
             ]
         }
     },
-
-    "joint pain":{
+    "joint pain": {
         "duration": 2,
         "severity": "minor",
         "medicine_duration": 2,
@@ -577,8 +561,7 @@
             ]
         }
     },
-
-    "sprain":{
+    "sprain": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 2,
@@ -608,8 +591,7 @@
             ]
         }
     },
-
-    "mangled tail":{
+    "mangled tail": {
         "duration": 3,
         "severity": "severe",
         "medicine_duration": 3,
@@ -655,8 +637,7 @@
             ]
         }
     },
-
-    "bruises":{
+    "bruises": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -680,8 +661,7 @@
             "3": []
         }
     },
-
-    "cracked pads":{
+    "cracked pads": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -717,8 +697,7 @@
             ]
         }
     },
-
-    "sore":{
+    "sore": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -751,8 +730,7 @@
             ]
         }
     },
-
-    "phantom pain":{
+    "phantom pain": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 1,
@@ -782,8 +760,7 @@
             ]
         }
     },
-
-    "scrapes":{
+    "scrapes": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -818,8 +795,7 @@
             ]
         }
     },
-
-    "small cut":{
+    "small cut": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -854,8 +830,7 @@
             ]
         }
     },
-
-    "torn pelt":{
+    "torn pelt": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -894,8 +869,7 @@
             ]
         }
     },
-
-    "torn ear":{
+    "torn ear": {
         "duration": 1,
         "severity": "minor",
         "medicine_duration": 1,
@@ -934,8 +908,7 @@
             ]
         }
     },
-
-    "frostbite":{
+    "frostbite": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 2,
@@ -980,8 +953,7 @@
             ]
         }
     },
-
-    "recovering from birth":{
+    "recovering from birth": {
         "duration": 3,
         "severity": "major",
         "medicine_duration": 5,
@@ -1020,8 +992,7 @@
             "3": []
         }
     },
-
-    "water in their lungs":{
+    "water in their lungs": {
         "duration": 3,
         "severity": "major",
         "medicine_duration": 2,
@@ -1073,8 +1044,7 @@
             ]
         }
     },
-
-    "burn":{
+    "burn": {
         "duration": 2,
         "severity": "major",
         "medicine_duration": 2,
@@ -1115,8 +1085,7 @@
             ]
         }
     },
-
-    "severe burn":{
+    "severe burn": {
         "duration": 4,
         "severity": "severe",
         "medicine_duration": 3,
@@ -1159,8 +1128,7 @@
             ]
         }
     },
-
-    "shock":{
+    "shock": {
         "duration": 1,
         "severity": "major",
         "medicine_duration": 1,
@@ -1195,8 +1163,7 @@
             ]
         }
     },
-
-    "lingering shock":{
+    "lingering shock": {
         "duration": 12,
         "severity": "major",
         "medicine_duration": 8,
@@ -1210,8 +1177,7 @@
             "senior": 0
         },
         "illness_infectiousness": [],
-        "risks": [
-        ],
+        "risks": [],
         "also_got": [],
         "cause_permanent": [
             "recurring shock",
@@ -1230,8 +1196,7 @@
             ]
         }
     },
-
-    "shivering":{
+    "shivering": {
         "duration": 2,
         "severity": "minor",
         "medicine_duration": 1,
@@ -1278,8 +1243,7 @@
             ]
         }
     },
-
-    "dehydrated":{
+    "dehydrated": {
         "duration": 1,
         "severity": "major",
         "medicine_duration": 1,
@@ -1292,8 +1256,7 @@
             "senior adult": 50,
             "senior": 20
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "heat exhaustion",
@@ -1320,8 +1283,7 @@
             ]
         }
     },
-
-    "head damage":{
+    "head damage": {
         "duration": 5,
         "severity": "major",
         "medicine_duration": 2,
@@ -1334,8 +1296,7 @@
             "senior adult": 40,
             "senior": 20
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "headache",
@@ -1346,8 +1307,7 @@
                 "chance": 20
             }
         ],
-        "also_got": [
-        ],
+        "also_got": [],
         "cause_permanent": [
             "failing eyesight",
             "one bad eye",
@@ -1370,8 +1330,7 @@
             ]
         }
     },
-
-    "damaged eyes":{
+    "damaged eyes": {
         "duration": 6,
         "severity": "major",
         "medicine_duration": 4,
@@ -1384,16 +1343,14 @@
             "senior adult": 70,
             "senior": 50
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
                 "chance": 4
             }
         ],
-        "also_got": [
-        ],
+        "also_got": [],
         "cause_permanent": [
             "blind",
             "one bad eye",
@@ -1417,8 +1374,7 @@
             ]
         }
     },
-
-    "quilled by a porcupine":{
+    "quilled by a porcupine": {
         "duration": 2,
         "severity": "minor",
         "medicine_duration": 1,
@@ -1431,8 +1387,7 @@
             "senior adult": 50,
             "senior": 30
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
@@ -1463,8 +1418,7 @@
             ]
         }
     },
-
-    "broken back":{
+    "broken back": {
         "duration": 8,
         "severity": "severe",
         "medicine_duration": 6,
@@ -1477,16 +1431,14 @@
             "senior adult": 25,
             "senior": 10
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "an infected wound",
                 "chance": 10
             }
         ],
-        "also_got": [
-        ],
+        "also_got": [],
         "cause_permanent": [
             "paralyzed", "bad back"
         ],
@@ -1505,7 +1457,6 @@
             ]
         }
     },
-    
     "poisoned": {
         "duration": 2,
         "severity": "major",
@@ -1519,8 +1470,7 @@
             "senior adult": 20,
             "senior": 15
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
         "risks": [
             {
                 "name": "redcough",
@@ -1543,7 +1493,6 @@
             "3": []
         }
     },
-
     "bee sting": {
         "duration": 2,
         "severity": "minor",
@@ -1577,7 +1526,6 @@
             ]
         }
     },
-
     "headache": {
         "duration": 1,
         "severity": "minor",
@@ -1611,7 +1559,6 @@
             ]
         }
     },
-
     "severe headache": {
         "duration": 1,
         "severity": "major",
@@ -1739,9 +1686,35 @@
             "senior adult": 30,
             "senior": 20
         },
-        "illness_infectiousness": [
-        ],
+        "illness_infectiousness": [],
+        "risks": [],
+        "also_got": [],
+        "cause_permanent": [],
+        "herbs": {
+            "1": [],
+            "2": [],
+            "3": []
+        }
+    },
+    "guilt": {
+        "duration": 6,
+        "severity": "minor",
+        "medicine_duration": 1,
+        "mortality": {
+            "newborn": 0,
+            "kitten": 0,
+            "adolescent": 0,
+            "young adult": 0,
+            "adult": 0,
+            "senior adult": 0,
+            "senior": 0
+        },
+        "illness_infectiousness": [],
         "risks": [
+            {
+                "name": "shock",
+                "chance": 25
+            }
         ],
         "also_got": [
         ],

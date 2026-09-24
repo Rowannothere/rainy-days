@@ -1,3 +1,4 @@
+import i18n
 import pygame
 import pygame_gui
 
@@ -20,7 +21,7 @@ class CatToggleWindow(GameWindow):
 
     def __init__(self, cat):
         super().__init__(
-            ui_scale(pygame.Rect((300, 215), (400, 185))),
+            ui_scale(pygame.Rect((300, 200), (400, 240))),
         )
         self.the_cat = cat
 
@@ -38,6 +39,33 @@ class CatToggleWindow(GameWindow):
                 anchors={"top_target": prev_element} if prev_element else None,
             )
             prev_element = self.textbox[text]
+
+        self.text_5 = pygame_gui.elements.UITextBox(
+            "windows.no_faith",
+            ui_scale(pygame.Rect(55, 125, -1, 32)),
+            object_id="#text_box_30_horizleft_pad_0_8",
+            container=self,
+        )
+
+        self.faith_lock_button = UISurfaceImageButton(
+            ui_scale(pygame.Rect((22, 160), (356, 30))),
+            "windows.faith_lock",
+            get_button_dict(ButtonStyles.SQUOVAL, (356, 30)),
+            object_id="@buttonstyles_squoval",
+            text_kwargs=self.faith_lock_kwargs(),
+            tool_tip_text="windows.faith_lock_tooltip",
+            manager=MANAGER,
+            container=self,
+        )
+
+    def faith_lock_kwargs(self):
+        lock_key = self.the_cat.lock_faith.replace(" ", "_")
+        return {"lock": i18n.t(f"windows.faith_lock_{lock_key}")}
+
+    def refresh_faith_lock_button(self):
+        self.faith_lock_button.set_text(
+            "windows.faith_lock", text_kwargs=self.faith_lock_kwargs()
+        )
 
     def refresh_checkboxes(self):
         for ele in self.checkboxes:

@@ -45,7 +45,7 @@
             "Is sharing tongues with r_c",
             "Has been spending time with r_c lately",
             "Is acting huffy at r_c",
-            "Is sharing fresh-kill with r_c",
+            "Is sharing freshkill with r_c",
             "Is curious about r_c",
             "Is talking with r_c",
             "Doesn't want to talk to r_c",
@@ -54,7 +54,9 @@
             "Is thinking about future prophecies with r_c",
             "Is watching over the Clan with r_c",
             "Is listening to long-forgotten stories about the Clan",
-            "Is gossiping with r_c"
+            "Is gossiping with r_c",
+            "Is envisioning with r_c on their lives if they took a different path",
+            "Is galloping beside r_c, racing through starry fields"
         ],
         "involved_cats": {
             "r_c": {
@@ -69,6 +71,8 @@
         "strings": [
             "Is speaking with r_c about how c_n came to be",
             "Is telling other StarClan cats stories of c_n's beginning",
+            "Feeling reminiscent of the past, spent the day giving r_c a tale about {PRONOUN/m_c/poss} life before c_n",
+            "Is listening to r_c the chronicle the events that led to c_n's current era",
             "Is telling other StarClan cats about the ambitions, hopes, and dreams {PRONOUN/m_c/subject} had for c_n"
         ],
         "involved_cats": {
@@ -92,7 +96,9 @@
         "event_id": "founder_dead_to_dead_other_founder",
         "strings": [
             "Is reminiscing with r_c about how c_n came to be",
-            "Is speaking with r_c about how the Clan they founded has changed"
+            "Is speaking with r_c about how the Clan they founded has changed",
+            "Ponders a thought with r_c -- was {PRONOUN/m_c/poss} Warrior Code, at the time, for the best?",
+            "Was feeling reminiscent, and joined r_c by thinking about their old Clan"
         ],
         "involved_cats": {
             "m_c": {
@@ -264,7 +270,8 @@
         "event_id": "dead_med_cat_to_dead_other",
         "strings": [
             "Shares {PRONOUN/m_c/poss} knowledge with r_c",
-            "Is discussing Clan matters with r_c"
+            "Is discussing Clan matters with r_c",
+            "Is debating with r_c about {PRONOUN/m_c/poss} visions for a certain cat"
         ],
         "involved_cats": {
             "m_c": {
@@ -284,7 +291,8 @@
         "event_id": "dead_med_cat_to_dead_newborn",
         "strings": [
             "Softly describes the stars to r_c",
-            "Hums calming melodies to soothe r_c"
+            "Hums calming melodies to soothe r_c",
+            "Is trying to find solace to see r_c in StarClan despite being so young"
         ],
         "involved_cats": {
             "m_c": {
@@ -383,6 +391,9 @@
             "Wants to let r_c know {PRONOUN/m_c/subject} {VERB/m_c/are/is} okay",
             "Wishes {PRONOUN/m_c/subject} could play with r_c",
             "Is watching r_c play",
+            "Can't wait to see who r_c would become!",
+            "Imagines if {PRONOUN/m_c/subject} and r_c would've shared the same warrior name",
+            "Squeaking gleefully that {PRONOUN/m_c/subject} {VERB/m_c/can/could} still tussle with r_c in {PRONOUN/r_c/poss} dreams",
             "Is watching over r_c, reminiscing over the short time they had together"
         ],
         "involved_cats": {
@@ -519,7 +530,9 @@
         "event_id": "dead_app_to_alive_app_sibling",
         "strings": [
             "Can't wait to find out r_c's new name",
-            "Wishes {PRONOUN/m_c/subject} could train with r_c"
+            "Wishes {PRONOUN/m_c/subject} could train with r_c",
+            "Cheering on to r_c to continue {PRONOUN/r_c/poss} training for the both of them",
+            "Although a bit envious, {PRONOUN/m_c/subject} {VERB/m_c/is/are} proud of r_c"
         ],
         "involved_cats": {
             "m_c": {
@@ -594,7 +607,8 @@
         "strings": [
             "Hopes {PRONOUN/m_c/subject} {VERB/m_c/have/has} been a good mentor to r_c",
             "Wishes {PRONOUN/m_c/subject} could have finished training r_c",
-            "Hopes r_c is training well under {PRONOUN/r_c/poss} new mentor"
+            "Hopes r_c is training well under {PRONOUN/r_c/poss} new mentor",
+            "Is overjoyed r_c continues to use {PRONOUN/m_c/poss} training, even under a new mentor"
         ],
         "involved_cats": {
             "r_c": {

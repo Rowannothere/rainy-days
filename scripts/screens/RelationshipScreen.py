@@ -377,6 +377,15 @@ class RelationshipScreen(Screens):
                 if search_text.lower() in str(cat.cat_to.name).lower():
                     search_cats.append(cat)
             self.filtered_cats = search_cats
+        
+        seen = set()
+        uniq = []
+        for x in self.filtered_cats:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        if len(seen) != len(uniq):
+            print("duplicates: " + seen)
 
         # FILTER TOGGLES
         if not get_clan_setting("show_dead_relation"):

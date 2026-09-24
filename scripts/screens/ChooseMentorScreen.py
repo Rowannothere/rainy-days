@@ -20,6 +20,7 @@ from ..game_structure.screen_settings import MANAGER
 from ..ui.generate_box import get_box, BoxStyles
 from ..ui.generate_button import get_button_dict, ButtonStyles
 from ..ui.icon import Icon
+from scripts.clan_package.settings import get_clan_setting
 
 
 class ChooseMentorScreen(Screens):
@@ -31,6 +32,7 @@ class ChooseMentorScreen(Screens):
 
     def __init__(self, name=None):
         super().__init__(name)
+        self.fav = {}
         self.list_frame = None
         self.list_page = None
         self.next_cat = None
@@ -335,6 +337,10 @@ class ChooseMentorScreen(Screens):
             self.cat_list_buttons[ele].kill()
         self.cat_list_buttons = {}
 
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
+
         for ele in self.apprentice_details:
             self.apprentice_details[ele].kill()
         self.apprentice_details = {}
@@ -569,10 +575,23 @@ class ChooseMentorScreen(Screens):
             self.cat_list_buttons[ele].kill()
         self.cat_list_buttons = {}
 
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
+
         pos_x = 0
         pos_y = 20
         i = 0
         for cat in display_cats:
+            if get_clan_setting("show fav") and cat.favourite != 0:
+                self.fav[str(i)] = pygame_gui.elements.UIImage(
+                    ui_scale(pygame.Rect((100 + pos_x, 365 + pos_y), (50, 50))),
+                    pygame.transform.scale(
+                        pygame.image.load(
+                            f"resources/images/fav_marker_{cat.favourite}.png").convert_alpha(),
+                        (50, 50))
+                )
+                self.fav[str(i)].disable()
             self.cat_list_buttons["cat" + str(i)] = UISpriteButton(
                 ui_scale(pygame.Rect((100 + pos_x, 365 + pos_y), (50, 50))),
                 cat.sprite,
@@ -615,6 +634,7 @@ class ChooseMentorScreen(Screens):
             for cat in Cat.all_cats_list
             if cat.status.group_ID == self.the_cat.status.group_ID
             and cat.status.rank.is_any_adult_warrior_like_rank()
+            and cat.moons > 0
         ]
         valid_warrior_mentors = []
         potential_medcat_mentors = [
@@ -622,6 +642,7 @@ class ChooseMentorScreen(Screens):
             for cat in Cat.all_cats_list
             if cat.status.group_ID == self.the_cat.status.group_ID
             and cat.status.rank == CatRank.MEDICINE_CAT
+            and cat.moons > 0
         ]
         valid_medcat_mentors = []
         potential_mediator_mentors = [
@@ -696,7 +717,7 @@ class ChooseMentorScreen(Screens):
 
             return potential_mediator_mentors
 
-        elif self.the_cat.status.rank == CatRank.QUEEN_APPRENTICE:
+        elif self.the_cat.status.rank == CatRank.QUEENS_APPRENTICE:
             for cat in potential_queen_mentors:
                 # Assume cat is valid initially
                 is_valid = True

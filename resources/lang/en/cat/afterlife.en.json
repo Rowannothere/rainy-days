@@ -59,6 +59,13 @@
         "dark_forest_kit_1": "m_c reached a shadowed hollow, still and quiet. {PRONOUN/m_c/subject/CAP} hadn't seen any cat, and didn't know how {PRONOUN/m_c/subject} got so far from camp.",
         "dark_forest_kit_2": "The wind rustled through the trees, shadowed tangled on the ground, and m_c stepped into an afterlife peaceful, still, and quiet.",
         "dark_forest_kit_3": "The new world was damp and dark, but not unwelcoming to m_c.",
-        "dark_forest_kit_4": "m_c wandered the Dark Forest, a little confused, but mostly curious."
+        "dark_forest_kit_4": "m_c wandered the Dark Forest, a little confused, but mostly curious.",
+
+        "dark_forest_misplaced_0": "m_c had done nothing to deserve the shadows, yet they closed around {PRONOUN/m_c/object} dark and enveloping. Somewhere, a terrible mistake had been made.",
+        "dark_forest_misplaced_1": "The gnarled trees loomed close and the cold seeped into m_c's fur. {PRONOUN/m_c/subject/CAP} waited for the stars to correct their error, but the darkness only deepened.",
+        "dark_forest_misplaced_2": "There was a kindness in m_c that the deep woods had no place for, and yet here {PRONOUN/m_c/subject} woke, wronged by an afterlife that had misjudged {PRONOUN/m_c/object}.",
+        "dark_forest_misplaced_3": "m_c did not belong here -- every honest bone in {PRONOUN/m_c/poss} body knew it -- but no one came to lead {PRONOUN/m_c/object} back to the light.",
+        "dark_forest_misplaced_4": "Confused and afraid, m_c wandered in the sludge, a good soul lost to a fate meant for someone far crueler.",
+        "dark_forest_misplaced_5": "The Dark Forest had taken one it should never have touched, and m_c's spirit flickered there like a star fallen where no star should fall."
     }
 }

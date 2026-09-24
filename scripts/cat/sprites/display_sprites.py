@@ -35,6 +35,7 @@ def generate_sprite(
     disable_sick_sprite=False,
     hide_white=False,
     season_override=None,
+    only_accessory=False,
 ) -> pygame.Surface:
     """
     Generates the sprite for a cat, with optional arguments that will override certain things.
@@ -1632,9 +1633,24 @@ def generate_sprite(
 
         # draw accessories
         from scripts.cat.pelts import Pelt
+        if only_accessory:
+            proceed = (
+                not acc_hidden
+            )
+        else:
+            proceed = (
+                not acc_hidden and cat.pelt.inventory
+            )
 
-        if not acc_hidden and cat.pelt.accessory:
-            cat_accessories = cat.pelt.accessory
+        if proceed:
+            if only_accessory:
+                new_sprite = pygame.Surface(
+                    (sprites.size, sprites.size), pygame.HWSURFACE | pygame.SRCALPHA
+                )
+                cat_accessories = [accessory_to_render]
+            else:
+                cat_accessories = cat.pelt.accessory
+
             categories = [
                 "collar_accessories",
                 "tail_accessories",
@@ -1675,7 +1691,24 @@ def generate_sprite(
                                 ),
                                 (0, 0),
                             )
-
+                        else:
+                            if game_setting_get("lifegen_sprite_changes"):
+                                # LIFEGEN
+                                for acc_list in Pelt.acc_list_of_lists:
+                                    if accessory in acc_list:
+                                        sprite_name = (
+                                            f"{Pelt.acc_data_list[Pelt.acc_list_of_lists.index(acc_list)]['spritesheet']}{accessory}{cat_sprite}"
+                                            )
+                                        new_sprite.blit(
+                                            _recolor_lineart(
+                                                sprites.sprites[sprite_name],
+                                                lineart_color,
+                                                gradient_surface,
+                                            ),
+                                            (0, 0),
+                                        )
+        if only_accessory:
+            return new_sprite
         # Apply fading fog
         if (
             cat.pelt.opacity <= 97
@@ -1702,7 +1735,11 @@ def generate_sprite(
                 temp.blit(new_sprite, (0, 0))
                 new_sprite = temp
             elif cat.status.group == CatGroup.UNKNOWN_RESIDENCE:
-                temp = sprites.sprites["fadeur" + stage + cat_sprite].copy()
+                if game_setting_get("lifegen_sprite_changes"):
+                    temp = sprites.sprites["fadestarclan" + stage + cat_sprite].copy()
+                else:
+                    temp = sprites.sprites["fadeur" + stage + cat_sprite].copy()
+
                 temp.blit(new_sprite, (0, 0))
                 new_sprite = temp
             else:
@@ -1728,20 +1765,30 @@ def generate_sprite(
                     (0, 0),
                 )
             elif cat.status.group == CatGroup.UNKNOWN_RESIDENCE:
-                # underlay
-                temp_sprite.blit(
-                    sprites.sprites["line_ur_underlay" + cat_sprite],
-                    (0, 0),
-                )
+                if not game_setting_get("lifegen_sprite_changes"):
+                    # underlay
+                    temp_sprite.blit(
+                        sprites.sprites["line_ur_underlay" + cat_sprite],
+                        (0, 0),
+                    )
 
-                # cat sprite
-                temp_sprite.blit(new_sprite, (0, 0))
+                    # cat sprite
+                    temp_sprite.blit(new_sprite, (0, 0))
 
-                # overlay
-                temp_sprite.blit(
-                    sprites.sprites["line_ur_overlay" + cat_sprite],
-                    (0, 0),
-                )
+                    # overlay
+                    temp_sprite.blit(
+                        sprites.sprites["line_ur_overlay" + cat_sprite],
+                        (0, 0),
+                    )
+                else:
+                    # LG
+                    # no underlay
+
+                    # cat sprite
+                    temp_sprite.blit(new_sprite, (0, 0))
+
+                    # no overlay
+
             elif cat.status.group == CatGroup.DARK_FOREST:
                 # no underlay
 

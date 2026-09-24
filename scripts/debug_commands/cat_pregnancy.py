@@ -94,11 +94,11 @@ class EditPregnancyCommand(Command):
             add_output_line_to_log("Invalid name/id.")
             return
         moons_amt = args[1] if len(args) > 1 else None
-        if not moons_amt or moons_amt in ("same" or "" or "s"):
+        if not moons_amt or moons_amt in ("same", "", "s"):
             moons_amt = game.clan.pregnancy_data[current_cat.ID]["moons"]
 
         kits_amt = args[2] if len(args) > 2 else None
-        if not kits_amt or kits_amt in ("same" or "" or "s"):
+        if not kits_amt or kits_amt in ("same", "", "s"):
             kits_amt = game.clan.pregnancy_data[current_cat.ID]["amount"]
 
         severity = args[3] if len(args) > 3 else None
@@ -106,7 +106,7 @@ class EditPregnancyCommand(Command):
             severity = current_cat.injuries["pregnant"]["severity"]
 
         second_parent = args[4] if len(args) > 4 else None
-        if not second_parent or second_parent in ("same" or "" or "s"):
+        if not second_parent or second_parent in ("same", "", "s"):
             second_parent = game.clan.pregnancy_data[current_cat.ID]["second_parent"]
 
         second_parent_cat = (

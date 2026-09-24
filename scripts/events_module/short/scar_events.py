@@ -216,15 +216,7 @@ class Scar_Events:
                     acc
                     for acc in cat.pelt.accessory
                     if acc
-                    not in (
-                        "RED FEATHERS",
-                        "BLUE FEATHERS",
-                        "JAY FEATHERS",
-                        "GULL FEATHERS",
-                        "SPARROW FEATHERS",
-                        "CLOVER",
-                        "DAISY",
-                    )
+                    not in cat.pelt.tail_accessories
                 )
 
             # combining left/right variations into the both version

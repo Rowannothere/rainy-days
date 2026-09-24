@@ -28,10 +28,10 @@ EVENTS_PER_PAGE = 10
 BIOME_TYPES = ["Forest", "Plains", "Mountainous", "Beach", "Wetlands", "Desert"]
 
 CAMPS: dict = {
-    "Forest": ["Classic", "Gully", "Grotto", "Lakeside"],
-    "Mountainous": ["Cliff", "Cavern", "Crystal River", "Ruins"],
-    "Plains": ["Grasslands", "Tunnels", "Wastelands", "Bridge"],
-    "Beach": ["Tidepools", "Tidal Cave", "Shipwreck", "Fjord"],
+    "Forest": ["Classic", "Gully", "Grotto", "Lakeside", "Pine", "Birch"],
+    "Mountainous": ["Cliff", "Cavern", "Crystal River", "Rocky Slope", "Quarry", "Ruins"],
+    "Plains": ["Grasslands", "Tunnels", "Wastelands", "Taiga", "Desert", "City", "Farm", "Bushland", "Castle", "Bridge"],
+    "Beach": ["Tidepools", "Tidal Cave", "Shipwreck", "Fjord", "Tropical_Island", "Quay"],
 }
 
 SEASONS = ["Newleaf", "Greenleaf", "Leaf-fall", "Leaf-bare"]
@@ -196,6 +196,9 @@ with open("resources/display_settings.toml", "r", encoding="utf-8") as read_file
 
 with open("resources/placements.json", "r", encoding="utf-8") as read_file:
     LAYOUTS = ujson.loads(read_file.read())
+
+with open("resources/game_config.toml", "r", encoding="utf-8") as read_file:
+    CONFIG = tomllib.loads(read_file.read())
 
 CUSTOM_CURSOR = Cursor((9, 0), image.load("resources/images/cursor.png"))
 DEFAULT_CURSOR = Cursor(SYSTEM_CURSOR_ARROW)

@@ -44,3 +44,18 @@ class GameScreen(StrEnum):
     CHOOSE_MENTOR = "choose_mentor_screen"
     CHOOSE_ADOPTIVE_PARENT = "choose_adoptive_parent_screen"
     OFFSPRING_PREDICT = "offspring_predict_screen"
+
+    # LG
+    MURDER = "murder_screen"
+    AFFAIR = "affair_screen"
+    GIFT = "gift_screen"
+    TALK = "talk_screen"
+    MOONPLACE = "moonplace_screen"
+    NAME_KITS = "name_kits_screen"
+    CHOOSE_REBORN = "choose_reborn_screen"
+    CHOOSE_DEPUTY = "choose_deputy_screen"
+    ACHIEVEMENTS = "achievements_screen"
+    ELDER_STORY = "elder_story_screen"
+    QUEEN = "queen_screen"
+    MAKE_CLAN_YOUR_NAME = "choose_your_name_screen"
+    MAKE_CLAN_CUSTOM_CAT = "customize_cat_screen"

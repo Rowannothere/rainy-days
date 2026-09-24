@@ -24,9 +24,11 @@ from .enums import GameScreen
 from ..clan_package.settings import get_clan_setting
 from ..clan_package.settings.clan_settings import switch_clan_setting
 from ..game_structure.game.switches import switch_set_value, Switch
-from ..cat.enums import CatRank
+from ..cat.enums import CatRank, CatAge, CatGroup
 from ..ui.elements.save_button import UISaveButton
 from ..ui.generate_button import ButtonStyles, get_button_dict
+
+from scripts.lifegen_utility import assign_new_bg, get_current_camp
 
 
 class ClanScreen(Screens):
@@ -132,6 +134,7 @@ class ClanScreen(Screens):
                         blend_layer, self.layout["cat_shading"]["blur"]
                     )
                 except ValueError:
+                    print("LG PRINT: ValueError:", x.placement, "is out of bounds.")
                     x_diff = ui_scale_value(
                         50 + (x.placement[0] if x.placement[0] < 0 else 0)
                     )
@@ -294,13 +297,12 @@ class ClanScreen(Screens):
     def update_camp_bg(self):
         light_dark = "dark" if xor(game_setting_get("dark mode"), game_setting_get("flip camp mode")) else "light"
 
-        camp_bg_base_dir = "resources/images/camp_bg/"
         leaves = ["newleaf", "greenleaf", "leafbare", "leaffall"]
-        camp_nr = game.selected_clan.camp_bg
+        camp_bg_base_dir, camp_nr = get_current_camp(game.selected_clan)
 
-        if camp_nr is None:
+        if not camp_nr:
             camp_nr = "camp1"
-            game.clan.camp_bg = camp_nr
+            assign_new_bg("camp1")
 
         available_biome = ["Forest", "Mountainous", "Plains", "Beach"]
         biome = game.selected_clan.biome
@@ -426,6 +428,7 @@ class ClanScreen(Screens):
             if Cat.all_cats[x].status.rank in (
                 CatRank.APPRENTICE,
                 CatRank.MEDIATOR_APPRENTICE,
+                CatRank.QUEENS_APPRENTICE
             ):
                 [
                     Cat.all_cats[x].placement,
@@ -448,7 +451,7 @@ class ClanScreen(Screens):
                 ] = self.choose_nonoverlapping_positions(
                     first_choices, all_dens, [1, 1, 2000, 1, 1, 1, 1]
                 )
-            elif Cat.all_cats[x].status.rank in [CatRank.KITTEN, CatRank.QUEEN, CatRank.QUEEN_APPRENTICE]:
+            elif Cat.all_cats[x].status.rank in [CatRank.KITTEN, CatRank.QUEEN, CatRank.QUEENS_APPRENTICE]:
                 [
                     Cat.all_cats[x].placement,
                     base_pos,
@@ -462,7 +465,7 @@ class ClanScreen(Screens):
                 ] = self.choose_nonoverlapping_positions(
                     first_choices, all_dens, [20, 20, 20, 400, 1, 1, 1]
                 )
-            elif Cat.all_cats[x].status.rank in (CatRank.WARRIOR, CatRank.MEDIATOR):
+            elif Cat.all_cats[x].status.rank in (CatRank.WARRIOR, CatRank.MEDIATOR, CatRank.QUEEN):
                 [
                     Cat.all_cats[x].placement,
                     base_pos,
@@ -476,6 +479,16 @@ class ClanScreen(Screens):
                 ] = self.choose_nonoverlapping_positions(
                     first_choices, all_dens, [1, 200, 1, 1, 1, 1, 1]
                 )
+            # LG
+            # placing outsiders if youre outside
+            else:
+                [
+                    Cat.all_cats[x].placement,
+                    base_pos,
+                ] = self.choose_nonoverlapping_positions(
+                    first_choices, all_dens, [1, 100, 1, 1, 1, 100, 50]
+                )
+            # ---
             if not Cat.all_cats[x].placement:
                 # if a cat wasn't placed, it's because no spots remain
                 break

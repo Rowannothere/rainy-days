@@ -24,7 +24,7 @@ from scripts.events_module.short.short_event_generation import (
 from scripts.game_structure import game
 from scripts.game_structure.game.save_load import read_clans
 from scripts.housekeeping.datadir import get_save_dir
-
+from scripts.cat_relations.inheritance import Inheritance
 
 class TestEvents(unittest.TestCase):
     @classmethod
@@ -50,6 +50,7 @@ class TestEvents(unittest.TestCase):
             biome="Forest",
             camp_bg="camp1",
             symbol="symbolADDER0",
+            your_cat=create_cat(CatRank.KITTEN),
             game_mode="expanded",
             starting_members=[
                 cat_factory.create_cat(rank=rank)
@@ -68,6 +69,9 @@ class TestEvents(unittest.TestCase):
             ],
             starting_season="Newleaf",
         )
+        # dpmo
+        game.clan.your_cat.inheritance = Inheritance(game.clan.your_cat)
+        # ---
         save_load.cat_to_fade.clear()
         game.clan.create_clan("singleclan")
         game.cur_events_list.clear()

@@ -107,6 +107,9 @@ class ClanSettingsScreen(Screens):
             elif event.ui_element == self.clan_stats_button:
                 self.open_clan_stats()
                 return
+            elif "achievements" in self.checkboxes_text:
+                if event.ui_element == self.checkboxes_text["achievements"]:
+                    self.change_screen(GameScreen.ACHIEVEMENTS)
             self.handle_checkbox_events(event)
             self.menu_button_pressed(event)
             self.mute_button_pressed(event)
@@ -348,6 +351,8 @@ class ClanSettingsScreen(Screens):
         med_cat_apprentices = 0
         mediator_apprentices = 0
         mediators = 0
+        queens_apprentices = 0
+        queens = 0
         elders = 0
         kits = 0
         cats_outside = 0
@@ -368,6 +373,9 @@ class ClanSettingsScreen(Screens):
                 else:
                     ur += 1
                 continue
+
+
+            living_cats += 1
 
             if cat.status.is_outsider:
                 cats_outside += 1
@@ -390,11 +398,14 @@ class ClanSettingsScreen(Screens):
                 mediator_apprentices += 1
             elif cat.status.rank == CatRank.MEDIATOR:
                 mediators += 1
+            elif cat.status.rank == CatRank.QUEENS_APPRENTICE:
+                queens_apprentices += 1
+            elif cat.status.rank == CatRank.QUEEN:
+                queens += 1
             elif cat.status.rank == CatRank.ELDER:
                 elders += 1
             elif cat.status.rank.is_baby():
                 kits += 1
-
         self.checkboxes_text["stat_box"] = pygame_gui.elements.UITextBox(
             "screens.clan_settings.stats_text",
             ui_scale(pygame.Rect((150, 200), (530, 400))),
@@ -406,6 +417,7 @@ class ClanSettingsScreen(Screens):
                 "starclan": str(starclan),
                 "darkforest": str(df),
                 "unknownresidence": str(ur),
+                "othercats": str(cats_other_clans),
                 "medcats": str(med_cats),
                 "medcatapps": str(med_cat_apprentices),
                 "warriors": str(warriors),
@@ -413,9 +425,19 @@ class ClanSettingsScreen(Screens):
                 "mediators": str(mediators),
                 "mediatorapps": str(mediator_apprentices),
                 "elders": str(elders),
+                "queens": str(queens),
+                "queensapps": str(queens_apprentices),
                 "kits": str(kits),
                 "faded": str(faded_cats),
             },
+        )
+        
+        self.checkboxes_text["achievements"] = UISurfaceImageButton(
+            ui_scale(pygame.Rect((335, 615), (120, 30))),
+            "achievements",
+            get_button_dict(ButtonStyles.SQUOVAL, (120, 30)),
+            object_id="@buttonstyles_squoval",
+            manager=MANAGER,
         )
 
     def refresh_checkboxes(self):

@@ -45,3 +45,13 @@ class ThoughtSchemaItem(BaseModel):
         MISSING,
         description="Used to require specific relationships between the cats",
     )
+
+    # LG
+    main_faith_constraint: Union[List[str], MISSING] = Field(
+        MISSING,
+        description="Contraints the thought to m_c with a specific faith range."
+    )
+    random_faith_constraint: Union[List[str], MISSING] = Field(
+        MISSING,
+        description="Contraints the thought to r_c with a specific faith range."
+    )

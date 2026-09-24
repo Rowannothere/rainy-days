@@ -98,6 +98,7 @@ class Illness:
         clan:CatGroup=CatGroup.PLAYER_CLAN_ID,
         herbs=None,
         event_triggered=False,
+        grief_cat=None
     ):
         self.name = name
         self.severity = severity
@@ -113,6 +114,7 @@ class Illness:
 
         self.current_duration = duration
         self.current_mortality = mortality
+        self.grief_cat = grief_cat
 
         amount_per_med = get_amount_cat_for_one_medic()
         if medicine_cats_can_cover_clan(

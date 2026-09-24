@@ -170,6 +170,7 @@ class Patrol:
                     {},
                     None,
                 )
+                    
             else:
                 return "Error - no event chosen", "", {}, None
 
@@ -227,7 +228,10 @@ class Patrol:
                 else:
                     self.involved_cats["healer adult"] = [cat]
 
-            game.patrolled.append(cat.ID)
+            if switch_get_value(Switch.patrol_category) == "clangen":
+                game.patrolled.append(cat.ID)
+            elif switch_get_value(Switch.patrol_category) == "date":
+                game.dated_cats.append(cat.ID)
 
         # DETERMINE PATROL LEADER
         # THIS CANNOT CHANGE AFTER SET-UP
@@ -614,6 +618,19 @@ class Patrol:
             f"Outcome Frequency: {chosen_outcome.frequency} | Outcome Weight: {chosen_outcome.weight}"
         )
 
+        if success and switch_get_value(Switch.patrol_category) == "df":
+            game.clan.your_cat.df_patrols += 1
+            # graduate from the Dark Forest after 5 successful DF patrols. Once
+            # graduated, the cat can act as a mentor to other DF trainees.
+            if (
+                game.clan.your_cat.df_patrols >= 5
+                and not game.clan.your_cat.graduated_df
+            ):
+                game.clan.your_cat.graduated_df = True
+
+
+        print(f"PATROL ID: {self.patrol_event.patrol_id} | SUCCESS: {success}")
+        
         # Run the chosen outcome
         return handle_consequences.execute_outcome(
             chosen_outcome,
@@ -671,6 +688,61 @@ class Patrol:
                     success_chance += get_config("patrol_generation.trait_cat_modifier")
                     print(f"success chance increase to {success_chance}")
 
+            if (
+                cluster1 in fail_outcome.stat_cluster or
+                cluster2 and cluster2 in fail_outcome.stat_cluster
+                ):
+                success_chance += constants.CONFIG["patrol_generation"][
+                    "fail_stat_cat_modifier"
+                ]
+            # ---
+
+            skill_updates += f"{kitty.name} updated chance to {success_chance} | "
+        if switch_get_value(Switch.patrol_category) == 'date':
+            c = random.randint(1,100)
+            success_chance = 40
+            date = None
+            you = game.clan.your_cat
+            if self.patrol_cats[0].ID == game.clan.your_cat.ID:
+                date = self.patrol_cats[1]
+            else:
+                date = self.patrol_cats[0]
+            if date.relationships.get(you.ID):
+                if date.relationships.get(you.ID).romance > 50:
+                    success_chance += 40
+                elif date.relationships.get(you.ID).romance > 40:
+                    success_chance += 30
+                elif date.relationships.get(you.ID).romance > 30:
+                    success_chance += 20
+                elif date.relationships.get(you.ID).romance > 10:
+                    success_chance += 10
+                
+                if date.relationships.get(you.ID).like > 40:
+                    success_chance += 15
+                elif date.relationships.get(you.ID).like > 30:
+                    success_chance += 10
+                elif date.relationships.get(you.ID).like > 20:
+                    success_chance += 5
+                    
+                if date.relationships.get(you.ID).like < -50:
+                    success_chance -= 50
+                if date.relationships.get(you.ID).like < -30:
+                    success_chance -= 40
+                if date.relationships.get(you.ID).like < -20:
+                    success_chance -= 30
+                if date.relationships.get(you.ID).like < -0:
+                    success_chance -= 10
+                success_chance += random.randint(-20,20)
+            success_chance = min(90, success_chance)
+            success_chance = max(success_chance, 10)
+            print(f"c: {c} chance: {success_chance}")
+            if c < success_chance:
+                if not date.relationships.get(you.ID):
+                    date.create_one_relationship(you)
+                if not you.relationships.get(date.ID):
+                    you.create_one_relationship(date)
+                date.relationships.get(you.ID).romance += 10
+                you.relationships.get(date.ID).romance += 10
         if success_chance >= 120:
             success_chance = 115
             print("success chance over 120, updated to 115")

@@ -146,8 +146,8 @@ class FreshkillPileTest(unittest.TestCase):
         """
         # given
         freshkill_pile1 = FreshkillPile()
-        freshkill_pile1.pile["expires_in_1"] = 10
-        self.assertEqual(freshkill_pile1.pile["expires_in_1"], 10)
+        freshkill_pile1.active_pile["expires_in_1"] = 10
+        self.assertEqual(freshkill_pile1.active_pile["expires_in_1"], 10)
         freshkill_pile1.remove_freshkill(5)
 
         freshkill_pile2 = FreshkillPile()

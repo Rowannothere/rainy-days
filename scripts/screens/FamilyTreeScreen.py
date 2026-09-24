@@ -20,13 +20,14 @@ from ..game_structure.screen_settings import MANAGER
 from ..ui.generate_box import BoxStyles, get_box
 from ..ui.generate_button import get_button_dict, ButtonStyles
 from ..ui.icon import Icon
-
+from scripts.clan_package.settings import get_clan_setting
 
 class FamilyTreeScreen(Screens):
     # Page numbers for siblings and offspring
 
     def __init__(self, name=None):
         super().__init__(name)
+        self.fav = {}
         self.next_cat = None
         self.previous_cat = None
         self.grandkits_tab = None
@@ -536,6 +537,10 @@ class FamilyTreeScreen(Screens):
             self.relation_elements[ele].kill()
         self.relation_elements = {}
 
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
+
         self.update_tab()
         if not self.current_group:
             self.relation_elements["no_cats_notice"] = pygame_gui.elements.UITextBox(
@@ -638,6 +643,10 @@ class FamilyTreeScreen(Screens):
         for ele in self.cat_elements:
             self.cat_elements[ele].kill()
         self.cat_elements = {}
+
+        for marker in self.fav:
+            self.fav[marker].kill()
+        self.fav = {}
 
         for ele in self.relation_elements:
             self.relation_elements[ele].kill()

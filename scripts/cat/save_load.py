@@ -94,15 +94,15 @@ def save_faded_cats(clanname, cat_class: Type["Cat"], game: "Game"):
                 + "\n--------------------------------------------------------------------------\n"
             )
 
-        # SAVE TO ITS OWN LITTLE FILE. This is a trimmed-down version for relation keeping only.
-        cat_data = inter_cat.get_save_dict(faded=True)
-        cat_path = fade_cat_dir / f"{cat}.json"
-        safe_save(cat_path, cat_data)
+            # SAVE TO ITS OWN LITTLE FILE. This is a trimmed-down version for relation keeping only.
+            cat_data = inter_cat.get_save_dict(faded=True)
+            cat_path = fade_cat_dir / f"{cat}.json"
+            safe_save(cat_path, cat_data)
 
-        # Remove the cat from the active cats lists
-        game.clan.remove_cat(
-            cat
-        )  # todo: when catdirectory is added, this dependency injection can be removed
+            # Remove the cat from the active cats lists
+            game.clan.remove_cat(
+                cat
+            )  # todo: when catdirectory is added, this dependency injection can be removed
 
     cat_to_fade = []
 
@@ -165,6 +165,43 @@ def add_cat_to_fade_id(cat_id):
 
 def get_faded_ids():
     return faded_ids + cat_to_fade
+
+
+# fields on a Cat that store references to other cats by ID
+_SINGLE_REF_FIELDS = ("parent1", "parent2", "mentor", "df_mentor")
+_LIST_REF_FIELDS = (
+    "adoptive_parents",
+    "apprentice",
+    "former_apprentices",
+    "mate",
+    "previous_mates",
+    "df_apprentices",
+    "faded_offspring",
+)
+
+
+def prune_dead_relationships(cat_class: Type["Cat"]):
+    resolvable = set(cat_class.all_cats.keys()) | set(get_faded_ids())
+
+    pruned = 0
+    for cat in cat_class.all_cats.values():
+        for field in _SINGLE_REF_FIELDS:
+            value = getattr(cat, field, None)
+            if value and value not in resolvable:
+                setattr(cat, field, None)
+                pruned += 1
+        for field in _LIST_REF_FIELDS:
+            value = getattr(cat, field, None)
+            if not value:
+                continue
+            cleaned = [cid for cid in value if cid in resolvable]
+            if len(cleaned) != len(value):
+                pruned += len(value) - len(cleaned)
+                setattr(cat, field, cleaned)
+
+    if pruned:
+        print(f"Pruned {pruned} while loading.")
+    return pruned
 
 
 def load_faded_cat_ids(clanname):

@@ -18,7 +18,9 @@
         "event_id": "deputy_alive_leader",
         "strings": [
             "Is doing {PRONOUN/m_c/poss} best to honor {PRONOUN/m_c/poss} Clan and {PRONOUN/m_c/poss} leader",
-            "Must speak with the leader soon about something {PRONOUN/m_c/subject} found while out on patrol"
+            "Must speak with the leader soon about something {PRONOUN/m_c/subject} found while out on patrol",
+            "Is reporting recent events around the territories to the leader",
+            "Is debating with r_c on who should mentor the new apprentices"
         ],
         "involved_cats": {
             "r_c": {
@@ -487,7 +489,7 @@
         "event_id": "teacher_deputy_to_apprentice",
         "strings": [
             "Feels satisfaction watching an apprentice master a lesson",
-            "Guides an apprentice through {PRONOUN/m_c/poss} hunting assessment"
+            "Guides an apprentice through {PRONOUN/r_c/poss} hunting assessment"
         ],
         "involved_cats": {
             "m_c": {

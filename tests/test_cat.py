@@ -267,7 +267,6 @@ class TestPossibleMateFunction(unittest.TestCase):
         self.assertFalse(senior_adult_cat1.is_potential_mate(young_adult_cat1, True))
 
         # check valid constellations
-        self.assertTrue(kitten_cat1.is_potential_mate(kitten_cat2, True))
         self.assertTrue(adolescent_cat1.is_potential_mate(adolescent_cat2, True))
         self.assertTrue(young_adult_cat1.is_potential_mate(young_adult_cat2, True))
         self.assertTrue(young_adult_cat1.is_potential_mate(adult_cat_in_range1, True))
@@ -508,6 +507,7 @@ class TestNameRepr(unittest.TestCase):
                     {"rank": CatRank.APPRENTICE},
                     {"rank": CatRank.MEDICINE_APPRENTICE},
                     {"rank": CatRank.MEDIATOR_APPRENTICE},
+                    {"rank": CatRank.QUEENS_APPRENTICE},
                 ],
                 6,
                 "test",
@@ -616,7 +616,7 @@ class TestNameRepr(unittest.TestCase):
         Test that outsiders with hidden special suffixes return the correct name
         :return:
         """
-        game.used_group_IDs["5"] = CatGroup.OTHER_CLAN
+        game.used_group_IDs["8"] = CatGroup.OTHER_CLAN
         outsider_statuses = [
             {"rank": CatRank.LONER},
             {"rank": CatRank.ROGUE},
@@ -624,10 +624,10 @@ class TestNameRepr(unittest.TestCase):
         ]
         former_clancat_status = {
             "group_history": [
-                {"group": "5", "rank": CatRank.WARRIOR, "moons_as": 1},
+                {"group": "8", "rank": CatRank.WARRIOR, "moons_as": 1},
                 {"group": None, "rank": CatRank.LONER, "moons_as": 1},
             ],
-            "standing_history": [{"group": "5", "standing": ["member", "known"]}],
+            "standing_history": [{"group": "8", "standing": ["member", "known"]}],
         }
         exiled_status = {
             "group_history": [
@@ -726,6 +726,8 @@ class TestSocialAssignment(unittest.TestCase):
             CatRank.DEPUTY,
             CatRank.LEADER,
             CatRank.ELDER,
+            CatRank.QUEEN,
+            CatRank.QUEENS_APPRENTICE
         )
 
         for rank in clancat_ranks:

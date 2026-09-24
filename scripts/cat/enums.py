@@ -64,7 +64,7 @@ class CatRank(StrEnum):
     APPRENTICE = "apprentice"
     MEDICINE_APPRENTICE = "healer apprentice"
     MEDIATOR_APPRENTICE = "mediator apprentice"
-    QUEEN_APPRENTICE = "queen apprentice"
+    QUEENS_APPRENTICE = "queen apprentice"
     WARRIOR = "warrior"
     MEDICINE_CAT = "healer"
     MEDIATOR = "mediator"
@@ -86,16 +86,20 @@ class CatRank(StrEnum):
 
     def is_any_mediator_rank(self) -> bool:
         return self in (self.MEDIATOR, self.MEDIATOR_APPRENTICE)
+    
+    def is_any_queen_rank(self) -> bool:
+        return self in (self.QUEEN, self.QUEENS_APPRENTICE)
 
     def is_any_queen_rank(self) -> bool:
-        return self in (self.QUEEN, self.QUEEN_APPRENTICE)
+        return self in (self.QUEEN, self.QUEENS_APPRENTICE)
 
     def is_any_apprentice_rank(self) -> bool:
         return self in (
             self.APPRENTICE,
             self.MEDIATOR_APPRENTICE,
-            self.QUEEN_APPRENTICE,
+            self.QUEENS_APPRENTICE,
             self.MEDICINE_APPRENTICE,
+            self.QUEENS_APPRENTICE
         )
 
     def is_any_adult_warrior_like_rank(self) -> bool:
@@ -118,7 +122,7 @@ class CatRank(StrEnum):
                 return False
             if not allow_queens and self in (
                 self.QUEEN,
-                self.QUEEN_APPRENTICE
+                self.QUEENS_APPRENTICE
             ):
                 return False
             return True
@@ -149,6 +153,10 @@ class CatStanding(StrEnum):
     KNOWN = "known"
     UNKNOWN = "unknown"
 
+    # LG
+    SHUNNED = "shunned"
+    DAYLIGHT = "daylight"
+
 
 class CatGroup(StrEnum):
     PLAYER_CLAN = "player_clan"
@@ -164,6 +172,15 @@ class CatGroup(StrEnum):
     STARCLAN_ID = "2"
     UNKNOWN_RESIDENCE_ID = "3"
     DARK_FOREST_ID = "4"
+
+    # LG
+    ROGUE_GROUP = "rogue_group"
+    LONER_GROUP = "loner_group"
+    HOUSEHOLD = "household"
+
+    ROGUE_GROUP_ID = "5"
+    LONER_GROUP_ID = "6"
+    HOUSEHOLD_ID = "7"
 
     def is_afterlife(self) -> bool:
         return self in (self.DARK_FOREST, self.STARCLAN, self.UNKNOWN_RESIDENCE)

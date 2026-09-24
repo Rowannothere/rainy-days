@@ -82,6 +82,7 @@ class ShortEvent:
 
         self.event_id = event_id
         self.location = location if location else ["any"]
+        self.faith_effect = faith_effect if faith_effect else 0
         if "any" not in self.location:
             self.weight += 1
         self.season = season if season else ["any"]
@@ -339,12 +340,37 @@ class ShortEvent:
 
         # handle murder reveals
         if "murder_reveal" in self.sub_type or "hidden_murder_reveal" in self.sub_type:
+            no_shun = "LIFEGEN_no_shun" in self.sub_type
+            clan_reveal = "clan_wide" in self.tags
+
+            if not clan_reveal and not no_shun and self.random_cat:
+                if not randrange(2):
+                    clan_reveal = True
+                    self.additional_event_text = (
+                        f"{self.random_cat.name} has told the Clan about "
+                        f"{self.main_cat.name}'s crime."
+                    )
+                else:
+                    self.additional_event_text = (
+                        f"{self.random_cat.name} has decided to keep "
+                        f"{self.main_cat.name}'s secret."
+                    )
+
+            should_shun = clan_reveal and not no_shun
             self.main_cat.history.reveal_murder(
                 victim=self.victim_cat,
                 murderer_id=self.main_cat.ID,
-                clan_reveal="clan_wide" in self.tags,
-                aware_individuals=[self.random_cat.ID],
+                clan_reveal=clan_reveal,
+                aware_individuals=[self.random_cat.ID] if self.random_cat else [],
+                shunned_cat=self.main_cat if should_shun else None,
             )
+
+            if should_shun:
+                demotion_text = self.main_cat.shunned_demotion()
+                if demotion_text:
+                    self.additional_event_text = (
+                        f"{self.additional_event_text} {demotion_text}".strip()
+                    )
 
         # change outsider rep
         if self.outsider:
@@ -540,15 +566,26 @@ class ShortEvent:
             self.types.append("misc")
         acc_list = []
         possible_accs = getattr(self, "new_accessory", [])
-        if "WILD" in possible_accs:
-            acc_list.extend(Pelt.wild_accessories)
-        if "PLANT" in possible_accs:
-            acc_list.extend(Pelt.plant_accessories)
-        if "COLLAR" in possible_accs:
-            acc_list.extend(Pelt.collar_accessories)
+        # if "WILD" in possible_accs:
+        #     acc_list.extend(Pelt.wild_accessories)
+        # if "PLANT" in possible_accs:
+        #     acc_list.extend(Pelt.plant_accessories)
+        # if "COLLAR" in possible_accs:
+        #     acc_list.extend(Pelt.collar_accessories)
+        
+        # LIFEGEN
+        
+        if game_setting_get("lifegen_sprite_changes"):
+            categories = Pelt.lifegen_acc_categories
+        else:
+            categories = Pelt.clangen_acc_categories
+        
+        for category in categories:
+            if category in possible_accs:
+                acc_list.extend(categories[category])
 
         for acc in possible_accs:
-            if acc not in ("WILD", "PLANT", "COLLAR"):
+            if acc not in categories:
                 acc_list.append(acc)
 
         if hasattr(self.main_cat.pelt, "scars"):
@@ -659,18 +696,20 @@ class ShortEvent:
 
         # make sure all cats in the pool fit the event requirements
         requirements = self.m_c
+        eligible_cats = []
         for kitty in alive_cats:
             if (
                 kitty.status.rank not in requirements["status"]
                 and "any" not in requirements["status"]
             ):
-                alive_cats.remove(kitty)
                 continue
             if (
                 kitty.age not in requirements["age"]
                 and "any" not in requirements["age"]
             ):
-                alive_cats.remove(kitty)
+                continue
+            eligible_cats.append(kitty)
+        alive_cats = eligible_cats
         alive_count = len(alive_cats)
 
         # if there's enough eligible cats, then we KILL

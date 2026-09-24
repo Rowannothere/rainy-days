@@ -192,7 +192,10 @@ class ListScreen(Screens):
                     element.set_text("screens.list.view_dead")
                     element.set_tooltip("screens.list.view_dead_tooltip")
                     self.death_status = "living"
-                    self.get_your_clan_cats()
+                    if game.clan.your_cat.status.alive_in_player_clan:
+                        self.get_your_clan_cats()
+                    else:
+                        self.get_your_group_cats()
 
                 self.update_cat_list(
                     self.cat_list_bar_elements["search_bar_entry"].get_text()
@@ -275,6 +278,14 @@ class ListScreen(Screens):
 
         self.set_disabled_menu_buttons(["cats"])
         self.show_menu_buttons()
+
+        # LG
+        if not game.clan.your_cat.status.alive_in_player_clan and not game.clan.your_cat.dead:
+            self.living_group_names = ("general.your_clan", "general.your_group", "general.cotc")
+            if not game.last_list_forProfile:
+                self.current_group = "your_group"
+        else:
+            self.living_group_names = ("general.your_clan", "general.cotc")
 
         # SCREEN CONTAINER - everything should come back to here
         self.list_screen_container = pygame_gui.core.UIContainer(
@@ -613,6 +624,11 @@ class ListScreen(Screens):
         updates the cat list and display, search text is taken into account
         """
         self.current_listed_cats = []
+        # print("LIST:", self.full_cat_list)
+        # for cat in self.full_cat_list:
+        #     print(cat.name, cat.status.group, cat.status.social, cat.status.alive_in_player_clan)
+        #     print(cat.status.group == CatGroup.PLAYER_CLAN_ID)
+        # print("player clan group:", CatGroup.PLAYER_CLAN_ID)
 
         # make sure cat list is the same everywhere else in the game.
         Cat.sort_cats(self.full_cat_list)
@@ -809,7 +825,7 @@ class ListScreen(Screens):
         self.current_group = "general.your_clan"
         self.death_status = "living"
         self.full_cat_list = [
-            cat for cat in Cat.all_cats_list if cat.status.alive_in_player_clan
+            cat for cat in Cat.all_cats_list if cat.status.alive_in_player_clan and cat.moons >= 0
         ]
 
     def get_other_clan_cats(self, clan):
@@ -865,6 +881,7 @@ class ListScreen(Screens):
             if (
                 the_cat.status.group == CatGroup.STARCLAN
                 and not the_cat.faded
+                and the_cat.moons >= 0
             ):
                 self.full_cat_list.append(the_cat)
 
@@ -880,6 +897,7 @@ class ListScreen(Screens):
             if (
                 the_cat.status.group == CatGroup.DARK_FOREST
                 and not the_cat.faded
+                and the_cat.moons >= 0
             ):
                 self.full_cat_list.append(the_cat)
 
