@@ -9,6 +9,7 @@ from scripts.cat.names import Name
 from scripts.cat.personality import Personality
 from scripts.cat.skills import SkillPath, Skill
 from scripts.cat.factories.typed_dicts import StatusDict
+from scripts.cat.status import Status
 from scripts.cat_relations.cat_handle_funcs import create_relationships_new_cat
 from scripts.cat_relations.inheritance2 import inheritance_db
 from scripts.cat_relations.relationship import Relationship
@@ -38,21 +39,40 @@ def updated_create_new_cat(
     :return: list of created cats
     """
     option_dict = option_dict.copy()
+
     # STATUS
     status = StatusDict()
+
+    # check if we need to match age to an assigned mate
+    if option_dict.get("can_create_new_cat", {}).get("assign_mate"):
+        possible_ages = []
+        for m in option_dict["can_create_new_cat"].get("assign_mate", []):
+            if m in involved_cats:
+                possible_ages.append(involved_cats[m].age)
+        # this takes priority over any age specified in option_dict
+        # since we need to ensure cats are appropriate ages
+        status["age"] = choice(possible_ages)
+
+    if option_dict.get("age") and not status.get("age"):
+        status["age"] = CatAge(choice(option_dict["age"]))
+
     if option_dict.get("status"):
         # check for "clancat" first since it's not really a rank
         if "clancat" in option_dict["status"]:
-            status["social"] = CatSocial.CLANCAT
-            possible_ranks = [r for r in option_dict["status"] if r != "clancat"]
-            possible_ranks.extend(
-                [
-                    r
-                    for r in [*CatRank]
-                    if r.is_any_clancat_rank()
-                    and r not in (CatRank.LEADER, CatRank.DEPUTY)
-                ]
-            )
+            if status.get("age"):
+                # ensure rank matches any already assigned age
+                possible_ranks = [Status.get_rank_from_age(status["age"])]
+            else:
+                status["social"] = CatSocial.CLANCAT
+                possible_ranks = [r for r in option_dict["status"] if r != "clancat"]
+                possible_ranks.extend(
+                    [
+                        r
+                        for r in [*CatRank]
+                        if r.is_any_clancat_rank()
+                        and r not in (CatRank.LEADER, CatRank.DEPUTY)
+                    ]
+                )
         else:
             possible_ranks = option_dict["status"]
 
@@ -65,21 +85,17 @@ def updated_create_new_cat(
             status["group_ID"] = _get_id_for_group(
                 [CatGroup.OTHER_CLAN], involved_cats, other_clan
             )
-    if option_dict.get("age"):
-        status["age"] = CatAge(choice(option_dict["age"]))
-
-    # check if we need to match age to an assigned mate
-    if option_dict.get("can_create_new_cat", {}).get("assign_mate"):
-        possible_ages = []
-        for m in option_dict["can_create_new_cat"].get("assign_mate", []):
-            if m in involved_cats:
-                possible_ages.append(involved_cats[m].age)
-        status["age"] = choice(possible_ages)
 
     if option_dict.get("group"):
         status["group_ID"] = _get_id_for_group(
             option_dict["group"], involved_cats, other_clan
         )
+
+    # handle applying an age for litters if one wasn't specified
+    is_litter = option_dict["can_create_new_cat"].get("become_litter")
+    if is_litter:
+        if not status.get("age") or not status["age"].is_baby():
+            status["age"] = choice((CatAge.NEWBORN, CatAge.KITTEN))
 
     if not status.get("rank") and not status.get("age"):
         # if no group was given either, then we just pick either no group or other clan
@@ -91,16 +107,22 @@ def updated_create_new_cat(
         # then we find an appropriate rank for that group
         if status["group_ID"] == "no_group":
             status["rank"] = choice(
-                [r for r in [*CatRank] if not r.is_any_clancat_rank()]
+                [
+                    r
+                    for r in [*CatRank]
+                    if not r.is_any_clancat_rank()
+                    and r not in (CatRank.LEADER, CatRank.DEPUTY)
+                ]
             )
         else:
-            status["rank"] = choice([r for r in [*CatRank] if r.is_any_clancat_rank()])
-
-    # handle applying an age for litters if one wasn't specified
-    is_litter = option_dict["can_create_new_cat"].get("become_litter")
-    if is_litter:
-        if not status.get("age") or not status["age"].is_baby():
-            status["age"] = choice((CatAge.NEWBORN, CatAge.KITTEN))
+            status["rank"] = choice(
+                [
+                    r
+                    for r in [*CatRank]
+                    if r.is_any_clancat_rank()
+                    and r not in (CatRank.LEADER, CatRank.DEPUTY)
+                ]
+            )
 
     # MOONS OLD
     moons = None
@@ -127,8 +149,8 @@ def updated_create_new_cat(
                 adoptive_parents.append(involved_cats[p])
 
     # GENDER
-    gender = option_dict.get("gender", None)
-    if gender == "can_birth":
+    gender = choice(option_dict.get("gender")) if option_dict.get("gender") else None
+    if gender and "can_birth" in gender:
         if not get_clan_setting("same sex birth"):
             gender = "female"
         else:
@@ -149,12 +171,6 @@ def updated_create_new_cat(
             if adoptive_parents
             else None,
         )
-        # check if kittypets get collar
-        if created_cat.status.social == CatSocial.KITTYPET and bool(getrandbits(1)):
-            created_cat.pelt.accessory = (
-                *created_cat.pelt.accessory,
-                choice(created_cat.pelt.collar_accessories),
-            )
 
         # MATES
         _assign_mates(created_cat, involved_cats, option_dict)
@@ -264,7 +280,7 @@ def _assign_name(created_cat: Cat):
         # give kittypets a kittypet name
         if created_cat.status.social == CatSocial.KITTYPET:
             weights = constants.CONFIG["cat_name_controls"]["kittypet"]
-            # check if the kittypets come with a pretty acc
+            # check if the kittypets come with a collar
             if bool(getrandbits(1)):
                 created_cat.pelt.accessory = (
                     *created_cat.pelt.accessory,

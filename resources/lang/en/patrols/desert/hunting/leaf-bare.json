@@ -19,8 +19,12 @@
         },
         "chance_of_success": 50,
         "patrol_art": "hunt_general_intro",
-        "intro_text": "p_l finds a patch of herbs that {PRONOUN/p_l/subject} {VERB/p_l/believe/believes} c_n might need for their stores. {PRONOUN/p_l/subject/CAP} freely {VERB/p_l/admit/admits} to {PRONOUN/p_l/poss} patrol {PRONOUN/p_l/subject} {VERB/p_l/are/is}n't a medicine cat, and {VERB/p_l/ask/asks} {PRONOUN/p_l/poss} companions' advice. What do they know about this part of the desert's herbal properties, what grows in the brief bloom of leaf-bare?",
-        "decline_text": "They decide to focus on hunting and leave the herb collecting to the medicine cats.",
+        "intro_strings": [
+            "p_l finds a patch of herbs that {PRONOUN/p_l/subject} {VERB/p_l/believe/believes} c_n might need for their stores. {PRONOUN/p_l/subject/CAP} freely {VERB/p_l/admit/admits} to {PRONOUN/p_l/poss} patrol {PRONOUN/p_l/subject} {VERB/p_l/are/is}n't a medicine cat, and {VERB/p_l/ask/asks} {PRONOUN/p_l/poss} companions' advice. What do they know about this part of the desert's herbal properties, what grows in the brief bloom of leaf-bare?"
+        ],
+        "decline_strings": [
+            "They decide to focus on hunting and leave the herb collecting to the medicine cats."
+        ],
         "success_outcomes": [
             {
                 "frequency": 4,
@@ -150,8 +154,12 @@
         },
         "chance_of_success": 50,
         "patrol_art": "hunt_general_intro",
-        "intro_text": "It starts raining soon after the patrol sets out, trying to bring back something nice for the fresh-kill pile.",
-        "decline_text": "They decide to turn back and wait until the rain dies down.",
+        "intro_strings": [
+            "It starts raining soon after the patrol sets out, trying to bring back something nice for the fresh-kill pile."
+        ],
+        "decline_strings": [
+            "They decide to turn back and wait until the rain dies down."
+        ],
         "success_outcomes": [
             {
                 "frequency": 4,
@@ -331,8 +339,12 @@
         },
         "chance_of_success": 40,
         "patrol_art": "hunt_general_intro",
-        "intro_text": "It starts raining soon after p_l sets out, trying to bring back something nice for the fresh-kill pile.",
-        "decline_text": "They decide to turn back and wait until the rain dies down.",
+        "intro_strings": [
+            "It starts raining soon after p_l sets out, trying to bring back something nice for the fresh-kill pile."
+        ],
+        "decline_strings": [
+            "They decide to turn back and wait until the rain dies down."
+        ],
         "success_outcomes": [
             {
                 "frequency": 4,
@@ -430,8 +442,12 @@
         ],
         "chance_of_success": 50,
         "patrol_art": "hunt_general_intro",
-        "intro_text": "It starts raining soon after the patrol sets out, trying to bring back something nice for the fresh-kill pile.",
-        "decline_text": "They decide to turn back and wait until the rain dies down.",
+        "intro_strings": [
+            "It starts raining soon after the patrol sets out, trying to bring back something nice for the fresh-kill pile."
+        ],
+        "decline_strings": [
+            "They decide to turn back and wait until the rain dies down."
+        ],
         "success_outcomes": [
             {
                 "frequency": 4,
@@ -598,258 +614,6 @@
                         "log": {
                             "cats_from": "cat_from and cat_to struggled to hunt together on a slippery hunting patrol."
                         }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "event_id": "dst_hunt_swiftfox_leaf-barevixen1",
-        "types": [
-            "hunting"
-        ],
-        "frequency": 2,
-        "location": [
-            "desert"
-        ],
-        "season": [
-            "leaf-bare"
-        ],
-        "required_cat_types": {
-            "patrol_cats": [
-                2,
-                6
-            ]
-        },
-        "chance_of_success": 50,
-        "patrol_art": "hunt_general_intro",
-        "intro_text": "The patrol spots a swift fox in the distance, behaving weirdly.",
-        "decline_text": "Best not to risk a fight. The patrol watches it go.",
-        "success_outcomes": [
-            {
-                "frequency": 4,
-                "strings": [
-                    "The patrol charges the vixen, and she runs, leaving the scent of milk in the air behind her. Though they don't know where her cubs are hidden, without their mother they won't pose a threat to the Clan."
-                ],
-                "exp_gained": 30,
-                "relationship_changes": [
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "patrol_cats"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "trust"
-                        ],
-                        "amount": 5,
-                        "log": {
-                            "cats_from": "cat_from and cat_to drove off a swift fox vixen together."
-                        }
-                    },
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "some_clan"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "respect"
-                        ],
-                        "amount": 5,
-                        "log": {
-                            "cats_from": "cat_from heard about how cat_to's patrol drove off a swift fox vixen."
-                        }
-                    }
-                ]
-            },
-            {
-                "frequency": 1,
-                "strings": [
-                    "The patrol sneaks closer, until p_l realizes that the vixen is approaching her den — a den where cubs must surely hide. A competitor denning within c_n's borders is an outrage, and the patrol leaps to attack, pinning the vixen in a cluster of boulders. Her body, and that of her cubs, will go to the fresh-kill pile tonight."
-                ],
-                "exp_gained": 30,
-                "relationship_changes": [
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "patrol_cats"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "trust"
-                        ],
-                        "amount": 5,
-                        "log": {
-                            "cats_from": "cat_from and cat_to killed a swift fox vixen and her cubs together."
-                        }
-                    },
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "some_clan"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "respect"
-                        ],
-                        "amount": 5,
-                        "log": {
-                            "cats_from": "cat_from heard about how cat_to's patrol killed a swift fox vixen and her cubs."
-                        }
-                    }
-                ],
-                "supply": [
-                    {
-                        "type": "freshkill",
-                        "adjust": "increase_large"
-                    }
-                ]
-            },
-            {
-                "frequency": 4,
-                "strings": [
-                    "s_c0 holds the patrol back until they spot the vixen's mate, approaching with poached prey in his jaws. Together, the cats ambush the foxes, bursting from cover with claws unsheathed as a vicious fight starts. But warriors fight as a team, and the foxes do not, and one flees, abandoning its mate to the fury of c_n."
-                ],
-                "involved_cats": {
-                    "s_c0": {
-                        "prior_abbreviation": [
-                            "any"
-                        ],
-                        "stat": {
-                            "skill": [
-                                "CLEVER,1"
-                            ]
-                        }
-                    }
-                },
-                "exp_gained": 30,
-                "relationship_changes": [
-                    {
-                        "cats_to": [
-                            "s_c0"
-                        ],
-                        "cats_from": [
-                            "patrol_cats"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "respect",
-                            "like"
-                        ],
-                        "amount": 8,
-                        "log": {
-                            "cats_from": "cat_from was impressed that cat_to knew to wait and lure out a swift fox vixen's mate so the patrol could drive off both."
-                        }
-                    },
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "clan"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "respect"
-                        ],
-                        "amount": 5,
-                        "log": {
-                            "cats_from": "cat_from heard about how cat_to's patrol drove off both a swift fox vixen and her mate."
-                        }
-                    }
-                ],
-                "supply": [
-                    {
-                        "type": "freshkill",
-                        "adjust": "increase_large"
-                    }
-                ]
-            }
-        ],
-        "fail_outcomes": [
-            {
-                "frequency": 4,
-                "strings": [
-                    "The swift fox spots the patrol coming and scarpers, tucking tail and fleeing across the horizon in an example of where the small carnivore gets its name."
-                ],
-                "exp_gained": 0,
-                "relationship_changes": [
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "patrol_cats"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "trust"
-                        ],
-                        "amount": -5,
-                        "log": {
-                            "cats_from": "cat_from and cat_to doubted each other's skills after a swift fox easily escaped them on patrol."
-                        }
-                    }
-                ],
-                "supply": [
-                    {
-                        "type": "freshkill",
-                        "adjust": "increase_tiny"
-                    }
-                ]
-            },
-            {
-                "frequency": 3,
-                "strings": [
-                    "As the patrol descends on the vixen, her scream of surprise brings in her mate, changing the odds. The male bursts out from cover and sinks his teeth into r_c0, both foxes using the patrol switching to r_c's defense as their signal to flee."
-                ],
-                "involved_cats": {
-                    "r_c0": {}
-                },
-                "exp_gained": 0,
-                "relationship_changes": [
-                    {
-                        "cats_to": [
-                            "patrol_cats"
-                        ],
-                        "cats_from": [
-                            "patrol_cats"
-                        ],
-                        "mutual": false,
-                        "values": [
-                            "trust"
-                        ],
-                        "amount": -3,
-                        "log": {
-                            "cats_from": "cat_from and cat_to were unable to drive off a pair of swift foxes together."
-                        }
-                    }
-                ],
-                "supply": [
-                    {
-                        "type": "freshkill",
-                        "adjust": "increase_tiny"
-                    }
-                ],
-                "condition": [
-                    {
-                        "cats": [
-                            "r_c0"
-                        ],
-                        "condition": [
-                            "big_bite_injury"
-                        ],
-                        "scar_history": "m_c was marked by a fight with a pair of swift foxes.",
-                        "death_history": "m_c died of injuries inflicted by a pair of swift foxes."
                     }
                 ]
             }

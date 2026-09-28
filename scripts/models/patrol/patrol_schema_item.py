@@ -79,11 +79,11 @@ class PatrolSchemaItem(BaseModel):
         MISSING,
         description="Constrains the event to only occur if the involved other Clan has one of these temperaments.",
     )
-    intro_text: str = Field(
+    intro_strings: list[str] = Field(
         ..., description="The text that displays when the patrol first starts."
     )
-    decline_text: str = Field(
-        "",
+    decline_strings: list[str] = Field(
+        ...,
         description="The text that displays if the patrol is declined (do not proceed)",
     )
     success_outcomes: List[Outcome] = Field(default_factory=list)
