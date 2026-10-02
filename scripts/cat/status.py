@@ -343,7 +343,15 @@ class Status:
             return self.alive_in_player_clan
         # this fails tests bc it checks this before Clan exists
         # so... nonecheck failsafe
+        if game.clan.clancount == "multiclan":
+            return self.group_ID == game.clan.your_cat.status.group_ID
         return self.group == game.clan.your_cat.status.group
+
+    def fetch_clan_object(self, default=None):
+        """Return the Clan object for this cat's current group, if it is a Clan."""
+        if not game.clan:
+            return default
+        return game.clan.group_ID_to_clan(self.group_ID) or default
 
     @property
     def is_outsider(self) -> bool:

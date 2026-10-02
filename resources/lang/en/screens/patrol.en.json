@@ -5,6 +5,7 @@
         "hunting": "hunting",
         "border": "border",
         "herb_gathering": "herb gathering",
+        "clan_select": "Clan: %{clan}",
         "choose_cats_info": "Choose up to six cats to take on patrol.\nSmaller patrols help cats gain more experience, but larger patrols are safer.",
         "able_cats_label": "able cats",
         "patrol_label": "patrol",

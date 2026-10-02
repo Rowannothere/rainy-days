@@ -76,7 +76,10 @@ def killing_outsiders(cat: "Cat"):
         if cat.status.is_other_clancat:
             game.cur_events_list.append(
                 EventInformation(
-                    text, ["birth_death", "other_clans"], cat_dict={"m_c": cat}
+                    text,
+                    ["birth_death", "other_clans"],
+                    cat_dict={"m_c": cat},
+                    clan=cat.status.group_ID,
                 )
             )
         else:

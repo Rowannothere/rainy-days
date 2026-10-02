@@ -46,7 +46,7 @@ class ChooseModeScreen(MakeClanScreenBase):
                 ),
             )
 
-        self.elements["previous_step"].disable()
+        self.elements["previous_step"].enable()
         self.elements["next_step"].enable()
 
         self.set_mute_button_position("topright")
@@ -152,6 +152,8 @@ class ChooseModeScreen(MakeClanScreenBase):
                         self.change_screen(GameScreen.MAKE_CLAN_CHOOSE_CARDS)
                     else:
                         self.change_screen(GameScreen.MAKE_CLAN_CHOOSE_NAME)
+            elif event.ui_element == self.elements["previous_step"]:
+                self.change_screen(GameScreen.MAKE_CLAN_CHOOSE_CLANCOUNT)
             elif event.ui_element == self.elements["random_clan_checkbox"]:
                 if self.elements["random_clan_checkbox"].checked:
                     self.elements["random_clan_checkbox"].uncheck()

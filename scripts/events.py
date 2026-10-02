@@ -801,7 +801,13 @@ def handle_lead_den_event():
             clan=game.clan,
         ) + additional_text
         game.cur_events_list.insert(
-            4, EventInformation(event_text, ["other_clans"], [gathering_cat.ID])
+            4,
+            EventInformation(
+                event_text,
+                ["other_clans"],
+                [gathering_cat.ID],
+                clan=game.clan.group_ID,
+            ),
         )
 
         set_clan_setting("lead_den_clan_event", {})
@@ -2524,11 +2530,13 @@ def one_moon_outside_cat(cat, other_clan_cats: list = None):
     """
     exiled cat events
     """
+    multiclan_cat = game.clan.clancount == "multiclan" and cat.status.is_other_clancat
+
     # aging the cat
     cat.one_moon(other_clan_cats)
-    cat.manage_outside_trait()
-
-    handle_outside_EX(cat)
+    if not multiclan_cat:
+        cat.manage_outside_trait()
+        handle_outside_EX(cat)
 
     # LG
     if (
@@ -2979,13 +2987,16 @@ def find_war_events(event_type, war, rel_change=None):
             EventInformation(
                 event,
                 ["other_clans"],
-                event_tile=event_tile.tile_string
+                event_tile=event_tile.tile_string,
+                clan=clan.group_ID,
                 )
             )
         event_tile.add_event(event)
 
         return
-    game.cur_events_list.append(EventInformation(event, ["other_clans"]))
+    game.cur_events_list.append(
+        EventInformation(event, ["other_clans"], clan=clan.group_ID)
+    )
 
 
 
@@ -4055,7 +4066,14 @@ def other_clans_relations_wobble():
         event_tile = territory_class.get_tiles(["gathering"])[0]
         event_tile.add_event(event_text)
         event_tile_string = event_tile.tile_string
-    game.cur_events_list.append(EventInformation(event_text, ["other_clans"], event_tile=event_tile_string))
+    game.cur_events_list.append(
+        EventInformation(
+            event_text,
+            ["other_clans"],
+            event_tile=event_tile_string,
+            clan=from_clan.group_ID,
+        )
+    )
 
 
     from_clan.relations[to_clan.group_ID] = 0
@@ -4126,7 +4144,8 @@ def other_clans_territory_wobble():
         EventInformation(
             event_string,
             ["other_clans"],
-            event_tile=traded_tile.tile_string
+            event_tile=traded_tile.tile_string,
+            clan=(first_clan if number == 1 else second_clan).group_ID,
             )
         )
     traded_tile.add_event(event_string)

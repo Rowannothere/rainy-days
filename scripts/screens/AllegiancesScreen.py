@@ -299,4 +299,23 @@ class AllegiancesScreen(Screens):
             _box[1] = "\n".join([self.generate_one_entry(i) for i in living_elders])
             outputs.append(_box)
 
+        if game.clan.clancount == "multiclan":
+            for other_clan in game.clan.all_other_clans:
+                other_cats = [
+                    Cat.all_cats[cat_id]
+                    for cat_id in other_clan.clan_cats
+                    if cat_id in Cat.all_cats
+                    and not Cat.all_cats[cat_id].dead
+                    and Cat.all_cats[cat_id].moons >= 0
+                ]
+                if other_cats:
+                    outputs.append(
+                        [
+                            f"<b><u>{other_clan.name.upper()}</u></b>",
+                            "\n".join(
+                                self.generate_one_entry(cat) for cat in other_cats
+                            ),
+                        ]
+                    )
+
         return outputs

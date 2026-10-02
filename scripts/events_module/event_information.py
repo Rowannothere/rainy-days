@@ -17,7 +17,8 @@ class EventInformation:
         ] = None,
         cats_involved: list | tuple = None,
         cat_dict: dict = None,
-        event_tile: str = None
+        event_tile: str = None,
+        clan: str = None,
     ):
         """
         :param text: The event text.
@@ -39,6 +40,7 @@ class EventInformation:
 
         # CGW
         self.event_tile = event_tile if event_tile else None
+        self.clan = str(clan) if clan is not None else None
 
         if isinstance(cats_involved, str):
             self.cats_involved = []
@@ -61,20 +63,17 @@ class EventInformation:
             for abbr, kitty in self.cat_dict.items():
                 cat_dict[abbr] = kitty.ID
 
-        if self.event_tile:
-            return {
-                "text": self.text,
-                "types": self.types,
-                "cats_involved": self.cats_involved,
-                "cat_dict": cat_dict,
-                "event_tile": self.event_tile
-            }
-        return {
+        event_dict = {
             "text": self.text,
             "types": self.types,
             "cats_involved": self.cats_involved,
             "cat_dict": cat_dict,
         }
+        if self.event_tile:
+            event_dict["event_tile"] = self.event_tile
+        if self.clan:
+            event_dict["clan"] = self.clan
+        return event_dict
 
     @staticmethod
     def from_dict(info_dict: dict, cat_class: "Cat"):
@@ -95,7 +94,8 @@ class EventInformation:
             types=info_dict.get("types", None),
             cats_involved=info_dict.get("cats_involved", None),
             cat_dict=cat_dict,
-            event_tile=info_dict.get("event_tile", None)
+            event_tile=info_dict.get("event_tile", None),
+            clan=info_dict.get("clan"),
         )
 
     def __eq__(self, obj):
