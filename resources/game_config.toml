@@ -708,8 +708,6 @@ dev_tools = false
 
   # other clans will start with a random relation between the two numbers
   starting_clan_relation = [8, 18]
-  other_clans_range = [2, 5]
-  neighbourclan_cats = [4, 7]
 
   # the "default" rank, the majority of cats will take this and random high ranks will originate from this rank
   majority_rank = "warrior"
@@ -1253,3 +1251,4 @@ dev_tools = false
       2 = 1
       3 = 1
       4 = 1
+

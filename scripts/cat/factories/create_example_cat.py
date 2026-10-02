@@ -17,35 +17,24 @@ def create_example_cats(
     rank_weights: dict,
     lifegen_kitten_creation=False,
     max_cats=12,
-    group_ID: str = None,
 ) -> list["Cat"]:
     majority_rank_cats = sample(range(max_cats), 3)
 
     chosen_cats = []
     if lifegen_kitten_creation:
         for cat_index in range(max_cats):
-            chosen_cats.append(
-                _create_example_cat(CatRank.KITTEN, group_ID, moons=1)
-            )
+            chosen_cats.append(NewCatFactory.create_cat(rank=CatRank.KITTEN, moons=1))
     else:
         for cat_index in range(max_cats):
             if cat_index in majority_rank_cats:
-                chosen_cats.append(_create_example_cat(majority_rank, group_ID))
+                chosen_cats.append(NewCatFactory.create_cat(rank=majority_rank))
             else:
                 random_rank = choices(
                     list(rank_weights.keys()), list(rank_weights.values())
                 )[0]
-                chosen_cats.append(_create_example_cat(random_rank, group_ID))
+                chosen_cats.append(NewCatFactory.create_cat(rank=random_rank))
 
     return chosen_cats
-
-
-def _create_example_cat(rank, group_ID, **overrides):
-    if group_ID is None:
-        return NewCatFactory.create_cat(rank=rank, **overrides)
-    return NewCatFactory.create_cat(
-        status_dict={"rank": rank, "group_ID": group_ID}, **overrides
-    )
 
 
 def create_option_preview_cat(scar: str = None, acc: str = None):

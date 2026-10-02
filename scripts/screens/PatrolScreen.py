@@ -93,7 +93,6 @@ class PatrolScreen(Screens):
         self.app_mentor = None
         self.able_cats = None
         self.current_patrol = None
-        self.patrol_clan = None
         self.display_text = ""
         self.results_text = ""
         self.rel_results = {}
@@ -146,22 +145,6 @@ class PatrolScreen(Screens):
 
     def handle_choose_cats_events(self, event):
         if (
-            "patrol_clan" in self.elements
-            and event.ui_element == self.elements["patrol_clan"]
-        ):
-            clans = [game.clan, *game.clan.all_other_clans]
-            current_index = clans.index(self.patrol_clan)
-            self.patrol_clan = clans[(current_index + 1) % len(clans)]
-            self.current_patrol.clear()
-            self.selected_cat = None
-            self.update_heading_text(self.patrol_clan.name)
-            self.elements["patrol_clan"].set_text(
-                "screens.patrol.clan_select",
-                text_kwargs={"clan": self.patrol_clan.name},
-            )
-            self.update_cat_images_buttons()
-            self.update_button()
-        elif (
             "cat_icon" in self.elements
             and event.ui_element == self.elements["cat_icon"]
         ):
@@ -767,7 +750,6 @@ class PatrolScreen(Screens):
         self.clear_page()  # Clear the page
         self.clear_cat_buttons()
         self.patrol_obj = Patrol()
-        self.patrol_clan = game.clan
 
         self.display_text = ""
         self.results_text = ""
@@ -781,16 +763,6 @@ class PatrolScreen(Screens):
             ui_scale(pygame.Rect((187, 95), (425, 100))),
             object_id=get_text_box_theme("#text_box_22_horizcenter"),
         )
-
-        if game.clan.clancount == "multiclan" and game.clan.all_other_clans:
-            self.elements["patrol_clan"] = UISurfaceImageButton(
-                ui_scale(pygame.Rect((40, 95), (140, 30))),
-                "screens.patrol.clan_select",
-                get_button_dict(ButtonStyles.SQUOVAL, (140, 30)),
-                object_id="@buttonstyles_squoval",
-                manager=MANAGER,
-                text_kwargs={"clan": self.patrol_clan.name},
-            )
 
         self.elements["cat_frame"] = pygame_gui.elements.UIImage(
             ui_scale(pygame.Rect((300, 165), (200, 275))),
@@ -1091,7 +1063,7 @@ class PatrolScreen(Screens):
         """Runs patrol start. To be run in a separate thread."""
         try:
             self.display_text = self.patrol_obj.begin_patrol(
-                self.current_patrol, self.patrol_type, self.patrol_clan
+                self.current_patrol, self.patrol_type
             )
         except RuntimeError:
             self.display_text = None
@@ -1317,7 +1289,7 @@ class PatrolScreen(Screens):
                 if (
                     the_cat.ID not in game.patrolled
                     and the_cat.status.rank.is_allowed_to_patrol(the_cat)
-                    and the_cat.status.group_ID == self.patrol_clan.group_ID
+                    and the_cat.status.alive_in_your_cat_group
                     and the_cat not in self.current_patrol
                     and not the_cat.not_working()
                 ):

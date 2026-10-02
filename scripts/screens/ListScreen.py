@@ -135,7 +135,6 @@ class ListScreen(Screens):
         self.ur_bg = None
         self.sc_bg = None
         self.clan_name = None
-        self.other_clan_groups = {}
 
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
@@ -264,16 +263,6 @@ class ListScreen(Screens):
                 self.current_group = "your_group"
         else:
             self.living_group_names = ("general.your_clan", "general.cotc")
-        if game.clan.clancount == "multiclan":
-            self.other_clan_groups = {
-                clan.prefix: clan for clan in game.clan.all_other_clans
-            }
-            self.living_group_names = (
-                *self.living_group_names,
-                *self.other_clan_groups.keys(),
-            )
-        else:
-            self.other_clan_groups = {}
 
         # SCREEN CONTAINER - everything should come back to here
         self.list_screen_container = pygame_gui.core.UIContainer(
@@ -370,11 +359,7 @@ class ListScreen(Screens):
             switch_set_value(Switch.sort_type, "rank")
 
         # CHOOSE GROUP DROPDOWN
-        starting_select = (
-            self.current_group
-            if self.current_group in self.other_clan_groups
-            else f"general.{self.current_group}"
-        )
+        starting_select = f"general.{self.current_group}"
         self.choose_group_dropdown = UIDropDown(
             pygame.Rect((-2, 0), (190, 34)),
             parent_text="screens.list.choose_group",
@@ -583,8 +568,6 @@ class ListScreen(Screens):
                 self.get_ur_cats()
             elif new_group == "dark_forest":
                 self.get_df_cats()
-            elif new_group in self.other_clan_groups:
-                self.get_other_clan_cats(new_group)
             self.update_cat_list(
                 self.cat_list_bar_elements["search_bar_entry"].get_text()
             )
@@ -759,10 +742,6 @@ class ListScreen(Screens):
         elif self.current_group == "dark_forest":
             self.set_bg("dark_forest")
             self.update_heading_text("general.dark_forest")
-        elif self.current_group in self.other_clan_groups:
-            other_clan = self.other_clan_groups[self.current_group]
-            self.set_bg(None)
-            self.update_heading_text(other_clan.name)
 
     def get_group_temper_message(self):
         # UR and COTC has no alignment and no message
@@ -775,10 +754,6 @@ class ListScreen(Screens):
         if self.current_group == "your_clan":
             group = self.clan_name
             first_temper, second_temper = game.clan.temperament
-        elif self.current_group in self.other_clan_groups:
-            other_clan = self.other_clan_groups[self.current_group]
-            group = other_clan.name
-            first_temper, second_temper = other_clan.temperament
 
         else:
             if self.current_group == "dark_forest":
@@ -806,9 +781,7 @@ class ListScreen(Screens):
         grabs the correct cat list for current group
         """
         if game.last_list_forProfile:
-            if game.last_list_forProfile in self.other_clan_groups:
-                self.get_other_clan_cats(game.last_list_forProfile)
-            elif game.last_list_forProfile == "starclan":
+            if game.last_list_forProfile == "starclan":
                 self.get_sc_cats()
             elif game.last_list_forProfile == "dark_forest":
                 self.get_df_cats()
@@ -853,10 +826,6 @@ class ListScreen(Screens):
                 not the_cat.dead
                 and not (the_cat.status.alive_in_player_clan)
                 and not (the_cat.status.alive_in_your_cat_group)
-                and not (
-                    game.clan.clancount == "multiclan"
-                    and the_cat.status.is_other_clancat
-                )
                 and the_cat.status.is_near(CatGroup.PLAYER_CLAN_ID)
                 and the_cat.moons >= 0
             ):
@@ -877,18 +846,6 @@ class ListScreen(Screens):
                 and the_cat.moons >= 0
             ):
                 self.full_cat_list.append(the_cat)
-
-    def get_other_clan_cats(self, clan_prefix):
-        self.current_group = clan_prefix
-        self.death_status = "living"
-        clan = self.other_clan_groups[clan_prefix]
-        self.full_cat_list = [
-            Cat.all_cats[cat_id]
-            for cat_id in clan.clan_cats
-            if cat_id in Cat.all_cats
-            and not Cat.all_cats[cat_id].dead
-            and Cat.all_cats[cat_id].moons >= 0
-        ]
 
     def get_sc_cats(self):
         """

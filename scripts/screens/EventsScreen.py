@@ -91,9 +91,6 @@ class EventsScreen(Screens):
         self.event_screen_container = None
         self.clan_info = {}
         self.timeskip_button = None
-        self.clan_select_button = None
-        self.current_event_clan = None
-        self.current_clan_events = []
 
         self.full_event_display_container = None
         self.events_frame = None
@@ -193,25 +190,6 @@ class EventsScreen(Screens):
             event.type == pygame_gui.UI_BUTTON_PRESSED
         ):  # everything else on button press to prevent blinking
             element = event.ui_element
-            if element == self.clan_select_button:
-                clans = [game.clan, *game.clan.all_other_clans]
-                current_index = next(
-                    (
-                        index
-                        for index, clan in enumerate(clans)
-                        if clan.group_ID == self.current_event_clan.group_ID
-                    ),
-                    0,
-                )
-                self.current_event_clan = clans[
-                    (current_index + 1) % len(clans)
-                ]
-                self.clan_select_button.set_text(
-                    "screens.events.clan_select",
-                    text_kwargs={"clan": self.current_event_clan.name},
-                )
-                self.update_display_events_lists()
-                self.update_events_display()
 
             for key, btn in self.open_map_buttons.items():
                 if element == btn:
@@ -489,13 +467,6 @@ class EventsScreen(Screens):
         super().screen_switches()
         # On first open, update display events list
         self.show_mute_buttons()
-        self.clan_select_button = None
-        clans = [game.clan, *game.clan.all_other_clans]
-        current_group_ID = getattr(self.current_event_clan, "group_ID", None)
-        self.current_event_clan = next(
-            (clan for clan in clans if clan.group_ID == current_group_ID),
-            game.clan,
-        )
         if not self.first_opened:
             self.first_opened = True
             self.update_display_events_lists()
@@ -593,17 +564,6 @@ class EventsScreen(Screens):
             position=(438, 223),
             container=self.event_screen_container,
         )
-        if game.clan.clancount == "multiclan":
-            self.clan_select_button = UISurfaceImageButton(
-                ui_scale(pygame.Rect((600, 223), (170, 30))),
-                "screens.events.clan_select",
-                get_button_dict(ButtonStyles.SQUOVAL, (170, 30)),
-                object_id="@buttonstyles_squoval",
-                starting_height=1,
-                container=self.event_screen_container,
-                manager=MANAGER,
-                text_kwargs={"clan": self.current_event_clan.name},
-            )
 
         height = 32
 
@@ -1175,20 +1135,10 @@ class EventsScreen(Screens):
         """
         Categorize events from game.cur_events_list into display categories for screen
         """
-        selected_group_ID = self.current_event_clan.group_ID
-        self.current_clan_events = [
-            event
-            for event in game.cur_events_list
-            if event.clan == selected_group_ID
-            or (
-                selected_group_ID == game.clan.group_ID
-                and event.clan is None
-            )
-        ]
 
         self.all_events = [
             x
-            for x in self.current_clan_events
+            for x in game.cur_events_list
             if "interaction" not in x.types and "faith" not in x.types
         ]
 
@@ -1227,22 +1177,22 @@ class EventsScreen(Screens):
         # ----------------------------------------------------------------
 
         self.ceremony_events = [
-            x for x in self.current_clan_events if "ceremony" in x.types and x.text
+            x for x in game.cur_events_list if "ceremony" in x.types and x.text
         ]
         self.birth_death_events = [
-            x for x in self.current_clan_events if "birth_death" in x.types and x.text
+            x for x in game.cur_events_list if "birth_death" in x.types and x.text
         ]
         self.relation_events = [
-            x for x in self.current_clan_events if "relation" in x.types and x.text
+            x for x in game.cur_events_list if "relation" in x.types and x.text
         ]
         self.health_events = [
-            x for x in self.current_clan_events if "health" in x.types and x.text
+            x for x in game.cur_events_list if "health" in x.types and x.text
         ]
         self.other_clans_events = [
-            x for x in self.current_clan_events if "other_clans" in x.types
+            x for x in game.cur_events_list if "other_clans" in x.types
         ]
         self.misc_events = [
-            x for x in self.current_clan_events if "misc" in x.types and x.text
+            x for x in game.cur_events_list if "misc" in x.types and x.text
         ]
 
     def update_events_display(self, is_page_update=False):
@@ -1285,11 +1235,11 @@ class EventsScreen(Screens):
         if self.current_display == "relationships":
             if self.faith_toggle is True:
                 self.display_events = [
-                    x for x in self.current_clan_events if "faith" in x.types
+                    x for x in game.cur_events_list if "faith" in x.types
                 ]
             else:
                 self.display_events = [
-                    x for x in self.current_clan_events if "interaction" in x.types
+                    x for x in game.cur_events_list if "interaction" in x.types
                 ]
 
         # SET UP PAGES

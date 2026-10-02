@@ -97,7 +97,6 @@ class Patrol:
         self.patrol_event: Optional[PatrolEvent] = None
         self.debug_patrol_id: str = ""
         self.other_clan = None
-        self.patrol_clan = game.clan
         self.temperament: tuple[str, str] = ("", "")
         """Set once the patrol cats are known, in begin_patrol"""
 
@@ -110,16 +109,12 @@ class Patrol:
         ) = {"success": {}, "failure": {}}
         self.chosen_poi = None
 
-    def begin_patrol(
-        self, patrol_cats: List[Cat], patrol_type: str, patrol_clan=None
-    ) -> str:
+    def begin_patrol(self, patrol_cats: List[Cat], patrol_type: str) -> str:
         """
         Handles all the initial patrol setup, returns the prepared patrol intro text.
         :param patrol_cats: All cats that have been chosen for this patrol
         :param patrol_type: Type of patrol
-        :param patrol_clan: Clan sending the patrol, defaults to the player Clan
         """
-        self.patrol_clan = patrol_clan or game.clan
         self.debug_patrol_id = get_config("patrol_generation.debug_ensure.patrol_id")
 
         print("PATROL START ---------------------------------------------------")
@@ -133,16 +128,14 @@ class Patrol:
         )
 
         # Choose other clan
-        other_clans = [
-            clan
-            for clan in game.clan.all_other_clans
-            if clan.group_ID != self.patrol_clan.group_ID
-        ]
-        if self.patrol_clan is game.clan:
-            neighbours = territory_class.get_neighbouring_clans(game.clan)
-            self.other_clan = choice(neighbours or other_clans) if other_clans else None
+        neighbours = territory_class.get_neighbouring_clans(game.clan)
+        if game.clan.all_other_clans and len(game.clan.all_other_clans) > 0:
+            if neighbours:
+                self.other_clan = choice(neighbours)
+            else:
+                self.other_clan = choice(game.clan.all_other_clans)
         else:
-            self.other_clan = choice(other_clans) if other_clans else None
+            self.other_clan = None
 
         # Find valid patrol
         self._load_patrols_and_set_patrol(patrol_type)
@@ -291,6 +284,13 @@ class Patrol:
         else:
             possible_leads = self.patrol_cats
 
+        if game.clan.all_other_clans and len(game.clan.all_other_clans) > 0:
+            # CGW edit
+            neighbours = territory_class.get_neighbouring_clans(game.clan)
+            if not neighbours:
+                neighbours = game.clan.all_other_clans
+            self.other_clan = choice(neighbours)
+
         # Flip a coin to pick the most experienced or the oldest.
         if randint(0, 1):
             possible_leads.sort(key=lambda x: x.moons)
@@ -339,10 +339,10 @@ class Patrol:
         patrol_list = get_patrol_list(
             patrol_type,
             outsider_rep=will_allow_outsider_patrols(
-                small_clan=int(len(self.patrol_clan.clan_cats))
+                small_clan=int(len(game.clan.clan_cats))
                 < get_config("patrol_generation.small_clan_threshold")
             ),
-            other_clan_rep=self.other_clan.get_standing(self.patrol_clan),
+            other_clan_rep=self.other_clan.get_standing(),
         )
 
         # INFORM -NOT PRESENT-
