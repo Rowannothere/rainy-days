@@ -1015,8 +1015,10 @@ def generate_dialogue_focus():
         debug_focus = constants.CONFIG["lifegen"]["debug"]["debug_ensure_focus"]
         if debug_focus and debug_focus in dialogue_focuses:
             game.clan.focus = debug_focus
-        elif game.clan.war.get("at_war"):
-            game.clan.focus = "war"
+        elif game.clan.war:
+            for war in game.clan.war:
+                game.clan.focus = "war"
+                break
         elif (
             game.clan.freshkill_pile.total_amount
             < game.clan.freshkill_pile.amount_food_needed() * 0.5
