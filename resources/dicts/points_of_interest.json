@@ -4,6 +4,11 @@
         "biome": ["any"],
         "tags": ["trees"]
     },
+    "gather_falls": {
+        "category": "gathering",
+        "biome": ["mountainous", "forest"],
+        "tags": ["water:flowing", "prey:water", "rocks", "fall_risk"]
+    },
     "gather_island": {
         "category": "gathering",
         "biome": ["any"],
@@ -34,10 +39,10 @@
         "biome": ["any"],
         "tags": ["cave", "rocks", "covered"]
     },
-    "terrain_lake": {
-        "category": "terrain",
+    "moon_hollowtree": {
+        "category": "moonplace",
         "biome": ["any"],
-        "tags": ["water:still", "water:flowing", "prey:water", "prey:flying"]
+        "tags": ["trees", "prey:flying", "covered"]
     },
     "terrain_fordriver": {
         "category": "terrain",
@@ -68,6 +73,11 @@
         "category": "terrain",
         "biome": ["plains"],
         "tags": ["Twolegs:present", "prey:ground", "prey:flying", "covered"]
+    },
+    "terrain_farmhouse": {
+        "category": "terrain",
+        "biome": ["plains"],
+        "tags": ["Twolegs:present", "prey:ground", "prey:flying"]
     },
     "terrain_deepforest": {
         "category": "terrain",

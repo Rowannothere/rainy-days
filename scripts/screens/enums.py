@@ -58,3 +58,5 @@ class GameScreen(StrEnum):
     NAME_KITS = "name_kits_screen"
     QUEEN = "queen_screen"
     TALK = "talk_screen"
+    # CGWAR
+    MAP_SCREEN = "map_screen"

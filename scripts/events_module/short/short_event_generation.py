@@ -16,6 +16,7 @@ from scripts.events_module.event_filters import (
     event_for_cat,
     event_for_reputation,
     event_for_clan_relations,
+    event_for_territory,
     event_for_temperament,
     event_for_freshkill_supply,
     event_for_herb_supply,
@@ -29,7 +30,6 @@ from scripts.events_module.event_filters import (
 from scripts.events_module.short.short_event import ShortEvent
 from scripts.game_structure import constants, game
 from scripts.game_structure.game.switches import switch_get_value, Switch
-from scripts.clan_package.cotc import get_warring_clan
 from scripts.clan_package.get_clan_cats import (
     get_living_clan_cat_count,
     find_alive_cats_with_rank,
@@ -50,6 +50,9 @@ def create_short_event(
     victim_cat: Cat = None,
     sub_type: list = None,
     future_event=None,
+    # CGW
+    other_clan=None,
+    multi_cats=[]
 ):
     """
     Handles everything involved in finding and executing an appropriate short event for the given args.
@@ -77,14 +80,21 @@ def create_short_event(
     # if the war didn't go badly, then we decrease the chance of this event being war-focused
     if switch_get_value(Switch.war_rel_change_type) != "rel_down":
         war_chance = 2
-    if game.clan.war.get("at_war", False) and random.randint(1, war_chance) != 1:
-        enemy_clan = get_warring_clan()
-        other_clan = enemy_clan
-        sub_types.append("war")
-    else:
-        other_clan = random.choice(
-            game.clan.all_other_clans if game.clan.all_other_clans else None
-        )
+    
+    current_war = None
+    for war in game.clan.war:
+        if war.is_in_war(game.clan):
+            current_war = war
+            break
+
+    if not other_clan:
+        if current_war and random.randint(1, war_chance) != 1:
+            other_clan = current_war.get_opponent_object(game.clan)
+            sub_types.append("war")
+        else:
+            other_clan = random.choice(
+                game.clan.all_other_clans if game.clan.all_other_clans else None
+            )
 
     # collecting CAMP skill cats for reduction events
     camp_cats = [
@@ -161,7 +171,7 @@ def create_short_event(
 
     else:
         # this doesn't necessarily mean there's a problem, but can be helpful for narrowing down possibilities
-        # print(f"WARNING: no {event_type}: {sub_types} events found for {main_cat.name}")
+        print(f"WARNING: no {event_type}: {sub_types} events found for {main_cat.name}", frequency)
         return
 
 
@@ -323,6 +333,7 @@ def generate_event_objects(event_triggered, biome, frequency) -> list:
                     future_event=event["future_event"]
                     if "future_event" in event
                     else {},
+                    tile_location=event["tile_location"] if "tile_location" in event else []
                 )
                 event_list.append(event)
 
@@ -483,6 +494,14 @@ def filter_events(
                 event.other_clan["current_rep"], other_clan
             ):
                 continue
+
+            # CGW
+            if "owns" in event.other_clan:
+                if not event_for_territory(
+                    event.other_clan["owns"], other_clan
+                ):
+                    continue
+            # --
 
             if not event_for_temperament(
                 event.other_clan["temperament"], other_clan.temperament

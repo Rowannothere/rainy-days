@@ -41,3 +41,5 @@ class Status(Enum):
     not_clancat = "-clancat"
     guide = "guide"
     not_guide = "-guide"
+    tribecat = "tribecat"
+    not_tribecat = "-tribecat"

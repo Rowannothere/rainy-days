@@ -1150,7 +1150,9 @@
         "clancat",
         "-clancat",
         "guide",
-        "-guide"
+        "-guide",
+        "tribecat",
+        "-tribecat"
       ],
       "title": "Status",
       "type": "string"

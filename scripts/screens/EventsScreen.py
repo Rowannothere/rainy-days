@@ -55,6 +55,7 @@ from scripts.ui.windows.choose_deputy import ChooseDeputyWindow
 
 from scripts.clan_package.get_clan_cats import get_living_clan_cat_count
 from scripts.ui.windows.view_cards import ViewCardsWindow
+from scripts.territory import territory_class
 
 
 class EventsScreen(Screens):
@@ -143,6 +144,7 @@ class EventsScreen(Screens):
         self.faves_2 = []
         self.faves_3 = []
         # -------------------------------
+        self.open_map_buttons = {}
 
         # Stores the involved cat button that currently has its cat profile buttons open
         self.open_involved_cat_button = None
@@ -188,6 +190,11 @@ class EventsScreen(Screens):
             event.type == pygame_gui.UI_BUTTON_PRESSED
         ):  # everything else on button press to prevent blinking
             element = event.ui_element
+
+            for key, btn in self.open_map_buttons.items():
+                if element == btn:
+                    switch_set_value(Switch.selected_tile, territory_class.get_tile_from_string(key.split(".")[1]))
+                    self.change_screen(GameScreen.MAP_SCREEN)
             if element == self.timeskip_button:
                 # ensure we can't run the same timeskip multiple times
                 if self.events_thread is not None and self.events_thread.is_alive():
@@ -921,10 +928,10 @@ class EventsScreen(Screens):
             )
 
         involved_cat_rect = ui_scale(
-            pygame.Rect((0, 0), (455, 56 if scrollbar_needed else 36))
+            pygame.Rect((40, 0), (415, 56 if scrollbar_needed else 36))
         )
         involved_cat_rect.topleft = (
-            ui_scale_value(5),
+            ui_scale_value(5) + 40,
             -button_pressed.get_relative_rect()[3],
         )
 
@@ -1379,6 +1386,21 @@ class EventsScreen(Screens):
 
             self.event_display_boxes.append(display_element_event)
 
+            # CGWAR
+            # make tile button
+            if event_object.event_tile:
+                self.open_map_buttons[str(i) + "." + event_object.event_tile] = UISurfaceImageButton(
+                    ui_scale(pygame.Rect((8, 5), (34, 34))),
+                    Icon.NEWLEAF,
+                    get_button_dict(ButtonStyles.ICON, (34, 34)),
+                    object_id="@buttonstyles_icon",
+                    starting_height=3,
+                    manager=MANAGER,
+                    container=display_element_container,
+                    anchors={"top_target": display_element_event},
+                    tool_tip_text="screens.events.view_map_tile"
+                )
+
             if event_object.cats_involved:
                 involved_cat_button = IDImageButton(
                     catbutton_rect,
@@ -1397,17 +1419,32 @@ class EventsScreen(Screens):
                 )
                 self.involved_cat_buttons.append(involved_cat_button)
 
+            # CGW edited
+            event_rect = None
+            if event_object.cats_involved:
+                event_rect = (
+                    display_element_event.get_relative_rect()[3]
+                    + (
+                        involved_cat_button.get_relative_rect()[3]
+                        + ui_scale_value(10)
+                        )
+                    )
+            elif event_object.event_tile:
+                event_rect = (
+                    display_element_event.get_relative_rect()[3]
+                    + (
+                        self.open_map_buttons[str(i) + "." + event_object.event_tile].get_relative_rect()[3]
+                        + ui_scale_value(10)
+                        )
+                    )
+            else:
+                event_rect = display_element_event.get_relative_rect()[3]
+                
             display_element_container.set_dimensions(
                 (
                     default_rect[2],
                     (
-                        display_element_event.get_relative_rect()[3]
-                        + (
-                            involved_cat_button.get_relative_rect()[3]
-                            + ui_scale_value(10)
-                        )
-                        if event_object.cats_involved
-                        else display_element_event.get_relative_rect()[3]
+                        event_rect
                     ),
                 )
             )

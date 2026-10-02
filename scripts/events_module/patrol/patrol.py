@@ -49,6 +49,7 @@ from scripts.clan_package.get_clan_cats import (
     get_living_clan_cat_count,
     find_alive_cats_with_rank,
 )
+from scripts.territory import territory_class
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +91,9 @@ class Patrol:
     used_patrols = {"romance": [], "normal": []}
 
     def __init__(self):
+        # CGW
+        self.chosen_intro_string: str = ""
+        # --
         self.patrol_event: Optional[PatrolEvent] = None
         self.debug_patrol_id: str = ""
         self.other_clan = None
@@ -124,14 +128,21 @@ class Patrol:
         )
 
         # Choose other clan
+        neighbours = territory_class.get_neighbouring_clans(game.clan)
         if game.clan.all_other_clans and len(game.clan.all_other_clans) > 0:
-            self.other_clan = choice(game.clan.all_other_clans)
+            if neighbours:
+                self.other_clan = choice(neighbours)
+            else:
+                self.other_clan = choice(game.clan.all_other_clans)
         else:
             self.other_clan = None
 
         # Find valid patrol
         self._load_patrols_and_set_patrol(patrol_type)
         self._create_needed_cats()
+
+        # CGWAR
+        self.chosen_intro_string = choice(self.patrol_event.intro_strings)
 
         if self.patrol_event.poi:
             self.chosen_poi = get_poi_from_constraints(
@@ -163,7 +174,7 @@ class Patrol:
         # Return text adjusted patrol intro
         return event_text_adjust(
             Cat,
-            choice(self.patrol_event.intro_strings),
+            self.chosen_intro_string,
             involved_cat_dict=self.involved_cats,
             clan=game.clan,
             other_clan=self.other_clan,
@@ -272,6 +283,13 @@ class Patrol:
         # if no warriors, set oldest or most experienced of any cats as patrol lead
         else:
             possible_leads = self.patrol_cats
+
+        if game.clan.all_other_clans and len(game.clan.all_other_clans) > 0:
+            # CGW edit
+            neighbours = territory_class.get_neighbouring_clans(game.clan)
+            if not neighbours:
+                neighbours = game.clan.all_other_clans
+            self.other_clan = choice(neighbours)
 
         # Flip a coin to pick the most experienced or the oldest.
         if randint(0, 1):
@@ -696,6 +714,8 @@ class Patrol:
             outcome_cat_dict,
             self.other_clan,
             self.chosen_poi,
+            patrol_event=self.patrol_event,
+            intro_string=self.chosen_intro_string
         ) + (self.get_patrol_art(chosen_outcome),)
 
     def calculate_success(

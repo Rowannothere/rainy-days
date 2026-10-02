@@ -47,6 +47,8 @@ from .make_clan_screens.ClanCreatedScreen import ClanCreatedScreen
 from .make_clan_screens.CustomCat import CustomCatScreen
 from .make_clan_screens.ChooseYourNameScreen import ChooseYourNameScreen
 
+from .MapScreen import MapScreen
+
 # ---------------------------------------------------------------------------- #
 #                                  UI RULES                                    #
 # ---------------------------------------------------------------------------- #
@@ -119,6 +121,7 @@ def rebuild_all_screens():
         GameScreen.ACHIEVEMENTS: AchievementScreen,
         GameScreen.ELDER_STORY: ElderStoryScreen,
         GameScreen.QUEEN: QueenScreen,
+        GameScreen.MAP_SCREEN: MapScreen
     }
 
     for enum, classobj in enum_to_class.items():

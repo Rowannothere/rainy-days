@@ -15,6 +15,7 @@
         ],
         "frequency": 3,
         "event_text": "The apprentices are learning how to disguise their scents from enemies with kelp and seawater.",
+        "tile_location": ["outside_camp"],
         "m_c": {
             "status": [
                 "apprentice"
@@ -73,7 +74,8 @@
             "war"
         ],
         "frequency": 3,
-        "event_text": "m_c sat by the water, wondering why times are not as peaceful as the tides.",
+        "event_text": "m_c sits by the water, wondering why times are not as peaceful as the tides.",
+        "tile_location": ["outside_camp"],
         "m_c": {
             "status": [
                 "leader"
@@ -111,6 +113,7 @@
         ],
         "frequency": 1,
         "event_text": "A huge wave crashes into camp, leaving everyone soaked and the herb stores quite damaged.",
+        "tile_location": ["camp"],
         "supplies": [
             {
                 "type": "all_herb",
@@ -132,6 +135,7 @@
         ],
         "frequency": 1,
         "event_text": "m_c finds an old seagull nest while out hunting. It seems to be long abandoned, but some pretty feathers have remained intact! m_c decides to take some with {PRONOUN/m_c/object}.",
+        "tile_location": ["outside_camp"],
         "new_accessory": [
             "GULL FEATHERS"
         ],
@@ -334,6 +338,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c takes r_c down to the edge of the water and begins to warn {PRONOUN/r_c/object} of the dangerous things that can be found in the deep blue sea.",
+        "tile_location": ["outside_camp"],
         "m_c": {
             "relationship_status": [
                 "parent/child"
@@ -374,6 +379,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c takes r_c down to the edge of the water and begins to warn {PRONOUN/r_c/object} of the dangerous things that can be found in the deep blue sea.",
+        "tile_location": ["outside_camp"],
         "m_c": {
             "relationship_status": [
                 "mentor/app"
@@ -410,6 +416,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c paws at the pretty, glittering seaglass tangled in the seaweed that hangs over the nursery entrance.",
+        "tile_location": ["camp"],
         "m_c": {
             "age": [
                 "kitten"
@@ -426,6 +433,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c peers over the edge of the rock, past the barnacles exposed by the low tide, searching for something in {PRONOUN/m_c/poss} reflection in the sea below.",
+        "tile_location": ["any"],
         "m_c": {
             "status": [
                 "elder"
@@ -442,6 +450,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c takes r_c to look for pretty treasures in the sand. {PRONOUN/m_c/subject/CAP} {VERB/m_c/smile/smiles} at seeing {PRONOUN/m_c/poss} kit happy.",
+        "tile_location": ["territory"],
         "m_c": {
             "relationship_status": [
                 "parent/child"
@@ -480,6 +489,7 @@
         ],
         "frequency": 3,
         "event_text": "m_c takes r_c to look for pretty treasures in the sand. {PRONOUN/m_c/subject/CAP} {VERB/m_c/blush/blushes} at r_c's smile.",
+        "tile_location": ["territory"],
         "m_c": {
             "relationship_status": [
                 "fancies"
@@ -503,6 +513,77 @@
                 "log": {
                     "cats_from": "cat_from spent time looking for treasures on the beach with cat_to."
                 }
+            }
+        ]
+    },
+    {
+        "event_id": "cgwar_terrain_beach_01",
+        "location": [
+            "any"
+        ],
+        "season": [
+            "any"
+        ],
+        "frequency": 4,
+        "event_text": "m_c takes a nap by the ocean and is rudely awoken by the tide hitting {PRONOUN/m_c/poss} back.",
+        "tile_location": [
+            "coast:ocean"
+        ],
+        "m_c": {
+            "status": [
+                "-kitten"
+            ]
+        }
+    },
+    {
+        "event_id": "cgwar_terrain_beach_02",
+        "location": [
+            "any"
+        ],
+        "season": [
+            "any"
+        ],
+        "frequency": 4,
+        "event_text": "m_c finds a strange, shiny Twoleg object washed up on the shore. It looks hollow, with something flat curled up inside. m_c can't get it open, so {PRONOUN/m_c/subject} {VERB/m_c/toss/tosses} it back into the water.",
+        "tile_location": [
+            "coast:ocean"
+        ],
+        "m_c": {
+            "status": [
+                "-kitten"
+            ]
+        }
+    },
+    {
+        "event_id": "gen_death_cgwar_terrain_05",
+        "location": [
+            "any"
+        ],
+        "season": [
+            "any"
+        ],
+        "frequency": 3,
+        "event_text": "m_c and r_c took a walk by the coast and ended up falling asleep by the water. While they were asleep, a storm began and the tide rose to pull them in. r_c tried {PRONOUN/r_c/poss} best to help m_c back to shore, but {PRONOUN/r_c/subject} ended up returning to camp alone, telling m_c's friends and family that {PRONOUN/r_c/subject}{VERB/r_c/'re/'s} sorry.",
+        "tile_location": [
+            "coast:ocean"
+        ],
+        "m_c": {
+            "status": [
+                "-kitten", "-leader"
+            ],
+            "dies": true
+        },
+        "r_c": {
+            "status": [
+                "-kitten"
+            ]
+        },
+        "history": [
+            {
+                "cats": [
+                    "m_c"
+                ],
+                "death": "m_c was taken out by the tide during an oceanside nap."
             }
         ]
     }

@@ -1,3 +1,4 @@
+import pygame
 import i18n
 
 from scripts.game_structure.constants import HERBS
@@ -11,6 +12,10 @@ class Herb:
         self._display_dict = self._herb_dict.get("display", {})
 
         self.expiration: int = self._herb_dict.get("expiration", 1)
+
+        # CGW
+        colour_list = self._herb_dict.get("colour")
+        self.colour = pygame.Color(colour_list[0], colour_list[1], colour_list[2])
 
     @property
     def singular_display(self):
@@ -26,10 +31,30 @@ class Herb:
             count=2,
         )
 
-    def get_rarity(self, biome, season) -> int:
+    def get_rarity(self, biome, season, territory_tiles=[], clan=None) -> int:
         """
         returns rarity of the herb within clan's current biome and season
         """
         rarity_dict = self._herb_dict.get("rarity", {})
 
-        return rarity_dict.get(biome.casefold(), {}).get(season.casefold(), 0)
+        rarity = rarity_dict.get(biome.casefold(), {}).get(season.casefold(), 0)
+
+        # CGWAR edited
+        # the presence of herbs in your territory makes them easier to gather passively
+        for tile in territory_tiles:
+            if (
+                tile.herb == self.name and
+                tile.owner == clan
+                ):
+                rarity -= tile.strength
+                break
+        if rarity < 1:
+            rarity = 1
+
+        return rarity
+
+
+# with open(
+#     os.path.normpath("resources/dicts/herb_info.json"), "r", encoding="utf-8"
+# ) as read_file:
+#     HERBS = ujson.loads(read_file.read())

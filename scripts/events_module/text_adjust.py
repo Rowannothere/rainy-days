@@ -27,6 +27,9 @@ from scripts.game_structure.localization import load_lang_resource, get_lang_con
 
 from scripts.screens.enums import GameScreen
 
+from scripts.game_structure.game.switches import (
+    switch_set_value
+)
 if TYPE_CHECKING:
     from scripts.cat.cats import Cat
 
@@ -333,7 +336,12 @@ def ongoing_event_text_adjust(Cat, text, clan=None, other_clan_name=None):
         text = process_text(text, cat_dict)
 
     if other_clan_name:
-        text = text.replace("o_c_n", other_clan_name)
+        # text = text.replace("o_c_n", other_clan_name)
+        text = _replace_clan_name(
+            text,
+            "o_c_n",
+            other_clan_name,
+        )
     if clan:
         clan_name = str(clan.name)
     else:

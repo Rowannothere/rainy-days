@@ -560,9 +560,10 @@ class HerbSupply:
         amount_modifier = 1
         quantity_modifier = 1
 
-        med_skills = med_cat.skills.get_all()
-        amount_modifier += med_skills.get(SkillPath.SENSE, 0)
-        quantity_modifier += med_skills.get(SkillPath.CLEVER, 0)
+        if med_cat:
+            med_skills = med_cat.skills.get_all()
+            amount_modifier += med_skills.get(SkillPath.SENSE, 0)
+            quantity_modifier += med_skills.get(SkillPath.CLEVER, 0)
 
         # list of the herbs, sorted by most need
         herb_list = self.sorted_by_need
@@ -607,6 +608,8 @@ class HerbSupply:
                 if not game.clan.override_biome
                 else game.clan.override_biome,
                 game.clan.current_season,
+                game.clan.territory_tiles,
+                game.clan
             )
             if not rarity:
                 continue

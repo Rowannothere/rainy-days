@@ -313,9 +313,29 @@ def event_for_clan_relations(required_rel: list, other_clan) -> bool:
     if not required_rel or "any" in required_rel:
         return True
 
-    current_standing = other_clan.get_standing()
+    current_standing = other_clan.get_standing(game.clan)
 
     return current_standing in required_rel
+
+# CGW
+def event_for_territory(required_territory: list, other_clan) -> bool:
+    """
+    Checks if the Clan owns or doesn't own the required territory.
+    """
+    # make territory list bc i cant import it
+    # circular import:(
+    all_tiles = []
+    for tile in game.clan.territory_tiles:
+        if tile.owner == other_clan.group_ID:
+            all_tiles.append(tile)
+
+    for item in required_territory:
+        if "terrain" in item:
+            for tile in all_tiles:
+                if tile.poi:
+                    if tile.poi == item:
+                        return True
+    return False
 
 
 def event_for_temperament(required_temp: list, temperament) -> bool:

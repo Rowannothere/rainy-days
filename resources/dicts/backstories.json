@@ -56,6 +56,9 @@
             "kittypet6", "kittypet7", "kittypet8", "kittypet9", "refugee3",
             "tragedy_survivor3", "guided1", "refugee6"
         ],
+        "tribecat_backstories": [
+            "tribecat01"
+        ],
         "former_clancat_backstories": [
             "otherclan1",
             "otherclan2",

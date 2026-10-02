@@ -35,6 +35,21 @@ from scripts.events_module.text_adjust import (
     history_text_adjust,
 )
 from scripts.game_structure import constants
+from scripts.territory import territory_class
+from scripts.clan_resources.point_of_interest import (
+    load_pois,
+    get_poi_save_dict,
+    generate_and_add_new_poi,
+    get_poi_tags_set,
+    get_poi_categories_set,
+    get_poi_names_set,
+    clear_pois,
+)
+from scripts.game_structure.game.switches import (
+    Switch,
+    switch_get_value,
+    switch_set_value,
+)
 from scripts.game_structure import game
 
 
@@ -78,6 +93,7 @@ class ShortEvent:
         supplies: list = None,
         new_gender: List[str] = None,
         future_event: dict = None,
+        tile_location: List[str] = None
     ):
         if not event_id:
             print("WARNING: moon event has no event_id")
@@ -206,6 +222,8 @@ class ShortEvent:
         self.new_gender = new_gender
         self.future_event = future_event if future_event else {}
 
+        self.tile_location = tile_location if tile_location else {}
+
         self.types: list[str] = []
         self.additional_event_text: str = ""
 
@@ -231,6 +249,7 @@ class ShortEvent:
         Handles the execution of this event.
         :param other_clan: the object for the other clan involved in this event
         """
+        # print("Executing", self.event_id)
         self.additional_event_text = ""
         self.text = self.text_template
         self.all_involved_cat_ids.clear()
@@ -256,6 +275,12 @@ class ShortEvent:
             self.handle_mass_death()
             if len(self.multi_cat_objects) <= 2:
                 return
+
+        # CGWAR
+        if "other_clan_death_reaction" in self.sub_type:
+            self.multi_cat_objects = game.dead_cats_to_grieve
+        if "other_clan_birth_reaction" in self.sub_type:
+            self.multi_cat_objects = [Cat.fetch_cat(c) for c in self.main_cat.get_children() if Cat.fetch_cat(c).moons == 0]
 
         # create new cats (must happen here so that new cats can be included in further changes)
         self.handle_new_cats(other_clan)
@@ -413,6 +438,13 @@ class ShortEvent:
             chosen_poi=chosen_poi,
         )
 
+        # get tile
+        # must be done after adjusting text
+        event_tile = self.handle_tile_location(other_clan)
+        if self.tile_location and not event_tile:
+            # print(self.event_id, ": No valid tile found for", self.tile_location, ". Aborting.")
+            return
+
         if self.chosen_herb:
             game.herb_events_list.append(f"{self.text} {self.herb_notice}")
 
@@ -423,6 +455,7 @@ class ShortEvent:
                 self.text + " " + self.additional_event_text,
                 self.types,
                 self.all_involved_cat_ids,
+                event_tile=event_tile.tile_string if event_tile else None
             )
         )
 
@@ -1019,6 +1052,46 @@ class ShortEvent:
             self.herb_notice = i18n.t(
                 "screens.med_den.gain_event", herbs=adjust_list_text(herb_list)
             )
+
+    def handle_tile_location(self, other_clan):
+        """
+        Finds a valid tile for the event to happen in and puts it in the dict.
+        """
+        if not self.tile_location:
+            return None
+
+        valid_tiles_dict = {}
+        # find valid tiles for all tile_location options
+        for option in self.tile_location:
+            preset = option
+            if preset in get_poi_tags_set():
+                if switch_get_value(Switch.last_used_POI):
+                    preset = switch_get_value(Switch.last_used_POI)
+                    switch_set_value(Switch.last_used_POI, "")
+
+            if "," in preset:
+                preset_list = preset.split(",")
+            else:
+                preset_list = [preset]
+
+            found_tiles = territory_class.get_tiles(
+                tile_types=preset_list,
+                clan=game.clan,
+                other_clan=other_clan
+                )
+            if not found_tiles:
+                continue
+
+            valid_tiles_dict[preset] = found_tiles
+
+        if not valid_tiles_dict:
+            return None
+
+        chosen_preset = choice(list(valid_tiles_dict.keys()))
+        chosen_tile = choice(valid_tiles_dict[chosen_preset])
+        chosen_tile.add_event(self.text)
+        return chosen_tile
+
 
     def __repr__(self):
         return f"{self.event_id} ({self.sub_type})"

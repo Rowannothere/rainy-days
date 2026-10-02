@@ -113,8 +113,6 @@ class StartScreen(Screens):
                 TortiePatchToolWindow()
             elif element == self.elements.get("white_patch"):
                 WhitePatchToolWindow()
-            elif element == self.elements.get("bug_report"):
-                open_url("https://github.com/ClanGenOfficial/clangen/issues/new/choose")
             elif element == self.social_buttons["discord_button"]:
                 open_url("https://discord.gg/WqzdEcavcH")
             elif element == self.social_buttons["tumblr_button"]:
