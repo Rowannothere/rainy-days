@@ -27,7 +27,7 @@
     "moon_cave": {
         "category": "moonplace",
         "biome": ["any"],
-        "tags": ["cave", "rocks", "maze"]
+        "tags": ["cave", "rocks"]
     },
     "moon_mothermouth": {
         "category": "moonplace",
@@ -47,42 +47,42 @@
     "terrain_carrionplace": {
         "category": "terrain",
         "biome": ["forest"],
-        "tags": ["Twolegs:present", "tainted", "prey:ground", "unstable", "covered", "maze"]
+        "tags": ["Twolegs:present", "tainted", "prey:ground", "unstable", "covered"]
     },
     "terrain_sunningrocks": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["rocks", "high_ground"]
+        "tags": ["rocks"]
     },
     "terrain_well": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["Twolegs:abandoned", "water:still", "fall_risk", "high_ground"]
+        "tags": ["Twolegs:abandoned", "water:still", "fall_risk"]
     },
     "terrain_twolegplace": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["Twolegs:present", "prey:ground", "tainted", "maze"]
+        "tags": ["Twolegs:present", "prey:ground", "tainted"]
     },
     "terrain_horseplace": {
         "category": "terrain",
         "biome": ["plains"],
-        "tags": ["Twolegs:present", "prey:ground", "prey:flying", "covered", "maze"]
+        "tags": ["Twolegs:present", "prey:ground", "prey:flying", "covered"]
     },
     "terrain_deepforest": {
         "category": "terrain",
         "biome": ["forest"],
-        "tags": ["trees", "prey:ground", "prey:flying", "maze"]
+        "tags": ["trees", "prey:ground", "prey:flying"]
     },
     "terrain_windswepttree": {
         "category": "terrain",
         "biome": ["plains"],
-        "tags": ["trees", "prey:ground", "prey:flying", "high_ground"]
+        "tags": ["trees", "prey:ground", "prey:flying"]
     },
     "terrain_hugeboulder": {
         "category": "terrain",
         "biome": ["forest"],
-        "tags": ["rocks", "prey:ground", "high_ground"]
+        "tags": ["rocks", "prey:ground", "covered"]
     },
     "terrain_waterfall": {
         "category": "terrain",
@@ -107,16 +107,16 @@
     "terrain_batcaves": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["prey:flying", "tainted", "cave", "covered", "maze"]
+        "tags": ["prey:flying", "tainted", "cave", "covered"]
     },
     "terrain_carrionbeach": {
         "category": "terrain",
         "biome": ["beach"],
-        "tags": ["Twolegs:present", "tainted", "prey:water", "water:ocean", "maze"]
+        "tags": ["Twolegs:present", "tainted", "prey:water", "water:ocean"]
     },
     "terrain_abandonednest": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["Twolegs:abandoned", "prey:ground", "covered", "unstable", "maze", "high_ground"]
+        "tags": ["Twolegs:abandoned", "prey:ground", "covered", "unstable"]
     }
 }

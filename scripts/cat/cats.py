@@ -28,6 +28,7 @@ from scripts.cat.factories.typed_dicts import (
     MentorshipDict,
     CatTogglesDict,
     InheritanceDict,
+    HeritageDict,
     AfterlifeAffinityDict,
     GenderDict,
 )
@@ -137,6 +138,7 @@ class Cat:
         personality: Personality,
         mentorship: MentorshipDict,
         inheritance: InheritanceDict,
+        heritage: HeritageDict,
         affinity: AfterlifeAffinityDict,
         toggles: CatTogglesDict,
         experience: int,
@@ -160,6 +162,7 @@ class Cat:
         :param personality: Personality object
         :param mentorship: MentorshipDict containing mentor data and apprentice data, including former for both
         :param inheritance: Inheritance object
+        :param heritage: HeritageDict containing information about the cat's known heritage
         :param affinity: AffinityDict containing starclan & dark forest affinity values
         :param toggles: Dict of cat-related behavior toggles
         :param experience: Cat's experience value
@@ -216,6 +219,10 @@ class Cat:
         self.mate = inheritance["mate"]
         self.previous_mates = inheritance["previous_mates"]
         self.inheritance = None
+
+        # heritage
+        self.parent1_known = heritage["parent1_known"]
+        self.parent2_known = heritage["parent2_known"]
 
         # afterlife affinity
         self.dark_forest_affinity = affinity["dark_forest"]
@@ -484,16 +491,18 @@ class Cat:
         """
         return not self.dead
 
-    def die(self, body: bool = True, grief_allowed: bool = True):
+    def die(self, body: bool = True, grief_allowed: bool = True, clan=None):
         """Kills cat.
         :param body: defaults to True, use this to mark if the body was recovered so
         that grief messages will align with body status
         :param grief_allowed: defaults to True, set to False if death should not trigger grief
         """
+        if clan is None:
+            clan=self.status.fetch_clan_object(game.clan)
         if (
             self.status.is_leader
             and "pregnant" in self.injuries
-            and game.clan.leader_lives > 0
+            and clan.leader_lives > 0
         ):
             self.illnesses.clear()
 
@@ -508,14 +517,14 @@ class Cat:
 
         # Deal with leader death
         if self.status.is_leader:
-            if game.clan.leader_lives > 0:
+            if clan.leader_lives > 0:
                 self.assign_thought(CatThought.ON_DEATH)
                 return
 
-            if game.clan.leader_lives <= 0:
+            if clan.leader_lives <= 0:
                 self.dead = True
                 game.just_died.append(self.ID)
-                game.clan.leader_lives = 0
+                clan.leader_lives = 0
 
         else:
             self.dead = True
@@ -531,11 +540,13 @@ class Cat:
 
         # handle grief
         # since we just yeeted them to their afterlife, we gotta check their previous group affiliation, not current
+        last_living_group = self.status.get_last_living_group()
+        
         if (
             grief_allowed
             and game.clan
-            and self.status.get_last_living_group() == CatGroup.PLAYER_CLAN_ID
-            and not self.status.is_exiled(CatGroup.PLAYER_CLAN_ID)
+            and last_living_group is not None
+            and not self.status.is_exiled(last_living_group)
         ):
             grief(self, body)
             game.dead_cats_to_grieve.append(self)
@@ -562,7 +573,7 @@ class Cat:
                 (CatSocial.KITTYPET, CatSocial.LONER, CatSocial.ROGUE)
             )
         self.status.leave_group(new_social_status=new_social_status)
-        self.assign_thought(CatThought.ON_RANK_CHANGE)
+        self.assign_thought()
 
         for app in self.apprentice.copy():
             app_ob = Cat.fetch_cat(app)
@@ -889,8 +900,11 @@ class Cat:
 
             print(f"WARNING: saving history of cat #{self.ID} didn't work")
 
-    def generate_lead_ceremony(self):
-        """Create a leader ceremony and add it to the history"""
+    def generate_lead_ceremony(self, clan=None):
+        """Create a leader ceremony and add it to the history
+        :param clan: the Clan this cat is becoming leader of, defaults to the cat's own Clan"""
+        if clan is None:
+            clan = self.status.fetch_clan_object(game.clan) or game.clan
 
         load_leader_ceremonies()
 
@@ -935,7 +949,7 @@ class Cat:
         life_givers = []
         dead_relations = []
         life_giving_leader = None
-        num_of_lives_to_give = game.clan.leader_lives
+        num_of_lives_to_give = clan.leader_lives
 
         # grab life givers that the cat actually knew in life and sort by amount of relationship!
         relationships = self.relationships.values()
@@ -1284,7 +1298,9 @@ class Cat:
         if mortality and not int(random() * mortality):
             if self.status.is_leader:
                 self.leader_death_heal = True
-                game.clan.leader_lives -= 1
+                clan = self.status.fetch_clan_object(game.clan)
+                clan.leader_lives -= 1
+
 
             self.die()
             return False
@@ -1327,7 +1343,7 @@ class Cat:
 
         if mortality and not int(random() * mortality):
             if self.status.is_leader:
-                game.clan.leader_lives -= 1
+                self.status.fetch_clan_object(game.clan).leader_lives -= 1
             self.die()
             return False
 
@@ -1389,7 +1405,7 @@ class Cat:
 
         if mortality and not int(random() * mortality):
             if self.status.is_leader:
-                game.clan.leader_lives -= 1
+                self.status.fetch_clan_object(game.clan).leader_lives -= 1
             self.die()
             return "continue"
 
@@ -2454,6 +2470,8 @@ class Cat:
                 "facets": self.personality.get_facet_string(),
                 "parent1": self.parent1,
                 "parent2": self.parent2,
+                "parent1_known": self.parent1_known,
+                "parent2_known": self.parent2_known,
                 "adoptive_parents": self.adoptive_parents,
                 "mentor": self.mentor or None,
                 "former_mentor": (
@@ -2521,6 +2539,13 @@ class Cat:
 
         # we're doing this separately so that we don't fuck up other clan cats and cats with no group
         if self.dead:
+            sorted_specific_list = [
+                check_cat
+                for check_cat in sorted_specific_list
+                if check_cat.status.group_ID == self.status.group_ID
+            ]
+
+        if not self.dead and self.status.is_clancat:
             sorted_specific_list = [
                 check_cat
                 for check_cat in sorted_specific_list

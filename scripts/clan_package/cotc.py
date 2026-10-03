@@ -9,7 +9,7 @@ def get_warring_clan():
     enemy_clan = None
     if game.clan.war.get("at_war", False):
         for other_clan in game.clan.all_other_clans:
-            if other_clan.prefix == game.clan.war["enemy"]:
+            if other_clan.name == game.clan.war["enemy"]:
                 enemy_clan = other_clan
 
     return enemy_clan
@@ -24,12 +24,25 @@ def get_other_clan(clan_name):
             return clan
 
 
-def change_clan_relations(other_clan: OtherClan, difference):
+def change_clan_relations(clan, other_clan=None, difference=None):
     """
     will change the Clan's relation with other clans according to the difference parameter.
+    old two arguement calls still default to player Clan
     """
-    other_clan.relations += difference
+    if difference is None:
+        difference = other_clan
+        other_clan = clan
+        clan = game.clan
 
+    clan_relations = game.clan.get_relations(clan, other_clan)
+    clan_relations += difference
+
+    if clan_relations > 30:
+        clan_relations = 30
+    elif clan_relations < 0:
+        clan_relations = 0
+
+    game.clan.set_relations(clan, other_clan, clan_relations)
 
 def change_clan_reputation(difference):
     """

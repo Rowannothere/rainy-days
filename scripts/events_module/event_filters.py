@@ -305,13 +305,21 @@ def event_for_reputation(required_rep: list) -> bool:
     return False
 
 
-def event_for_clan_relations(required_rel: list, other_clan) -> bool:
+def event_for_clan_relations(required_rel: list, other_clan, clan=None) -> bool:
     """
     checks if the clan has clan relations matching required_rel
     """
     if not required_rel or "any" in required_rel:
         return True
 
+    if clan is not None:
+        current_standing = game.clan.get_relations(
+            clan,
+            other_clan,
+            get_label=True,
+        )
+        return current_standing in required_rel
+    
     current_standing = other_clan.get_standing()
 
     return current_standing in required_rel
@@ -1482,14 +1490,14 @@ def _get_cats_from_group(
                     c
                     for c in cat_list
                     if c.status.group
-                    != already_involved_cats[cat_to_match].status.group
+                    == already_involved_cats[cat_to_match].status.group
                 ]
             else:
                 cat_list = [
                     c
                     for c in cat_list
                     if c.status.group
-                    == already_involved_cats[cat_to_match].status.group
+                    != already_involved_cats[cat_to_match].status.group
                 ]
             remaining_tags.remove(tag)
 

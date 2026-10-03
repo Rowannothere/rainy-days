@@ -16,7 +16,9 @@ class EventInformation:
             ]
         ] = None,
         cats_involved: list | tuple = None,
+        clan=None,
         cat_dict: dict = None,
+        clans_involved: list | tuple = None,
     ):
         """
         :param text: The event text.
@@ -28,6 +30,7 @@ class EventInformation:
         """
 
         self.text = text
+        self.clan = clan
 
         if types:
             self.types = list(types)
@@ -35,6 +38,7 @@ class EventInformation:
             self.types = []
 
         self.cat_dict = cat_dict if cat_dict else {}
+        self.clans_involved = list(clans_involved) if clans_involved else []
 
         if isinstance(cats_involved, str):
             self.cats_involved = []
@@ -62,6 +66,8 @@ class EventInformation:
             "types": self.types,
             "cats_involved": self.cats_involved,
             "cat_dict": cat_dict,
+            "clan": self.clan,
+            "clans_involved": self.clans_involved,
         }
 
     @staticmethod
@@ -83,4 +89,6 @@ class EventInformation:
             types=info_dict.get("types", None),
             cats_involved=info_dict.get("cats_involved", None),
             cat_dict=cat_dict,
+            clan=info_dict.get("clan", None),
+            clans_involved=info_dict.get("clans_involved", None),
         )

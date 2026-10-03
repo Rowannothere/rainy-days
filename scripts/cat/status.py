@@ -316,6 +316,21 @@ class Status:
         """
         return self.group == CatGroup.PLAYER_CLAN
 
+    def fetch_clan_object(self, player_clan):
+        """
+        Returns the Clan object associated with this cat's last living group.
+        """
+        living_group_id = self.get_last_living_group()
+
+        if living_group_id == CatGroup.PLAYER_CLAN_ID:
+            return player_clan
+
+        for clan in player_clan.all_other_clans:
+            if clan.group_ID == living_group_id:
+                return clan
+
+        return None
+
     @property
     def is_outsider(self) -> bool:
         """

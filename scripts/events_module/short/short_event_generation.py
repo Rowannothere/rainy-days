@@ -50,6 +50,7 @@ def create_short_event(
     victim_cat: Cat = None,
     sub_type: list = None,
     future_event=None,
+    clan=None,
 ):
     """
     Handles everything involved in finding and executing an appropriate short event for the given args.
@@ -60,6 +61,10 @@ def create_short_event(
     :param sub_type: The required subtypes for this event.
     :param future_event: If this is being triggered by a future event, pass the future event object here.
     """
+
+    if clan is None:
+        clan = game.clan
+
     if future_event and (
         not main_cat.status.alive_in_player_clan
         or (random_cat and not random_cat.status.alive_in_player_clan)
@@ -82,15 +87,19 @@ def create_short_event(
         other_clan = enemy_clan
         sub_types.append("war")
     else:
-        other_clan = random.choice(
-            game.clan.all_other_clans if game.clan.all_other_clans else None
-        )
+        possible_other_clans = [
+            other
+            for other in game.clan.all_other_clans
+            if other.group_ID != clan.group_ID
+        ]
+
+        other_clan = random.choice(possible_other_clans) if possible_other_clans else None
 
     # collecting CAMP skill cats for reduction events
     camp_cats = [
         c
         for c in Cat.all_cats_list
-        if c.status.alive_in_player_clan and SkillPath.CAMP in c.skills.get_all()
+        if c.status.group_ID == clan.group_ID and SkillPath.CAMP in c.skills.get_all()
     ]
 
     avoidance_chance = 1
@@ -127,6 +136,7 @@ def create_short_event(
             excluded_events=future_event.excluded_events if future_event else None,
             ignore_subtyping=future_event.negate_subtyping if future_event else None,
             reduction_avoidance_chance=avoidance_chance,
+            clan=clan,
         )
         if not chosen_event:
             # we'll see if any more common events are available
@@ -156,7 +166,7 @@ def create_short_event(
         chosen_event.types = types
 
         # execute the event
-        chosen_event.execute_event(other_clan)
+        chosen_event.execute_event(other_clan, clan)
 
     else:
         # this doesn't necessarily mean there's a problem, but can be helpful for narrowing down possibilities
@@ -329,6 +339,7 @@ def filter_events(
     excluded_events: list = None,
     ignore_subtyping: bool = False,
     reduction_avoidance_chance: int = 1,
+    clan=None,
 ) -> Tuple[Optional[ShortEvent], Optional[Cat]]:
     """
     Filters possible events to find an event that fits the given requirements
@@ -342,6 +353,10 @@ def filter_events(
     :param ignore_subtyping: ignores subtyping entirely
     :param reduction_avoidance_chance: chance to avoid events that reduce supplies
     """
+
+    if clan is None:
+        clan = game.clan
+
     final_events = []
     incorrect_format = []
 
@@ -583,7 +598,7 @@ def filter_events(
             cat_list = [
                 c
                 for c in Cat.all_cats.values()
-                if c.status.alive_in_player_clan and c != main_cat
+                if c.status.group_ID == main_cat.status.group_ID and c != main_cat
             ]
         if not cat_list:
             final_events.remove(chosen_event)

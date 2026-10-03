@@ -91,6 +91,7 @@ class Clan:
         starting_members=None,
         starting_season="Newleaf",
         self_run_init_functions=True,
+        clan_count_mode="singleclan",
     ):
         """
         :param save_id: The save file name for the Clan, this should not be used for player-facing text beyond the save file screen
@@ -102,8 +103,12 @@ class Clan:
         if starting_members is None:
             starting_members = []
 
+        self.group_ID = CatGroup.PLAYER_CLAN_ID
         self.save_id = save_id
         self.name = display_name if display_name else save_id
+        self.clancount = clan_count_mode
+        self.relations = {CatGroup.PLAYER_CLAN_ID: {}}
+        self.war = {CatGroup.PLAYER_CLAN_ID: {}}
 
         # needs to happen immediately so that any config retrievals will be accurate
         self.cruel_cards: list[str] = cruel_cards if cruel_cards else []
@@ -244,7 +249,7 @@ class Clan:
             "clan.settings has been deprecated, use get_clan_setting() and set_clan_setting() instead. Unrecoverable."
         )
 
-    def create_clan(self):
+    def create_clan(self, clancount="singleclan"):
         """
         This function is only called once a new clan is
         created in the 'clan created' screen, not every time
@@ -279,6 +284,7 @@ class Clan:
         self.instructor.dead = True
         self.instructor.dead_for = randint(20, 200)
         self.add_cat(self.instructor)
+        self.clancount = clancount
         self.all_other_clans = []
 
         key_copy = tuple(Cat.all_cats.keys())
@@ -363,10 +369,61 @@ class Clan:
                 self.clan_cats.append(c.ID)
 
         save_cats(game.clan.save_id, Cat, game)
+        rank_weights = get_config("clan_creation.rank_weights")
+        cat_range = get_config("clan_creation.neighbourclan_cats")
         number_other_clans = randint(3, 5)
         for _ in range(number_other_clans):
-            other_clan = OtherClan()
+            other_clan = OtherClan(clancount=self.clancount)
             self.all_other_clans.append(other_clan)
+            self.set_relations(self, other_clan, other_clan.relations)
+            for existing_clan in self.all_other_clans:
+                if existing_clan is other_clan:
+                    continue
+                self.set_relations(existing_clan, other_clan, other_clan.relations)          
+            if self.clancount == "multiclan":
+                leader = NewCatFactory.create_cat(
+                    status_dict=StatusDict(
+                        rank=CatRank.LEADER,
+                        group_ID=other_clan.group_ID,
+                    )
+                )
+                self.add_cat(leader)
+                other_clan.leader = leader
+                other_clan.leader_lives = 9
+
+                deputy = NewCatFactory.create_cat(
+                    status_dict=StatusDict(
+                        rank=CatRank.DEPUTY,
+                        group_ID=other_clan.group_ID,
+                    )
+                )
+                self.add_cat(deputy)
+                other_clan.deputy = deputy
+
+                medicine_cat = NewCatFactory.create_cat(
+                    status_dict=StatusDict(
+                        rank=CatRank.MEDICINE_CAT,
+                        group_ID=other_clan.group_ID,
+                    )
+                )
+                self.add_cat(medicine_cat)
+                other_clan.medicine_cat = medicine_cat
+
+                for _ in range(randint(cat_range[0], cat_range[1])):
+                    random_rank = choices(
+                        list(rank_weights.keys()),
+                        list(rank_weights.values()),
+                    )[0]
+
+                    new_cat = NewCatFactory.create_cat(
+                        status_dict=StatusDict(
+                            rank=random_rank,
+                            group_ID=other_clan.group_ID,
+                        )
+                    )
+                    self.add_cat(new_cat)
+
+            save_cats(game.clan.save_id, Cat, game)
 
         # remove any already loaded points of interest
         clear_pois()
@@ -378,7 +435,7 @@ class Clan:
 
         # create leader's ceremony and give lives
         if self.leader:
-            self.leader.generate_lead_ceremony()
+            self.leader.generate_lead_ceremony(self)
 
         self.save_clan()
         save_clanlist(self.save_id)
@@ -425,6 +482,80 @@ class Clan:
         for setting in ["hunter_first", "sick_injured_first"]:
             set_clan_setting(setting, True if starting_priority == setting else False)
 
+    def group_ID_to_clan(self, group_ID):
+        """
+        Returns the Clan object associated with a group ID.
+        """
+        if group_ID == self.group_ID:
+            return self
+
+        for clan in self.all_other_clans:
+            if clan.group_ID == group_ID:
+                return clan
+
+        return None
+
+    def get_relations(self, clan, other_clan, get_label=False):
+        main_enum = clan.group_ID
+        other_enum = other_clan.group_ID
+
+        if main_enum in game.clan.relations.get(other_enum, {}):
+            main_enum = other_clan.group_ID
+            other_enum = clan.group_ID
+
+        if other_enum not in game.clan.relations.get(main_enum, {}):
+            self.set_relations(clan, other_clan, other_clan.relations)
+
+        if get_label:
+            if game.clan.relations[main_enum][other_enum] > get_config(
+                "reputation.other_clans.neutral"
+            ):
+                return "ally"
+            elif game.clan.relations[main_enum][other_enum] <= get_config(
+                "reputation.other_clans.hostile"
+            ):
+                return "hostile"
+
+            return "neutral"
+
+        return game.clan.relations[main_enum][other_enum]
+
+    def  get_wars(self, clan):
+        wars = []
+
+        clan_id = clan.group_ID
+
+        for other_clan in [self] + self.all_other_clans:
+            if other_clan.group_ID == clan_id:
+                continue
+
+            other_id = other_clan.group_ID
+
+            war_data = self.war.get(clan_id, {}).get(other_id)
+
+            if war_data is None:
+                war_data = self.war.get(other_id, {}).get(clan_id)
+
+            if war_data and war_data.get("at_war"):
+                wars.append(other_id)
+
+        return wars
+
+    def set_relations(self, clan, other_clan, relations):
+        main_enum = clan.group_ID
+        other_enum = other_clan.group_ID
+
+        if main_enum not in self.relations:
+            self.relations[main_enum] = {}
+
+        if (
+            other_enum in self.relations
+            and main_enum in self.relations[other_enum]
+        ):
+            self.relations[other_enum][main_enum] = relations
+        else:
+            self.relations[main_enum][other_enum] = relations
+
     def add_cat(self, cat):  # cat is a 'Cat' object
         """Adds cat into the list of clan cats"""
         if cat.ID in Cat.all_cats and cat.ID not in self.clan_cats:
@@ -462,11 +593,12 @@ class Clan:
         """
 
         if leader:
-            leader.generate_lead_ceremony()
+            # the new leader's lives are rolled first, so the ceremony gives that many
+            self.reset_leader_lives()
+            leader.generate_lead_ceremony(self)
             self.leader = leader
             Cat.all_cats[leader.ID].rank_change(CatRank.LEADER)
             self.leader_predecessors += 1
-            self.reset_leader_lives()
 
         # todo: this leads nowhere, can it be deleted?
         switch_set_value(Switch.new_leader, None)
@@ -528,6 +660,7 @@ class Clan:
         """
 
         clan_data = {
+            "clancount_mode": self.clancount,
             "save_id": self.save_id,
             "displayname": self.prefix,
             "clanage": self.age,
@@ -588,6 +721,7 @@ class Clan:
 
         # OTHER CLANS
         clan_data["other_clans"] = [i.save_info() for i in self.all_other_clans]
+        clan_data["clan_relations"] = self.relations
 
         clan_data["war"] = self.war
 
@@ -740,6 +874,7 @@ class Clan:
 
         game.clan.reputation = clan_data["reputation"]
 
+        game.clan.clancount = clan_data.get("clancount_mode", "singleclan")
         game.clan.age = clan_data["clanage"]
         game.clan.starting_season = (
             clan_data["starting_season"]
@@ -784,6 +919,9 @@ class Clan:
         else:
             game.clan.chosen_symbol = clan_symbol_sprite(game.clan, return_string=True)
 
+        if "clan_relations" in clan_data:
+            game.clan.relations = clan_data["clan_relations"]
+
         if "other_clans" in clan_data:
             for other_clan in clan_data["other_clans"]:
                 if not other_clan.get("group_ID"):
@@ -796,6 +934,10 @@ class Clan:
                         relations=int(other_clan["relations"]),
                         temperament=other_clan["temperament"],
                         chosen_symbol=other_clan["chosen_symbol"],
+                        leader=other_clan.get("leader"),
+                        leader_lives=other_clan.get("leader_lives", 9),
+                        deputy=other_clan.get("deputy"),
+                        medicine_cat=other_clan.get("medicine_cat"),
                         ID=ID,
                     )
                 )
@@ -819,6 +961,24 @@ class Clan:
                     game.clan.all_other_clans.append(
                         OtherClan(name, int(relation), temper, symbol)
                     )
+
+        for other_clan in game.clan.all_other_clans:
+            for existing_clan in game.clan.all_other_clans:
+                if other_clan is existing_clan:
+                    continue    
+
+                other_id = other_clan.group_ID
+                existing_id = existing_clan.group_ID
+
+                if (
+                    existing_id not in game.clan.relations.get(other_id, {})
+                    and other_id not in game.clan.relations.get(existing_id, {})
+                ):      
+                    game.clan.set_relations(
+                        other_clan, 
+                        existing_clan, 
+                        other_clan.relations
+                        )
 
         missing_cats = []
         for cat in clan_data["clan_cats"].split(","):
@@ -1311,12 +1471,18 @@ class OtherClan:
     def __init__(
         self,
         name: str = "",
+        clancount="singleclan",
         relations: int = 0,
         temperament: tuple[str, str] = None,
         chosen_symbol: str = "",
+        leader=None,
+        leader_lives=9,
+        deputy=None,
+        medicine_cat=None,
         ID: int = 0,
     ):
         self.group_ID = ID
+        self.clancount = clancount
         if not self.group_ID:
             self.group_ID = game.get_free_group_ID(CatGroup.OTHER_CLAN)
         game.clan.other_clan_IDs.append(self.group_ID)
@@ -1370,14 +1536,23 @@ class OtherClan:
             if chosen_symbol
             else clan_symbol_sprite(self, return_string=True)
         )
+        self.leader = Cat.all_cats.get(leader)
+        self.leader_lives = leader_lives if self.leader else 0
+        self.deputy = Cat.all_cats.get(deputy)
+        self.medicine_cat = Cat.all_cats.get(medicine_cat)
 
     def __repr__(self):
         # has indicators that this is unlocalized, just in case
         return f"!!{self.name}Clan!!"
 
     @property
+    def game_mode(self):
+        # the game mode is picked for the whole game, other Clans play by the same one
+        return game.clan.game_mode if game.clan else "classic"
+
+    @property
     def name(self):
-        return i18n.t("general.clan", name=self.prefix)
+        return f"{self.prefix}Clan"
 
     @name.setter
     def name(self, value):
@@ -1401,6 +1576,10 @@ class OtherClan:
             "relations": self.relations,
             "temperament": self.temperament,
             "chosen_symbol": self.chosen_symbol,
+            "leader": self.leader.ID if self.leader else None,
+            "leader_lives": self.leader_lives,
+            "deputy": self.deputy.ID if self.deputy else None,
+            "medicine_cat": self.medicine_cat.ID if self.medicine_cat else None
         }
 
     def get_standing(self) -> Literal["ally", "neutral", "hostile"]:

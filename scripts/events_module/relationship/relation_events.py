@@ -42,7 +42,7 @@ def handle_relationships(cat: Cat):
     if not random.getrandbits(4):
         _trigger_romantic_event(cat)
 
-    romantic_events.handle_mates_and_breakup(cat)
+        romantic_events.handle_mates_and_breakup(cat)
 
 
 # ---------------------------------------------------------------------------- #
@@ -67,7 +67,7 @@ def _trigger_random_cat_event(
         c
         for c in Cat.all_cats.values()
         if c.ID != cat.ID
-        and c.status.alive_in_player_clan
+        and c.status.group_ID == cat.status.group_ID
         and c.age != CatAge.NEWBORN
         and c not in excluded_cats
     ]
@@ -227,8 +227,8 @@ def _trigger_group_event(cat: Cat):
     possible_interaction_cats = [
         c
         for c in Cat.all_cats_list
-        if c.status.alive_in_player_clan
-        and not c.status.rank == CatRank.NEWBORN
+        if c.status.group_ID == cat.status.group_ID
+        and c.status.rank != CatRank.NEWBORN
         and c != cat
         and can_trigger_events(cat)
     ]

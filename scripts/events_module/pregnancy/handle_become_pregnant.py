@@ -18,7 +18,7 @@ from scripts.game_structure import game
 def handle_zero_moon_pregnant(cat: Cat, other_cat: Optional[Cat] = None):
     """Handles if the cat is zero moons pregnant."""
     if other_cat and (
-        not other_cat.status.alive_in_player_clan or other_cat.birth_cooldown
+        other_cat.dead or not other_cat.status.is_clancat or other_cat.birth_cooldown
     ):
         return
 
@@ -125,7 +125,14 @@ def _handle_pregnancy_notice(pregnant_cat, second_parent):
         text, involved_cats = _create_pregnancy_announcement(
             pregnant_cat, "announcement", random_cat=second_parent
         )
-    game.cur_events_list.append(EventInformation(text, ["birth_death"], involved_cats))
+    game.cur_events_list.append(
+        EventInformation(
+            text, 
+            ["birth_death"], 
+            involved_cats,
+            clan=pregnant_cat.status.group_ID
+            )
+        )
 
 
 def _create_pregnancy_data(pregnant_cat: Cat, second_parent: Optional[Cat]):
@@ -150,7 +157,11 @@ def _retrieve_secret_kittens(cat):
         cats_involved.append(kit.ID)
     game.cur_events_list.append(
         EventInformation(
-            print_event, ["birth_death"], cats_involved, cat_dict={"m_c": cat}
+            print_event, 
+            ["birth_death"], 
+            cats_involved, 
+            cat_dict={"m_c": cat},
+            clan=cat.status.group_ID
         )
     )
 
@@ -172,7 +183,7 @@ def _create_pregnancy_announcement(
         text,
         main_cat=pregnant_cat,
         random_cat=random_cat,
-        clan=game.clan,
+        clan=pregnant_cat.status.fetch_clan_object(game.clan),
     )
     involved_cats = [pregnant_cat.ID]
     involved_cats = _append_second_parent_if_mentioned(
