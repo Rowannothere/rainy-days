@@ -26,6 +26,7 @@ class SkillPath(Enum):
     RUNNER = ("RUNNER,0", "RUNNER,1", "RUNNER,2", "RUNNER,3")
     CLIMBER = ("CLIMBER,0", "CLIMBER,1", "CLIMBER,2", "CLIMBER,3")
     SWIMMER = ("SWIMMER,0", "SWIMMER,1", "SWIMMER,2", "SWIMMER,3")
+    DIGGER = ("DIGGER,0", "DIGGER,1", "DIGGER,2", "DIGGER,3")
     STEALTH = ("STEALTH,0", "STEALTH,1", "STEALTH,2", "STEALTH,3")
     SPEAKER = ("SPEAKER,0", "SPEAKER,1", "SPEAKER,2", "SPEAKER,3")
     MEDIATOR = ("MEDIATOR,0", "MEDIATOR,1", "MEDIATOR,2", "MEDIATOR,3")
@@ -174,6 +175,7 @@ class Skill:
         SkillPath.RUNNER: "running",
         SkillPath.CLIMBER: "climbing",
         SkillPath.SWIMMER: "swimming",
+        SkillPath.DIGGER: "digging",
         SkillPath.STEALTH: "stealth",
         SkillPath.SPEAKER: "speaking",
         SkillPath.MEDIATOR: "mediating",
@@ -393,6 +395,7 @@ class CatSkills:
         SkillPath.RUNNER: SkillTypeFlag.AGILE,
         SkillPath.CLIMBER: SkillTypeFlag.STRONG | SkillTypeFlag.AGILE,
         SkillPath.SWIMMER: SkillTypeFlag.STRONG | SkillTypeFlag.AGILE,
+        SkillPath.DIGGER: SkillTypeFlag.STRONG | SkillTypeFlag.SMART,
         SkillPath.STEALTH: SkillTypeFlag.AGILE
         | SkillTypeFlag.SOCIAL
         | SkillTypeFlag.SMART,

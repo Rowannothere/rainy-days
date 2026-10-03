@@ -5,8 +5,7 @@ import i18n
 
 from scripts.cat.enums import CatGroup
 from scripts.cat.skills import SkillPath
-from scripts.clan_resources.herb.herb import Herb
-from scripts.game_structure.constants import HERBS
+from scripts.clan_resources.herb.herb import Herb, HERBS
 from scripts.clan_resources.herb.herb_effects import HerbEffect
 from scripts.clan_resources.supply import Supply
 from scripts.config import get_config
@@ -71,8 +70,6 @@ class HerbSupply:
 
         # med den log for current moon
         self.log = []
-
-        self.disable_random: bool = False
 
     @property
     def active_key(self) -> str:
@@ -502,7 +499,6 @@ class HerbSupply:
 
         # get herbs found
         herb_list = []
-        found_herbs = {}
         for med in med_cats:
             if assistants:
                 list_of_herb_strs, found_herbs = game.clan.herb_supply.get_found_herbs(
@@ -526,11 +522,9 @@ class HerbSupply:
         herb_list = adjust_list_text(herb_strs)
 
         # finish
-        amount = 0
-        for _h in found_herbs:
-            amount += found_herbs[_h]
-
-        focus_text = i18n.t("focus.focus_herbs", count=amount)
+        focus_text = i18n.t(
+            "hardcoded.focus_herbs", herbs=herb_list, count=len(herb_list)
+        )
 
         if herb_list:
             game.herb_events_list.append(
@@ -584,9 +578,6 @@ class HerbSupply:
         amount_of_herbs = (
             choices(population=[1, 2, 3], weights=weight, k=1)[0] + amount_modifier
         )
-        if self.disable_random:
-            amount_of_herbs = 2
-
         if general_amount_bonus:
             amount_of_herbs *= constants.CONFIG["clan_resources"]["herbs"][
                 "general_amount_bonus"
@@ -615,24 +606,18 @@ class HerbSupply:
                 continue
 
             # chance to find an herb is based on its rarity
-            if randint(1, rarity) == 1 or self.disable_random:
-                if self.disable_random:
-                    quantity_modifier = quantity_modifier
-                elif rarity in (5, 6):
+            if randint(1, rarity) == 1:
+                if rarity in (5, 6):
                     quantity_modifier = quantity_modifier / 2
                 elif rarity in (1, 2):
                     quantity_modifier += 1
-
-                if self.disable_random:
-                    amount = 3
-                else:
-                    amount = max(
-                        1,
-                        int(
-                            choices(population=[2, 3, 4], weights=weight, k=1)[0]
-                            * quantity_modifier
-                        ),
-                    )
+                amount = max(
+                    1,
+                    int(
+                        choices(population=[2, 3, 4], weights=weight, k=1)[0]
+                        * quantity_modifier
+                    ),
+                )
                 found_herbs[herb] = (
                     min(allowed_quantity, amount) if allowed_quantity else amount
                 )

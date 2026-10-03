@@ -98,8 +98,8 @@ def get_cats_same_age(Cat, cat_to_match, age_range=10):
     :param int age_range: The allowed age difference between the two cats, default 10
     """
     cats = []
-    for inter_cat in Cat.living_clan_cats():
-        if not inter_cat.status.alive_in_player_clan:
+    for inter_cat in Cat.all_cats.values():
+        if inter_cat.status.group_ID != cat_to_match.status.group_ID:
             continue
         if inter_cat.ID == cat_to_match.ID:
             continue

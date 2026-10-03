@@ -557,13 +557,14 @@ class MoonplaceScreen(Screens):
                 )
             )
 
-        if other_clan.relations > 16:
+        relation_to_player_clan = other_clan.relations[game.clan.group_ID]
+        if relation_to_player_clan > 16:
             greeting_pool.extend(
                 possible_texts["med_cat_greetings"].get(
                     f"general_greeting_friendly_{med_count_key}", []
                 )
             )
-        elif other_clan.relations < 7:
+        elif relation_to_player_clan < 7:
             greeting_pool.extend(
                 possible_texts["med_cat_greetings"].get(
                     f"general_greeting_unfriendly_{med_count_key}", []

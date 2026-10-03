@@ -61,6 +61,7 @@ class ClanInfo:
     symbol: str = ""
     starting_season: str = "Newleaf"
     game_mode: str = "classic"
+    clan_count_mode: str = "singleclan"
     cruel_cards: list[str] = field(default_factory=list)
 
     # LG
@@ -82,6 +83,7 @@ class ClanInfo:
         self.symbol = ""
         self.starting_season = "Newleaf"
         self.game_mode = "classic"
+        self.clan_count_mode = "singleclan"
         self.cruel_cards = []
 
         self.starting_size = "small"
@@ -109,6 +111,7 @@ class ClanInfo:
         self.symbol = saved_info["symbol"]
         self.starting_season = saved_info["starting_season"]
         self.game_mode = saved_info["game_mode"]
+        self.clan_count_mode = saved_info["clan_count_mode"]
         self.cruel_cards = saved_info["cruel_cards"]
 
         self.starting_size = saved_info["starting_size"]
@@ -130,6 +133,7 @@ class ClanInfo:
             "symbol": self.symbol,
             "starting_season": self.starting_season,
             "game_mode": self.game_mode,
+            "clan_count_mode": self.clan_count_mode,
             "cruel_cards": self.cruel_cards,
             "starting_size": self.starting_size,
             "clan_age": self.clan_age,
@@ -276,6 +280,7 @@ class MakeClanScreenBase(Screens):
             your_cat=self.clan_info.your_cat,
             clan_age=self.clan_info.clan_age,
             unborn=True,
+            clancount=self.clan_info.clan_count_mode,
         )
 
         game.cur_events_list.clear()

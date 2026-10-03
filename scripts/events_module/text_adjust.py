@@ -449,7 +449,7 @@ def event_text_adjust(
 
     # lead_name
     if "lead_name" in text:
-        leader = Cat.fetch_cat(game.clan.leader)
+        leader = Cat.fetch_cat(clan.leader if clan else game.clan.leader)
         replace_dict["lead_name"] = (str(leader.name), choice(leader.pronouns))
 
     # dep_name
@@ -625,20 +625,22 @@ def leader_ceremony_text_adjust(
     return text
 
 
-def get_leader_life_notice(leader_name: str) -> str:
+def get_leader_life_notice(leader_name: str, clan=None) -> str:
     """
     Returns a string specifying how many lives the leader has left or notifying of the leader's full death
     """
+    if clan is None:
+        clan = game.clan
     if game.clan.instructor.status.group == CatGroup.DARK_FOREST:
         return i18n.t(
             "cat.history.leader_lives_left_df",
             name=leader_name,
-            count=game.clan.leader_lives,
+            count=clan.leader_lives,
         )
     return i18n.t(
         "cat.history.leader_lives_left_sc",
         name=leader_name,
-        count=game.clan.leader_lives,
+        count=clan.leader_lives,
     )
 
 

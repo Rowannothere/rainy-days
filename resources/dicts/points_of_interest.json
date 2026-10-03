@@ -57,12 +57,12 @@
     "terrain_sunningrocks": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["rocks", "high_ground"]
+        "tags": ["rocks"]
     },
     "terrain_well": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["Twolegs:abandoned", "water:still", "fall_risk", "high_ground"]
+        "tags": ["Twolegs:abandoned", "water:still", "fall_risk"]
     },
     "terrain_twolegplace": {
         "category": "terrain",
@@ -87,12 +87,12 @@
     "terrain_windswepttree": {
         "category": "terrain",
         "biome": ["plains"],
-        "tags": ["trees", "prey:ground", "prey:flying", "high_ground"]
+        "tags": ["trees", "prey:ground", "prey:flying"]
     },
     "terrain_hugeboulder": {
         "category": "terrain",
         "biome": ["forest"],
-        "tags": ["rocks", "prey:ground", "high_ground"]
+        "tags": ["rocks", "prey:ground", "covered"]
     },
     "terrain_waterfall": {
         "category": "terrain",
@@ -127,6 +127,6 @@
     "terrain_abandonednest": {
         "category": "terrain",
         "biome": ["any"],
-        "tags": ["Twolegs:abandoned", "prey:ground", "covered", "unstable", "high_ground"]
+        "tags": ["Twolegs:abandoned", "prey:ground", "covered", "unstable"]
     }
 }

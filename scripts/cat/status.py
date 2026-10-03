@@ -344,6 +344,21 @@ class Status:
         # this fails tests bc it checks this before Clan exists
         # so... nonecheck failsafe
         return self.group == game.clan.your_cat.status.group
+    
+    def fetch_clan_object(self, player_clan):
+        """
+        Returns the Clan object associated with this cat's last living group.
+        """
+        living_group_id = self.get_last_living_group()
+
+        if living_group_id == CatGroup.PLAYER_CLAN_ID:
+            return player_clan
+
+        for clan in player_clan.all_other_clans:
+            if clan.group_ID == living_group_id:
+                return clan
+
+        return None
 
     @property
     def is_outsider(self) -> bool:

@@ -85,7 +85,7 @@ def get_kits(
                 continue
 
             mate = Cat.fetch_cat(mate_id)
-            if not mate or not mate.status.alive_in_player_clan:
+            if not mate or mate.dead or not mate.status.is_clancat:
                 continue
 
             add_poly_mate = poly_parenting and mate.ID != other_cat.ID
@@ -106,7 +106,7 @@ def get_kits(
                 continue
 
             mate = Cat.fetch_cat(mate_id)
-            if not mate or not mate.status.alive_in_player_clan:
+            if not mate or mate.dead or not mate.status.is_clancat:
                 continue
 
             add_poly_mate = poly_parenting and mate.ID != cat.ID
@@ -223,8 +223,14 @@ def get_kits(
         # create and update relationships
         relationships_to_update = []
         # if kits are in a clan, the whole clan gets to know
-        if cat and cat.status.alive_in_player_clan:
-            relationships_to_update = game.clan.clan_cats
+        if cat:
+            relationships_to_update = [
+                i.ID
+                for i in Cat.all_cats.values()
+                if i.status.group_ID == cat.status.group_ID
+                and not i.dead
+                and not i.status.is_clancat
+            ]
         # if they aren't, then they only know parents, sibling rels will be added later
         elif cat:
             relationships_to_update = [cat.ID]
@@ -329,7 +335,14 @@ def get_kits(
         for c in all_relatives
         if c not in list(parents) and c not in [k.ID for k in all_kitten]
     ]
-    all_relatives = [c for c in all_relatives if c.status.alive_in_player_clan]
+    all_relatives = [
+        c 
+        for c in all_relatives
+        if c 
+        and c.status.group_ID == cat.status.group_ID
+        and not c.dead
+        and c.status.is_clancat
+        ]
 
     for kit in all_kitten:
         for c in all_relatives:
@@ -409,7 +422,7 @@ def get_kits(
                     choice(get_newborn_strings()[f"{rel_type}_log"]),
                     main_cat=c,
                     random_cat=kit,
-                    clan=game.clan,
+                    clan=kit.status.fetch_clan_object(game.clan),
                 ),
             )
 
@@ -421,7 +434,7 @@ def get_kits(
 def handle_adoption(cat: Cat, other_cat: Optional[Cat] = None):
     """Handle if the there is no pregnancy but the pair triggered kits chance."""
     if other_cat and (
-        not other_cat.status.alive_in_player_clan or other_cat.birth_cooldown
+        other_cat.dead or not other_cat.status.is_clancat or other_cat.birth_cooldown
     ):
         return
 
@@ -482,7 +495,12 @@ def handle_adoption(cat: Cat, other_cat: Optional[Cat] = None):
     cat.birth_cooldown = get_config("pregnancy.birth_cooldown")
 
     game.cur_events_list.append(
-        EventInformation(print_event, ["birth_death"], cat_dict=cats_involved)
+        EventInformation(
+            print_event, 
+            ["birth_death"], 
+            cat_dict=cats_involved,
+            clan=cat.status.group_ID
+        )
     )
 
 
@@ -531,7 +549,16 @@ def get_balanced_kit_chance(first_parent: Cat, second_parent: Cat, is_affair) ->
 
     # CURRENT CAT AMOUNT
     # - increase the inverse chance if the clan is bigger
-    clan_size = len([i for i in Cat.all_cats.values() if i.status.alive_in_player_clan])
+    clan_size = len(
+        [
+            i 
+            for i in Cat.all_cats.values() 
+            if i.status.group_ID == first_parent.status.group_ID
+            and not i.dead
+            and i.status.is_clancat
+        ]
+    )
+   
     if clan_size < 10:
         inverse_chance = int(inverse_chance * 0.5)
     elif clan_size > 30:
@@ -624,7 +651,7 @@ def get_balanced_kit_chance(first_parent: Cat, second_parent: Cat, is_affair) ->
 
     # - decrease inverse chance for single parents if settings allow and biggest family is huge
     settings_allow = not second_parent and not get_clan_setting("single parentage")
-    if settings_allow and biggest_family_is_big():
+    if settings_allow and biggest_family_is_big(first_parent.status.group_ID):
         inverse_chance = int(inverse_chance * 0.9)
 
     return inverse_chance

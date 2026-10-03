@@ -10,9 +10,9 @@ from ..events_module.text_adjust import event_text_adjust, adjust_list_text
 from ..ui.scale import ui_scale, ui_scale_offset
 from ..clan_package.get_clan_cats import get_alive_clan_queens
 from .Screens import Screens
-from ..cat.enums import CatRank
+from ..cat.enums import CatRank, CatGroup
 from ..ui.elements.modified_scrolling_container import UIModifiedScrollingContainer
-
+from scripts.ui.elements.dropdown import UIDropDown
 
 class AllegiancesScreen(Screens):
     allegiance_list = []
@@ -23,22 +23,43 @@ class AllegiancesScreen(Screens):
         self.ranks_boxes = None
         self.scroll_container = None
         self.heading = None
+        self.selected_clan = None
 
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_START_PRESS:
             self.menu_button_pressed(event)
             self.mute_button_pressed(event)
+        if (
+            hasattr(self, "choose_clan_dropdown")
+            and self.choose_clan_dropdown.selected_list[0] != self.selected_clan.name
+        ):
+            selected_name = self.choose_clan_dropdown.selected_list[0]
 
+            if selected_name == game.clan.name:
+                self.selected_clan = game.clan
+            else:
+                self.selected_clan = next(
+                    (
+                        clan
+                        for clan in game.clan.all_other_clans
+                        if clan.name == selected_name
+                    ),
+                    game.clan,
+                )
+            self.exit_screen()
+            self.screen_switches()
     def on_use(self):
         super().on_use()
 
     def screen_switches(self):
         super().screen_switches()
+        if not self.selected_clan:
+            self.selected_clan = game.clan
         # Heading
         self.heading = pygame_gui.elements.UITextBox(
             "screens.allegiances.heading",
             ui_scale(pygame.Rect((0, 115), (400, 40))),
-            text_kwargs={"clan_name": game.clan.name},
+            text_kwargs={"clan_name": self.selected_clan.name},
             object_id=get_text_box_theme("#text_box_34_horizcenter_vertcenter"),
             manager=MANAGER,
             anchors={"centerx": "centerx"},
@@ -51,6 +72,20 @@ class AllegiancesScreen(Screens):
         # LG EDIT
         self.update_heading_text(game.clan.your_cat.status.get_group_heading_text())
         # ---
+        self.update_heading_text(self.selected_clan.name)
+
+        if game.clan.clancount == "multiclan":
+            clan_names = [game.clan.name] + [
+                clan.name for clan in game.clan.all_other_clans
+            ]
+
+            self.choose_clan_dropdown = UIDropDown(
+                pygame.Rect((600, 115), (190, 34)),
+                parent_text="screens.list.choose_group",
+                item_list=clan_names,
+                manager=MANAGER,
+                starting_selection=[self.selected_clan.name],
+            )
         allegiance_list = self.get_allegiances_text()
 
         self.scroll_container = UIModifiedScrollingContainer(
@@ -106,6 +141,9 @@ class AllegiancesScreen(Screens):
         )
 
     def exit_screen(self):
+        if hasattr(self, "choose_clan_dropdown"):
+            self.choose_clan_dropdown.kill()
+            del self.choose_clan_dropdown
         for x in self.ranks_boxes:
             x.kill()
         del self.ranks_boxes
@@ -139,10 +177,15 @@ class AllegiancesScreen(Screens):
     def get_allegiances_text(self):
         """Determine Text. Ouputs list of tuples."""
 
+        if self.selected_clan == game.clan:
+            selected_group_ID = CatGroup.PLAYER_CLAN_ID
+        else:
+            selected_group_ID = self.selected_clan.group_ID
+
         living_cats = [
             i
             for i in Cat.all_cats.values()
-            if i.status.alive_in_player_clan and i.moons >= 0
+            if i.status.group_ID == selected_group_ID and i.moons > 0
         ]
         living_meds = []
         living_mediators = []
@@ -183,20 +226,20 @@ class AllegiancesScreen(Screens):
         # Clan Leader Box:
         # Pull the Clan leaders
         outputs = []
-        if game.clan.leader and game.clan.leader.status.alive_in_player_clan:
+        if self.selected_clan.leader and self.selected_clan.leader in living_cats:
             outputs.append(
                 [
                     f"<b><u>{i18n.t('general.leader', count=1).upper()}</u></b>",
-                    self.generate_one_entry(game.clan.leader),
+                    self.generate_one_entry(self.selected_clan.leader),
                 ]
             )
 
         # Deputy Box:
-        if game.clan.deputy and game.clan.deputy.status.alive_in_player_clan:
+        if self.selected_clan.deputy and self.selected_clan.deputy in living_cats:
             outputs.append(
                 [
                     f"<b><u>{i18n.t('general.deputy', count=1).upper()}</u></b>",
-                    self.generate_one_entry(game.clan.deputy),
+                    self.generate_one_entry(self.selected_clan.deputy),
                 ]
             )
 

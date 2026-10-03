@@ -40,6 +40,7 @@ def create_new_cat_block(
     in_event_cats: dict,
     i: int,
     attribute_list: List[str],
+    clan=None,
     other_clan=None,
 ) -> list:
     """
@@ -361,7 +362,7 @@ def create_new_cat_block(
             elif not outside:
                 if not rank:
                     rank = chosen_cat.status.get_rank_from_age(chosen_cat.age)
-                add_to_clan(chosen_cat)
+                add_to_clan(chosen_cat, clan.group_ID)
                 add_dependents_to_clan(chosen_cat)
                 # todo why doesn't this do anything with the returned kits
                 if chosen_cat.status.rank != rank:
@@ -431,6 +432,7 @@ def create_new_cat_block(
             gender=gender,
             alive=alive,
             outside=outside,
+            group=clan.group_ID,
             parent1=parent1.ID if parent1 else None,
             parent2=parent2.ID if parent2 else None,
             adoptive_parents=adoptive_parents if adoptive_parents else None,
@@ -538,6 +540,7 @@ def create_new_cat(
     gender: str = None,
     alive: bool = True,
     outside: bool = False,
+    group: CatGroup = None,
     parent1: str = None,
     parent2: str = None,
     adoptive_parents: list = None,
@@ -657,7 +660,7 @@ def create_new_cat(
             )
         # now we actually add them to the clan, if they should be joining
         if not outside and alive:
-            add_to_clan(new_cat)
+            add_to_clan(new_cat, group)
             add_dependents_to_clan(new_cat)
             # todo why doesn't use the return value
 
@@ -866,7 +869,15 @@ def gather_cat_objects(
         if abbr == "m_c":
             found_cat = extra_cat if extra_cat else event.main_cat
         elif abbr == "r_c":
-            found_cat = event.random_cat
+            if hasattr(event, "random_cats"):
+                found_cat = event.random_cats[0] if event.random_cats else None
+            else:
+                found_cat = event.random_cat
+        elif re.match(r"r_c[0-9]+", abbr):
+            index = re.match(r"r_c([0-9]+)", abbr).group(1)
+            index = int(index) - 1
+            if index < len(event.random_cats):
+                found_cat = event.random_cats[index]
 
         # LG
         if dialogue_dict:
