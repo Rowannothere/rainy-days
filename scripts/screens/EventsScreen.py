@@ -75,6 +75,7 @@ class EventsScreen(Screens):
     relation_events = ""
     health_events = ""
     other_clans_events = ""
+    lifegen_events = ""
     misc_events = ""
     display_events = []
     tabs = [
@@ -1319,7 +1320,13 @@ class EventsScreen(Screens):
             if "misc" in x.types
             and self.event_matches_current_clan(x)
         ]
-        
+        self.lifegen_events = [
+            x
+            for x in game.cur_events_list
+            if "lifegen" in x.types
+            and self.event_matches_current_clan(x)
+        ]
+
     def update_events_display(self, is_page_update=False):
         """
         Kills and recreates the event display, updates the clan info, sets the event display scroll position if it was
@@ -1354,6 +1361,7 @@ class EventsScreen(Screens):
             "health": self.health_events,
             "other clans": self.other_clans_events,
             "miscellaneous": self.misc_events,
+            "lifegen": self.lifegen_events,
         }
         if self.current_display in category_map:
             self.display_events = category_map[self.current_display]

@@ -34,6 +34,7 @@ from scripts.clan_package.get_clan_cats import (
     get_living_clan_cat_count,
     find_alive_cats_with_rank,
 )
+from scripts.clan_package.cotc import get_warring_clan
 
 loaded_events = {}
 used_events = set()
@@ -89,7 +90,7 @@ def create_short_event(
     current_war = None
 
     for war in game.clan.war:
-        enemy_clan = war.get_warring_clan()
+        enemy_clan = get_warring_clan()
         other_clan = enemy_clan
         sub_types.append("war")
 

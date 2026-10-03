@@ -109,11 +109,12 @@ class Patrol:
         ) = {"success": {}, "failure": {}}
         self.chosen_poi = None
 
-    def begin_patrol(self, patrol_cats: List[Cat], patrol_type: str) -> str:
+    def begin_patrol(self, patrol_cats: List[Cat], patrol_type: str, clan) -> str:
         """
         Handles all the initial patrol setup, returns the prepared patrol intro text.
         :param patrol_cats: All cats that have been chosen for this patrol
         :param patrol_type: Type of patrol
+        :param clan: The clan to which the patrol belongs
         """
         self.debug_patrol_id = get_config("patrol_generation.debug_ensure.patrol_id")
 
@@ -121,7 +122,7 @@ class Patrol:
 
         # Add cats
         self._add_patrol_cats(patrol_cats)
-
+        self.clan = game.clan if clan.group_ID == game.clan.group_ID else next(filter(lambda c: clan.group_ID == c.group_ID, game.clan.all_other_clans), game.clan)
         # The patrol group can't change once it's set out, so this is fixed for the rest of the patrol
         self.temperament = get_patrol_temperament(
             self.patrol_cats, self.involved_cats.get("p_l")

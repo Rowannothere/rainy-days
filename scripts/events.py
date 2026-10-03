@@ -535,7 +535,7 @@ def _one_moon_impl():
                         clan=clan.group_ID,
                     )
                 )
-            game.dead_cats_to_grieve.clear()
+        game.dead_cats_to_grieve.clear()
 
     if game.clan.game_mode in ("expanded", "cruel_season") and game.clan.freshkill_pile:
         # make a notification if the Clan does not have enough prey

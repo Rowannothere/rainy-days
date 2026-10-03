@@ -104,9 +104,14 @@ class CatRank(StrEnum):
     def is_any_adult_warrior_like_rank(self) -> bool:
         return self in (self.WARRIOR, self.DEPUTY, self.LEADER)
 
-    def is_allowed_to_patrol(self, cat) -> bool:
+    def is_allowed_to_patrol(self, cat, group_ID: str | None = None) -> bool:
         # newborn is not included in this because the constants.CONFIG["fun"] needs extra checks
-        if cat.status.alive_in_your_cat_group:
+        if group_ID is None:
+            is_alive_in_group = cat.status.alive_in_your_cat_group
+        else:
+            is_alive_in_group = cat.status.group_ID == group_ID
+
+        if is_alive_in_group:
             if cat.status.group.is_any_clan_group():
                 if self.is_any_clancat_rank() and self not in (
                     self.ELDER,
