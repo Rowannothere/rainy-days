@@ -9,7 +9,6 @@ from scripts.game_structure.localization import load_lang_resource
 from scripts.game_structure.game.switches import (
     Switch,
     switch_get_value,
-    switch_set_value,
 )
 
 loaded_events: dict[str, list[PatrolEvent]] = {}
@@ -17,7 +16,9 @@ loaded_events: dict[str, list[PatrolEvent]] = {}
 
 def get_patrol_list(
     patrol_type: str,
-    other_clan_rep: Optional[Literal["hostile", "ally", "neutral"]] = None,
+    other_clan_rep: Optional[
+        Literal["hostile", "ally", "neutral", "tense", "amicable"]
+    ] = None,
     outsider_rep: Optional[Literal["hostile", "welcoming", "neutral"]] = None,
 ) -> list[PatrolEvent]:
     """
@@ -31,7 +32,9 @@ def get_patrol_list(
 
     possible_patrols = []
 
-    if switch_get_value(Switch.patrol_category) == "clangen":
+    patrol_category = switch_get_value(Switch.patrol_category)
+
+    if patrol_category == "clangen":
         # TYPE PATROL
         biome = (
             game.clan.biome
@@ -49,6 +52,17 @@ def get_patrol_list(
         possible_patrols.extend(
             _get_all_patrols_of_type(patrol_type, biome, path, season)
         )
+    elif patrol_category == "lifegen":
+        possible_patrols.extend(
+            _load_file(f"{path}lifegen/{game.clan.your_cat.status.rank}.json")
+        )
+        possible_patrols.extend(_load_file(f"{path}lifegen/general.json"))
+    elif patrol_category in {"df", "date"}:
+        possible_patrols.extend(
+            _load_file(f"{path}lifegen/{patrol_category}.json")
+        )
+    else:
+        raise ValueError(f"Unknown patrol category: {patrol_category}")
 
     # OTHER CLAN
     # CGW
@@ -58,31 +72,24 @@ def get_patrol_list(
     elif other_clan_rep == "amicable":
         other_clan_rep = "ally"
     # --
-    possible_patrols.extend(_load_file(f"{path}other_clan.json"))
-    if other_clan_rep != "neutral":
-        possible_patrols.extend(_load_file(f"{path}other_clan_{other_clan_rep}.json"))
+    if other_clan_rep is not None:
+        possible_patrols.extend(_load_file(f"{path}other_clan.json"))
+        if other_clan_rep != "neutral":
+            possible_patrols.extend(
+                _load_file(f"{path}other_clan_{other_clan_rep}.json")
+            )
 
-        # OUTSIDER
-        if outsider_rep:
-            possible_patrols.extend(_load_file(f"{path}new_cat.json"))
-            if outsider_rep != "neutral":
-                possible_patrols.extend(
-                    _load_file(f"{path}new_cat_{outsider_rep}.json")
-                )
+            # OUTSIDER
+            if outsider_rep:
+                possible_patrols.extend(_load_file(f"{path}new_cat.json"))
+                if outsider_rep != "neutral":
+                    possible_patrols.extend(
+                        _load_file(f"{path}new_cat_{outsider_rep}.json")
+                    )
 
-        # DISASTERS
-        if get_clan_setting("disasters"):
-            possible_patrols.extend(_load_file(f"{path}disaster.json"))
-    elif switch_get_value(Switch.patrol_category) == "lifegen":
-        possible_patrols.extend(
-            _load_file(f"{path}lifegen/{game.clan.your_cat.status.rank}.json")
-        )
-        possible_patrols.extend(_load_file(f"{path}lifegen/general.json"))
-    else:
-        possible_patrols.extend(
-            _load_file(f"{path}lifegen/{switch_get_value(Switch.patrol_category)}.json")
-        )
-
+            # DISASTERS
+            if get_clan_setting("disasters"):
+                possible_patrols.extend(_load_file(f"{path}disaster.json"))
     return possible_patrols
 
 
@@ -131,12 +138,11 @@ def _load_file(path: str) -> list[PatrolEvent]:
     Loads and returns the patrol events from a json file at the given path
     """
     if path not in loaded_events.keys():
-        loaded_events[path] = []
         try:
-            for p in load_lang_resource(path):
-                loaded_events[path].append(PatrolEvent(**p))
-        except FileNotFoundError:
-            raise Exception(f"Patrol file {path} not found!")
+            events = [PatrolEvent(**p) for p in load_lang_resource(path)]
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"Patrol file {path} not found!") from exc
+        loaded_events[path] = events
 
     return loaded_events[path].copy()
 

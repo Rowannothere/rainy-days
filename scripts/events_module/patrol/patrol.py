@@ -343,7 +343,9 @@ class Patrol:
                 small_clan=int(len(game.clan.clan_cats))
                 < get_config("patrol_generation.small_clan_threshold")
             ),
-            other_clan_rep=self.other_clan.get_standing(),
+            other_clan_rep=(
+                self.other_clan.get_standing() if self.other_clan else None
+            ),
         )
 
         # INFORM -NOT PRESENT-
