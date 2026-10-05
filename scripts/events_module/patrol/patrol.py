@@ -27,6 +27,7 @@ from scripts.events_module.patrol.generate_patrol_list import (
     will_allow_outsider_patrols,
 )
 from scripts.events_module.patrol.patrol_event import PatrolEvent
+from scripts.events_module.patrol.patrol_option import PatrolOption
 from scripts.events_module.text_adjust import (
     event_text_adjust,
 )
@@ -107,6 +108,7 @@ class Patrol:
         self.outcome_cats: TypedDict(
             "outcome_cats", {"success": dict[str, Cat], "failure": dict[str, Cat]}
         ) = {"success": {}, "failure": {}}
+        self.available_options: list[PatrolOption] = []
         self.chosen_poi = None
 
     def begin_patrol(self, patrol_cats: List[Cat], patrol_type: str, clan) -> str:
@@ -140,6 +142,7 @@ class Patrol:
 
         # Find valid patrol
         self._load_patrols_and_set_patrol(patrol_type)
+        self.available_options = self.patrol_event.options
         self._create_needed_cats()
 
         # CGWAR
@@ -183,8 +186,10 @@ class Patrol:
         )
 
     def proceed_patrol(
-        self, path: PatrolChoice = PatrolChoice.PROCEED
-    ) -> Tuple[str, str, dict, pygame.Surface | None]:
+        self,
+        path: PatrolChoice = PatrolChoice.PROCEED,
+        selected_option: PatrolOption = None,
+    ) -> Tuple[str, str, list, pygame.Surface | None]:
         """Proceed the patrol to the next step."""
 
         if path == PatrolChoice.DECLINE:
@@ -208,7 +213,15 @@ class Patrol:
             else:
                 return "Error - no event chosen", "", {}, None
 
-        return self.determine_outcome(antagonize=(path == PatrolChoice.ANTAGONIZE))
+        if selected_option is None and self.available_options:
+            raise ValueError("A patrol option must be selected before proceeding")
+        if selected_option is not None and selected_option not in self.available_options:
+            raise ValueError("Selected patrol option is not currently available")
+
+        return self.determine_outcome(
+            antagonize=(path == PatrolChoice.ANTAGONIZE),
+            selected_option=selected_option,
+        )
 
     def _create_needed_cats(self):
         """
@@ -584,7 +597,9 @@ class Patrol:
         return True
 
     def _find_allowed_outcomes(
-        self, antagonize: bool = False
+        self,
+        antagonize: bool = False,
+        selected_option: PatrolOption = None,
     ) -> tuple[TextPoolEvent, TextPoolEvent]:
         """
         Filters through possible outcomes to find appropriate outcomes for both failure and success
@@ -593,13 +608,18 @@ class Patrol:
         """
 
         # find which set of outcomes we'll be using based on if the player choose to antagonize
-        if antagonize:
+        if selected_option is not None:
+            success_outcomes = selected_option.success_outcomes
+            fail_outcomes = selected_option.fail_outcomes
+        elif antagonize:
             success_outcomes = self.patrol_event.antag_success_outcomes
             fail_outcomes = self.patrol_event.antag_fail_outcomes
         else:
             success_outcomes = self.patrol_event.success_outcomes
             fail_outcomes = self.patrol_event.fail_outcomes
 
+        success_outcomes = self._normalize_nested_outcomes(success_outcomes, "success")
+        fail_outcomes = self._normalize_nested_outcomes(fail_outcomes, "failure")
         debug_outcome = None
         if self.debug_patrol_id:
             # outcomes generate an ID based off their parent
@@ -644,6 +664,36 @@ class Patrol:
 
         return chosen_success, chosen_failure
 
+    def _normalize_nested_outcomes(
+        self, outcomes: list[TextPoolEvent], outcome_type: str
+    ) -> list[TextPoolEvent]:
+        normalized = []
+        for index, outcome in enumerate(outcomes):
+            if isinstance(outcome, dict):
+                outcome = TextPoolEvent(**outcome)
+            if not outcome.event_id:
+                outcome.event_id = f"{self.patrol_event.event_id}_{outcome_type}_{index}"
+            self._normalize_nested_outcomes_for_event(outcome)
+            normalized.append(outcome)
+        return normalized
+
+    def _normalize_nested_outcomes_for_event(self, outcome: TextPoolEvent):
+        for option_index, option in enumerate(outcome.options):
+            for outcome_type, child_outcomes in (
+                ("success", option.success_outcomes),
+                ("failure", option.fail_outcomes),
+            ):
+                for child_index, child in enumerate(child_outcomes):
+                    if isinstance(child, dict):
+                        child = TextPoolEvent(**child)
+                        child_outcomes[child_index] = child
+                    if not child.event_id:
+                        child.event_id = (
+                            f"{outcome.event_id}_option{option_index}_"
+                            f"{outcome_type}_{child_index}"
+                        )
+                    self._normalize_nested_outcomes_for_event(child)
+
     def _check_outcome_constraints(
         self, outcome: TextPoolEvent, outcome_type: Literal["success", "failure"]
     ) -> bool:
@@ -683,14 +733,20 @@ class Patrol:
         return True
 
     def determine_outcome(
-        self, antagonize=False
-    ) -> Tuple[str, str, dict, pygame.Surface | None]:
+        self,
+        antagonize=False,
+        selected_option: PatrolOption = None,
+    ) -> Tuple[str, str, list, pygame.Surface | None]:
         if self.patrol_event is None:
             raise Exception("No patrol event supplied")
 
-        success_outcome, fail_outcome = self._find_allowed_outcomes(antagonize)
+        success_outcome, fail_outcome = self._find_allowed_outcomes(
+            antagonize, selected_option
+        )
 
-        chosen_outcome, success = self.calculate_success(success_outcome, fail_outcome)
+        chosen_outcome, success = self.calculate_success(
+            success_outcome, fail_outcome, selected_option
+        )
 
         if not self.chosen_poi and chosen_outcome.poi:
             self.chosen_poi = get_poi_from_constraints(
@@ -716,7 +772,7 @@ class Patrol:
                 outcome_cat_dict[abbr] = self.involved_cats[abbr]
 
         # Run the chosen outcome
-        return handle_consequences.execute_outcome(
+        result = handle_consequences.execute_outcome(
             chosen_outcome,
             outcome_cat_dict,
             self.other_clan,
@@ -724,9 +780,14 @@ class Patrol:
             patrol_event=self.patrol_event,
             intro_string=self.chosen_intro_string
         ) + (self.get_patrol_art(chosen_outcome),)
+        self.available_options = chosen_outcome.options
+        return result
 
     def calculate_success(
-        self, success_outcome: TextPoolEvent, fail_outcome: TextPoolEvent
+        self,
+        success_outcome: TextPoolEvent,
+        fail_outcome: TextPoolEvent,
+        selected_option: PatrolOption = None,
     ) -> Tuple[TextPoolEvent, bool]:
         """Returns both the chosen outcome, and a boolean that's True if success, and False if failure."""
 
@@ -749,13 +810,19 @@ class Patrol:
             (1 + 0.10 * patrol_size) * total_exp / (patrol_size * gm_modifier * 2)
         )
 
-        success_chance = self.patrol_event.chance_of_success + int(exp_adjustment)
+        base_chance = (
+            selected_option.chance_of_success
+            if selected_option is not None
+            and selected_option.chance_of_success is not None
+            else self.patrol_event.chance_of_success
+        )
+        success_chance = base_chance + int(exp_adjustment)
         success_chance = min(success_chance, 90)
 
         # Now, apply success and fail skill
         print(
             "starting chance:",
-            self.patrol_event.chance_of_success,
+            base_chance,
             "| EX_updated chance:",
             success_chance,
         )
