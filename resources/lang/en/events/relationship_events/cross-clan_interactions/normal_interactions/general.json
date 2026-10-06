@@ -836,11 +836,11 @@
         ],
         "m_c": {
             "age": [ "adolescent" ],
-            "skill": ["DIGGER,0"]
+            "skill": ["TUNNELER,0"]
         },
         "r_c": {
             "age": [ "adolescent" ],
-            "skill": [ "DIGGER,0" ]
+            "skill": [ "TUNNELER,0" ]
         },
         "relationships": [
             {
@@ -896,11 +896,11 @@
         ],
         "m_c": {
             "age": [ "adolescent" ],
-            "skill": [ "DIGGER,0" ]
+            "skill": [ "TUNNELER,0" ]
         },
         "r_c": {
             "age": [ "adolescent" ],
-            "skill": [ "DIGGER,0" ]
+            "skill": [ "TUNNELER,0" ]
         },
         "relationships": [
             {

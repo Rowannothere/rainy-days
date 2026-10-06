@@ -1024,13 +1024,13 @@
         ],
         "m_c": {
             "age": [ "adolescent" ],
-            "skill": ["DIGGER,0"]
+            "skill": ["TUNNELER,0"]
         },
         "r_c": [
             {
                 "clan": 2,
                 "age": [ "adolescent" ],
-                "skill": [ "DIGGER,0"]
+                "skill": [ "TUNNELER,0"]
             },
             {
                 "clan": "any",
