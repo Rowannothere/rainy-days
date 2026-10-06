@@ -8,6 +8,7 @@ TODO: Docs
 import logging
 import random
 from copy import deepcopy
+from random import choices, randint, sample, choice
 
 from scripts.cat.microservices.add_to_clan import add_dependents_to_clan, add_to_clan
 from scripts.cat_relations.cat_handle_funcs import create_relationships_new_cat
@@ -15,6 +16,8 @@ from scripts.config import get_config
 from scripts.events_module.pregnancy.create_kits import get_kits
 from scripts.cat_relations.cat_handle_funcs import init_all_relationships
 
+from scripts.cat.factories.new_cat_factory import NewCatFactory
+from scripts.cat.factories.typed_dicts import StatusDict
 
 # pylint: enable=line-too-long
 import traceback
@@ -729,6 +732,163 @@ def _one_moon_impl():
             game.save_events()
         except:
             SaveErrorWindow(traceback.format_exc())
+
+def auto_patrol(clan):
+  # Reset patrolled list each moon
+  game.patrolled = []
+
+
+
+
+  # Build list of cats who can patrol
+  able_cats = []
+
+
+
+
+  for the_cat in Cat.all_cats_list:
+      if (
+          the_cat.ID not in game.patrolled
+          and the_cat.status.rank.is_allowed_to_patrol()
+          and the_cat.status.alive_in_player_clan
+          and not the_cat.not_working()
+      ):
+          able_cats.append(the_cat)
+
+
+
+
+  # If no cats can patrol, stop
+  if not able_cats:
+      return
+
+
+
+
+  # Decide how many patrols this moon (adjust as desired)
+  max_patrols = max(1, len(able_cats) // 3)
+  patrol_count = randint(1, max_patrols)
+
+
+
+
+  for _ in range(patrol_count):
+      # Rebuild available cats each patrol (exclude already used)
+      available = [cat for cat in able_cats if cat.ID not in game.patrolled]
+
+
+
+
+      if not available:
+          break
+
+
+
+
+      # Choose patrol size
+      patrol_size = min(randint(1, 6), len(available))
+
+
+
+
+      # Select unique cats
+      patrol_cats = sample(available, patrol_size)
+
+
+
+
+      # Mark them as patrolled
+      for cat in patrol_cats:
+          game.patrolled.append(cat.ID)
+
+
+
+
+      # --- Patrol type logic ---
+      has_medicine_cat = any(
+          cat.status.rank in [CatRank.MEDICINE_CAT, CatRank.MEDICINE_APPRENTICE]
+          for cat in patrol_cats
+      )
+
+
+
+
+      has_apprentice = any(
+          cat.status.rank == CatRank.APPRENTICE
+          for cat in patrol_cats
+      )
+
+
+
+
+      patrol_types = ["hunting", "border", "training"]
+      weights = [60, 25, 15]
+
+
+
+
+      # Boost training if apprentices present
+      if has_apprentice:
+          weights[2] += 10
+
+
+
+
+      # Add medicine patrol if valid
+      if has_medicine_cat:
+          patrol_types.append("med")
+          weights.append(20)
+
+
+
+
+      patrol_type = choices(patrol_types, weights=weights, k=1)[0]
+
+
+
+
+      # --- Run patrol ---
+      patrol_class = Patrol()
+
+
+
+
+      patrol_class.begin_patrol(
+          patrol_cats=patrol_cats,
+          patrol_type=patrol_type,
+          clan=clan
+      )
+
+
+
+
+      patrol_class.proceed_patrol("proceed")
+
+
+def bulkskip():
+  for i in range(5):
+      one_moon()
+      auto_patrol(game.clan)
+      for clan in game.clan.all_other_clans:
+          auto_patrol(clan)
+
+
+
+
+      # Maintain minimum clan size
+      if not i % 10:
+          while get_living_clan_cat_count(Cat) < 8:
+              NewCatFactory.create_cat(
+                  status_dict=StatusDict(
+                       rank=choice([CatRank.WARRIOR, CatRank.WARRIOR, CatRank.KITTEN, CatRank.APPRENTICE, CatRank.ELDER])
+                   )
+              )
+
+
+
+
+      if not i % 100:
+          print(f"CLANCATS ALIVE: {get_living_clan_cat_count(Cat)}")
 
 
 def update_afterlife_temper():

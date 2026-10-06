@@ -95,6 +95,7 @@ class EventsScreen(Screens):
         self.event_screen_container = None
         self.clan_info = {}
         self.timeskip_button = None
+        self.bulkskip_button = None
 
         self.full_event_display_container = None
         self.events_frame = None
@@ -241,7 +242,8 @@ class EventsScreen(Screens):
                     ChooseDeputyWindow("events screen")
                 else:
                     self.timeskip_button.disable()
-                    self.events_thread = self.loading_screen_start_work(events.one_moon)
+                    self.bulkskip_button.disable()
+                self.events_thread = self.loading_screen_start_work(events.one_moon)
                     # rebuild_moon_n_season_indicator(change_moon=True, visible=True)
                     self.save_button.reset_save()
 
@@ -347,6 +349,14 @@ class EventsScreen(Screens):
                 self.place_fave_filters()
                 self.handle_tab_switch("all events")
 
+            elif element == self.bulkskip_button:
+                # ensure we can't run the same timeskip multiple times
+                if self.events_thread is not None and self.events_thread.is_alive():
+                    return
+                self.bulkskip_button.disable()
+                self.timeskip_button.disable()
+                self.events_thread = self.loading_screen_start_work(events.bulkskip)
+                self.save_button.reset_save()
             elif event.ui_element == self.save_button.unsaved_state:
                 self.save_button.save_game(current_screen=self)
             elif event.ui_element == self.clan_info.get("view_cards"):
@@ -593,14 +603,7 @@ class EventsScreen(Screens):
             )
         
         self.timeskip_button = UISurfaceImageButton(
-            ui_scale(
-                pygame.Rect(
-                    (248, 223)
-                    if game.clan.clancount != "multiclan"
-                    else (195, 223),
-                    (180, 30),
-                )
-            ),
+            ui_scale(pygame.Rect((248, 223) if game.clan.clancount != 'multiclan' else (195, 223), (180, 30))),
             "screens.events.timeskip_button",
             get_button_dict(ButtonStyles.SQUOVAL, (180, 30)),
             object_id="@buttonstyles_squoval",
@@ -609,7 +612,6 @@ class EventsScreen(Screens):
             manager=MANAGER,
             sound_id="timeskip",
         )
-
         self.save_button = UISaveButton(
             position=(438, 223)
             if game.clan.clancount != "multiclan"
@@ -1736,3 +1738,4 @@ class EventsScreen(Screens):
 
         self.update_events_display()
         self.timeskip_button.enable()
+        self.bulkskip_button.enable()
