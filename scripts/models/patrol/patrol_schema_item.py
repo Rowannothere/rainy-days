@@ -98,11 +98,7 @@ class PatrolSchemaItem(BaseModel):
         ...,
         description="The text that displays if the patrol is declined (do not proceed)",
     )
-    success_outcomes: List[Outcome] = Field(default_factory=list)
-    fail_outcomes: List[Outcome] = Field(default_factory=list)
+    success_outcomes: List[Outcome]
+    fail_outcomes: List[Outcome]
     antag_success_outcomes: Union[List[Outcome], MISSING] = MISSING
     antag_fail_outcomes: List[Outcome] = MISSING
-    options: List[dict] = Field(
-        default_factory=list,
-        description="Choices shown for this patrol instead of the default proceed action.",
-    )

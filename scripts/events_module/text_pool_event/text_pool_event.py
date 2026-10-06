@@ -65,18 +65,11 @@ class TextPoolEvent:
     gain_accessory: list[AccessoryDict] = field(default_factory=list[dict])
     meet: list[MeetDict] = field(default_factory=list[dict])
     future_event: list[FutureEventDict] = field(default_factory=list[dict])
-    options: list = field(default_factory=list)
 
     # only for use in transition events
     new_gender: list[str] = field(default_factory=list)
 
     def __post_init__(self):
-        from scripts.events_module.patrol.patrol_option import PatrolOption
-
-        self.options = [
-            option if isinstance(option, PatrolOption) else PatrolOption(**option)
-            for option in self.options
-        ]
         self.weight = 1
         if self.location:
             self.weight += 4 * (len(constants.BIOME_TYPES) - len(self.location))
