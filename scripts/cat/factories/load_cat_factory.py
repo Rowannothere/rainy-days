@@ -119,6 +119,7 @@ class LoadCatFactory(BaseCatFactory):
             "personality": cls._build_personality(
                 kwargs.get("facets"),
                 kwargs["trait"],
+                kwargs["trait2"],
                 CatAge.get_from_moons(kwargs["moons"]).is_baby(),
             ),
             "mentorship": mentorship,
@@ -298,12 +299,13 @@ class LoadCatFactory(BaseCatFactory):
 
     @classmethod
     def _build_personality(
-        cls, facets: str, trait: str, is_kit_trait: bool
+        cls, facets: str, trait: str, trait2: str, is_kit_trait: bool
     ) -> Personality:
         """
         Builds the personality object from the inputs provided
         :param facets: Cat's facet string
         :param trait: Provided trait
+        :param trait2: Second trait
         :param is_kit_trait: True if the cat is kit-aged, False otherwise
         :return: Personality object
         """
@@ -311,6 +313,7 @@ class LoadCatFactory(BaseCatFactory):
             facets = [int(i) for i in facets.split(",")]
             return Personality(
                 trait=trait,
+                trait2=trait2,
                 kit_trait=is_kit_trait,
                 lawful=facets[0],
                 social=facets[1],
@@ -319,7 +322,7 @@ class LoadCatFactory(BaseCatFactory):
             )
         else:
             print(f"WARNING: no facets found for cat ID: {cls.cat_id}")
-            return Personality(trait=trait, kit_trait=is_kit_trait)
+            return Personality(trait=trait, trait2=trait2, kit_trait=is_kit_trait)
 
     @classmethod
     def _convert_skill_and_backstory(
