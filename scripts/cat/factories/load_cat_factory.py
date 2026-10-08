@@ -42,6 +42,9 @@ class LoadCatFactory(BaseCatFactory):
             raise KeyError("Cat ID missing!")
         cls.cat_id = kwargs["ID"]
 
+        if "trait2" not in kwargs:
+            kwargs["trait2"] = None
+
         pelt = cls._build_pelt(kwargs=kwargs)
 
         gender = GenderDict(

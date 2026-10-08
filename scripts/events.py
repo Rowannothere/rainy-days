@@ -1056,7 +1056,7 @@ def generate_dialogue_focus():
         dialogue_focuses = ujson.loads(read_file.read())
 
     # Handle lost focus for conditional focuses that have no set duration
-    if game.clan.focus == "war" and not game.clan.war.get("at_war"):
+    if game.clan.focus == "war" and not game.clan.war:
         game.clan.focus = ""
         game.clan.focus_moons = 0
     if (

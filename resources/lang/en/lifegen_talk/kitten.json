@@ -25085,7 +25085,7 @@
             "Ohh... I didn't think of that. Okay."
         ]
     },
-    "artistankit_tonotnewborn_JOL": {
+    "artisankit_tonotnewborn_JOL": {
         "season": [
             "newleaf",
             "greenleaf"
@@ -25102,7 +25102,7 @@
                     "kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,0"
+                    "ARTISAN,0"
                 ]
             }
         },
@@ -25200,7 +25200,7 @@
             ]
         }
     },
-    "campartistan_tokit_JOL": {
+    "campartisan_tokit_JOL": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -25208,7 +25208,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1",
+                    "ARTISAN,1",
                     "CAMP,1"
                 ]
             },
@@ -25217,7 +25217,7 @@
                     "kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,0",
+                    "ARTISAN,0",
                     "CAMP,0"
                 ]
             }

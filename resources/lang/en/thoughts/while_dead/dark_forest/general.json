@@ -239,7 +239,7 @@
             "m_c": {
                 "stat": {
                     "skill": [
-                        "ARTISTAN,1",
+                        "ARTISAN,1",
                         "CAMP,1",
                         "CLEAN,1"
                     ]
@@ -262,7 +262,7 @@
             "m_c": {
                 "stat": {
                     "skill": [
-                        "ARTISTAN,1"
+                        "ARTISAN,1"
                     ]
                 }
             }

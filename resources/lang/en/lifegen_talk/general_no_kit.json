@@ -45192,7 +45192,7 @@
             "...I feel bad saying this, but I'm really scared of {PRONOUN/r_c:0/object}."
         ]
     },
-    "neurotic_skillartistan_SQ1~1": {
+    "neurotic_skillartisan_SQ1~1": {
         "season": [
             "newleaf"
         ],
@@ -45211,7 +45211,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             }
         },
@@ -45236,7 +45236,7 @@
             "I'll think about it."
         ]
     },
-    "neurotic_skillartistan_SQ1~2": {
+    "neurotic_skillartisan_SQ1~2": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -45252,7 +45252,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             },
             "r_c:0": {
@@ -45280,7 +45280,7 @@
             "And if it's okay, could I ask for your thoughts on some color combinations?"
         ]
     },
-    "neurotic_skillartistan_SQ1~3": {
+    "neurotic_skillartisan_SQ1~3": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -45296,7 +45296,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             }
         },
@@ -45319,7 +45319,7 @@
             "I should make sure none of these are poisonous, in case any kits get into them."
         ]
     },
-    "neurotic_skillartistan_SQ1~4": {
+    "neurotic_skillartisan_SQ1~4": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -45335,7 +45335,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             },
             "r_c:0": {}
@@ -51726,7 +51726,7 @@
                     "assertive"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             }
         },
@@ -51901,7 +51901,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -54728,7 +54728,7 @@
             "You certainly have a lot of guts, coming to speak to me so soon."
         ]
     },
-    "dfskill_artistan_SQ2~1": {
+    "dfskill_artisan_SQ2~1": {
         "season": [
             "newleaf"
         ],
@@ -54750,7 +54750,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -54766,7 +54766,7 @@
             "[t_c narrows {PRONOUN/t_c/poss} eyes, turns, and walks away. {PRONOUN/t_c/poss/CAP} form fades before {PRONOUN/t_c/subject} {VERB/t_c/reach/reaches} the edge of camp.]"
         ]
     },
-    "dfskill_artistan_SQ2~2~a": {
+    "dfskill_artisan_SQ2~2~a": {
         "season": [
             "greenleaf",
             "newleaf"
@@ -54781,7 +54781,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             },
             "t_c": {
@@ -54792,7 +54792,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -54806,7 +54806,7 @@
             "[You let {PRONOUN/t_c/object} be. {PRONOUN/t_c/subject/CAP} {VERB/t_c/sit/sits} by the warriors' den until the sun begins to set.]"
         ]
     },
-    "dfskill_artistan_SQ2~2~b": {
+    "dfskill_artisan_SQ2~2~b": {
         "season": [
             "greenleaf",
             "newleaf"
@@ -54829,7 +54829,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -56312,7 +56312,7 @@
             "*sigh* Realistically, though, I know I'd probably worry about that stuff anyways."
         ]
     },
-    "neurotic_skillartistan_SQ2": {
+    "neurotic_skillartisan_SQ2": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -56328,7 +56328,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             },
             "r_c:0": {
@@ -61778,7 +61778,7 @@
                     "warrior"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             }
         },
@@ -64507,7 +64507,7 @@
             "So I know... I know that if anything attacked me, you'd be here to fight it off. I feel safe with you, y_c."
         ]
     },
-    "neurotic_choice_artistan_SQ49": {
+    "neurotic_choice_artisan_SQ49": {
         "frequency": 2,
         "cats": {
             "y_c": {
@@ -64523,7 +64523,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ]
             },
             "r_c:0": {
@@ -76309,7 +76309,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -76362,7 +76362,7 @@
                     "not_kitten"
                 ],
                 "skill": [
-                    "ARTISTAN,1"
+                    "ARTISAN,1"
                 ],
                 "residence": [
                     "df"
@@ -79119,7 +79119,7 @@
                     "KIT,1",
                     "CAMP,1",
                     "CLEAN,1",
-                    "ARTISTAN,1",
+                    "ARTISAN,1",
                     "COMFORTER,1",
                     "THINKER,1"
                 ]
@@ -79959,7 +79959,7 @@
             "t_c": {
               "age": ["not_kitten"],
               "condition": ["deaf:any:false"],
-              "skill": ["ARTISTAN,1"]
+              "skill": ["ARTISAN,1"]
             }
         },
         "intro": [

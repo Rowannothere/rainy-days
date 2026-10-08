@@ -270,7 +270,7 @@ class History:
             # LG
             SkillPath.EXPLORER: ["exploring unknown areas"],
             SkillPath.TRACKER: ["tracking down scents"],
-            SkillPath.ARTISTAN: ["decorating dens"],
+            SkillPath.ARTISAN: ["decorating dens"],
             SkillPath.GUARDIAN: ["guarding the camp"],
             SkillPath.TUNNELER: ["tunneling"],
             SkillPath.NAVIGATOR: ["navigating unknown territory"],
