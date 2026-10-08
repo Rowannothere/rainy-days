@@ -26,10 +26,7 @@ from scripts.events_module.pregnancy.check_family_size import (
     biggest_family_is_big,
     get_biggest_family,
 )
-from scripts.events_module.pregnancy.check_parents import (
-    check_parent_rank,
-    get_biological_parent,
-)
+from scripts.events_module.pregnancy.check_parents import check_parent_rank
 from scripts.events_module.short.condition_events import Condition_Events
 from scripts.events_module.text_adjust import event_text_adjust, adjust_list_text
 from scripts.game_structure import game
@@ -42,7 +39,6 @@ def get_kits(
     other_cat: Optional[Cat] = None,
     adoptive_parents: Optional[list] = None,
     creating_your_siblings=False,
-    parent_known: Optional[bool] = None
 ):
     """
     Create some amount of kits
@@ -65,41 +61,11 @@ def get_kits(
 
     blood_parent = None
 
-    if cat and not other_cat:
-        other_cat = get_biological_parent(cat)
-
-    if parent_known is None:
-        parent_known = False
-
     ##### SELECT BACKSTORY #####
-    if (
-        cat 
-        and "pregnant" in cat.injuries
-        and cat.status.is_clancat
-        and other_cat.status.is_clancat
-        and cat.status.group_ID != other_cat.status.group_ID
-    ):
-        backstory = "halfclan1"
-    elif (
-        cat
-        and cat.status.is_clancat
-        and other_cat.status.is_clancat
-        and cat.status.group_ID != other_cat.status.group_ID
-    ):
-        backstory = "halfclan2"
-    elif ( 
-        cat
-        and "pregnant" in cat.injuries
-        and cat.status.is_clancat
-        and other_cat.status.is_outsider
-    ):
-        backstory = "outsider_roots1"
-    elif (
-        cat
-        and cat.status.is_clancat
-        and other_cat.status.is_outsider
-    ):
-        backstory = "outsider_roots2"
+    if cat and "pregnant" in cat.injuries:
+        backstory = choice(["halfclan1", "outsider_roots1"])
+    elif cat:
+        backstory = choice(["halfclan2", "outsider_roots2"])
     else:  # cat is adopted
         backstory = choice(["abandoned1", "abandoned2", "abandoned3", "abandoned4"])
     ###########################
@@ -158,7 +124,7 @@ def get_kits(
             all_adoptive_parents.append(_mate)
 
     #############################
-    
+
     #### GENERATE THE KITS ######
     for kit in range(kits_amount):
         # shouldn't have to use this initial assignment, but just in case, we'll set it as newborn
@@ -210,9 +176,7 @@ def get_kits(
             kit = NewCatFactory.create_cat(
                 parent1=cat.ID,
                 parent2=other_cat.ID,
-                parent2_known=parent_known,
                 moons=0,
-                backstory=backstory,
                 status_dict=kitten_status,
             )
         else:

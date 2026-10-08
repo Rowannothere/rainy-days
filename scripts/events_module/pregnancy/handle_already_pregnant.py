@@ -107,7 +107,6 @@ def handle_two_moon_pregnant(cat: Cat):
         kits_amount = 1
     other_cat_id = game.clan.pregnancy_data[cat.ID]["second_parent"]
     other_cat = Cat.all_cats.get(other_cat_id)
-    second_parent_known = game.clan.pregnancy_data[cat.ID]["second_parent_known"]
 
     set_biggest_family()
     extra_naming_text = None
@@ -131,7 +130,7 @@ def handle_two_moon_pregnant(cat: Cat):
                 mate_claimed_kits = _check_should_claim_affair_kits(cheated_mate, cat)
                 if mate_claimed_kits:
                     adoptive_parents.append(cheated_mate.ID)
-    kits = get_kits(kits_amount, cat, other_cat, adoptive_parents=adoptive_parents, parent_known=second_parent_known,)
+    kits = get_kits(kits_amount, cat, other_cat, adoptive_parents=adoptive_parents)
     kits_amount = len(kits)
     set_biggest_family()
 
@@ -155,7 +154,7 @@ def handle_two_moon_pregnant(cat: Cat):
         involved_cats,
         cat_dict,
         event_list,
-    ) = _handle_main_birth_event(cat, other_cat, events, secret_affair_birth, second_parent_known)
+    ) = _handle_main_birth_event(cat, other_cat, events, secret_affair_birth)
 
     # the birthing cat's mate can choose to either help their cheating mate raise the new litter or
     # not be involved with their mate's kits at all
@@ -405,7 +404,7 @@ def _check_should_claim_affair_kits(mate: Cat, pregnant_cat: Cat) -> bool:
 
 
 def _handle_main_birth_event(
-    cat, other_cat, events, secret_affair_birth, second_parent_known
+    cat, other_cat, events, secret_affair_birth
 ) -> tuple[str, bool, list, dict, list]:
     other_cat_affair_known = False
     coparenting_outcome = None
@@ -413,12 +412,8 @@ def _handle_main_birth_event(
     cat_dict = {"m_c": cat}
     event_list = []
 
-    # UNKNOWN PARENT
-    if other_cat and not second_parent_known:
-        event_list.append(choice(events["birth"]["unmated_parent"]))
-
     # SINGLE PARENT
-    elif not cat.status.is_outsider and other_cat is None:
+    if not cat.status.is_outsider and other_cat is None:
         event_list.append(choice(events["birth"]["unmated_parent"]))
 
     # OUTSIDER

@@ -32,7 +32,7 @@ class ChooseModeScreen(MakeClanScreenBase):
         super().screen_switches()
 
         # Reset variables
-        if switch_get_value(Switch.possible_cats):
+        if not switch_get_value(Switch.possible_cats):
             switch_set_value(
                 Switch.possible_cats,
                 create_example_cats(
@@ -220,7 +220,7 @@ class ChooseModeScreen(MakeClanScreenBase):
                 ),
                 rank_weights=self.get_config_during_creation(
                     "clan_creation.rank_weights"
-                )
+                ),
             ),
         )
 
