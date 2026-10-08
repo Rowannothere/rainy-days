@@ -235,9 +235,6 @@ class Clan:
         self.herb_supply = HerbSupply()
         self.primary_disaster = None
         self.secondary_disaster = None
-        # CGW
-        self.war = []
-        # -->
         self.future_events = []
         self.last_focus_change = None
         self.clans_in_focus = []
@@ -1334,9 +1331,6 @@ class Clan:
         clan_data["focus"] = self.focus
         clan_data["focus_moons"] = self.focus_moons
         war_json_list = []
-        for war in clan_data["war"]:
-            war_json_list.append(war.get_war_dict())
-        clan_data["war"] = war_json_list
 
         clan_data["poi"] = get_poi_save_dict()
 

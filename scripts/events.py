@@ -390,7 +390,7 @@ def _one_moon_impl():
                             ["birth_death", 
                             "relation"],
                             cats,
-                            clan=grieving_cat.status.group_ID
+                            clan=cat.fetch_cat(cat_id).status.group_ID
                         )
                     )
                     Cat.fetch_cat(cat_id).faith -= round(random.uniform(-1, 0), 2)
@@ -3048,6 +3048,46 @@ def load_other_clan_events():
 
     TERRITORY_TXT = load_lang_resource("events/territory.json")
     MAP_INTERACTIONS = load_lang_resource("events/map_interactions.json")
+    
+def announce_war_events(clan, other_clan, war_events):
+    # if nothing happened, return
+    if not war_events or not other_clan:
+        return
+    war_events = war_events.copy()
+
+    available_med = [
+        cat
+        for cat in Cat.all_cats.values()
+        if cat.status.group_ID == clan.group_ID
+        and cat.status.rank.is_any_medicine_rank()
+        and cat.available_to_work()
+    ]
+
+    for event in war_events.copy():
+        if not clan.leader and "lead_name" in event:
+            war_events.remove(event)
+            continue
+        if not clan.deputy and "dep_name" in event:
+            war_events.remove(event)
+            continue
+        if not available_med and "med_name" in event:
+            war_events.remove(event)
+            continue
+
+    # grab our war "notice" for this moon
+    if not war_events:
+        return
+    event = random.choice(war_events)
+    event = ongoing_event_text_adjust(
+        Cat,
+        event,
+        other_clan_name=other_clan.name,
+        clan=clan,
+    )
+    game.cur_events_list.append(EventInformation(
+        event, 
+        ["other_clans"],
+        clan=clan.group_ID,))
 
 
 def bellsofwar_check_war():
@@ -3057,212 +3097,92 @@ def bellsofwar_check_war():
     if game.clan.age <= 4:
         return
 
-    # real
-    # first, check all wars, find events, see if they need to end
-    # then, try to start a war if needed
 
-    for war in game.clan.war:
-        # Grab the enemy clan object
-        offense_clan = war.get_offense_object()
-        defense_clan = war.get_defense_object()
+    # check if war in progress
+    processed_wars=set ()
+    for clan in [game.clan] + game.clan.all_other_clans:
+        war_events = []
+        enemies = game.clan.get_wars(clan)
+        if enemies:
+            for enemy_id in enemies:    
+                war_pair = tuple (sorted((clan.group_ID, enemy_id)))
+                if war_pair in processed_wars:
+                    continue
+                processed_wars.add(war_pair)
+            
+                war_data = game.clan.war.get(clan.group_ID, {}).get(enemy_id)
+                if war_data is None:
+                    war_data = game.clan.war.get(enemy_id, {}).get(clan.group_ID)
 
-        threshold = 10
-        if "bloodthirsty" in offense_clan.temperament:
-            threshold = 12
-        if set(offense_clan.temperament).intersection({"mellow", "amiable", "gracious"}):
-            threshold = 7
+                for possible_enemy in [game.clan] + game.clan.all_other_clans:
+                    if possible_enemy.group_ID == enemy_id:
+                        other_clan = possible_enemy
+                        break
+                        
+                threshold = 10
+                if "bloodthirsty" in other_clan.temperament:
+                    threshold = 12
+                if set(other_clan.temperament).intersection({"mellow", "amiable", "gracious"}):
+                    threshold = 7
 
-        threshold -= war.duration
+                threshold -= int(war_data["duration"])
 
-        conclude_war = offense_clan.relations[defense_clan.group_ID] >= threshold and war.duration > 1
+                clan_relations = game.clan.get_relations(clan, other_clan)
 
-        rel_change=None
-        if conclude_war:
-            war.end_war()
-            event_type = "conclusion_events"
-            find_war_events(event_type, war, rel_change=rel_change)
-            return
- 
-        else:  # try to influence the relation with warring clan
-            war.duration += 1
-            rel_options = ["rel_up", "neutral", "rel_down"]
-            rel_change = random.choice(rel_options)
-            war.progress = rel_options.index(rel_change) - 1
+                if clan_relations < 0:
+                    game.clan.set_relations(clan, other_clan, 0)
+                    clan_relations = 0
 
-            if rel_change == "rel_up":
-                if offense_clan.group_ID != game.clan.group_ID:
-                    offense_clan.relations[defense_clan.group_ID] += 2
-                if defense_clan.group_ID != game.clan.group_ID:
-                    defense_clan.relations[offense_clan.group_ID] += 2
-            elif rel_change == "rel_down":
-                if offense_clan.group_ID != game.clan.group_ID:
-                    offense_clan.relations[defense_clan.group_ID] -= 1
-                if defense_clan.group_ID != game.clan.group_ID:
-                    defense_clan.relations[offense_clan.group_ID] -= 1
+                # check if war should conclude, if not, continue
+                if clan_relations >= threshold and war_data["duration"] > 1:
+                    war_data["at_war"] = False
+                    war_data["duration"] = 0
+                    game.clan.set_relations(clan, other_clan, clan_relations + 2)
+                    war_events = WAR_TXT["conclusion_events"]
+                else:  # try to influence the relation with warring clan
+                    war_data["duration"] += 1
+                    choice = random.choice(["rel_up", "neutral", "rel_down"])
+                    switch_set_value(Switch.war_rel_change_type, choice)
+                    war_events = WAR_TXT["progress_events"][choice]
+                    if clan_relations < 0:
+                        game.clan.set_relations(clan, other_clan, 0)
+                    if choice == "rel_up":
+                        game.clan.set_relations(clan, other_clan, clan_relations + 2)
+                    elif choice == "rel_down" and clan_relations > 1:
+                        game.clan.set_relations(clan, other_clan, clan_relations - 1)
 
-            if defense_clan.group_ID != game.clan.group_ID:
-                if defense_clan.relations[offense_clan.group_ID] < 0:
-                    defense_clan.relations[offense_clan.group_ID] = 0
-            if offense_clan.group_ID != game.clan.group_ID:
-                if offense_clan.relations[defense_clan.group_ID] < 0:
-                    offense_clan.relations[defense_clan.group_ID] = 0
+                announce_war_events(clan, other_clan, war_events)
+                announce_war_events(other_clan, clan, war_events.copy())
 
-            event_type = "progress_events"
-        find_war_events(event_type, war, rel_change=rel_change)
-
-    for other_clan in game.clan.all_other_clans:
-        # you're already at war! no more!
-        if other_clan.get_current_war():
-            continue
-
-        threshold = 5
-        if "bloodthirsty" in other_clan.temperament:
-            threshold = 10
-        if set(other_clan.temperament).intersection(
-            {"mellow", "amiable", "gracious"}
-        ):
-            threshold = 3
-
-        possible_clans = game.clan.all_other_clans + [game.clan]
-        possible_clans.remove(other_clan)
-        war_clan = random.choice(possible_clans)
-
-        start_war = int(other_clan.relations[war_clan.group_ID]) <= threshold and not int(
-            random.random() * int((other_clan.relations[war_clan.group_ID]) * 3)
-        )
-        # start_war = True
-        if start_war is True:
-            # random chance theyll start fighting with someone else instead
-            # bc u pissed them off idk
-            OFFENSE = other_clan
-            DEFENSE = war_clan
-            new_war = War(
-                offense=OFFENSE.group_ID,
-                defense=DEFENSE.group_ID,
-                duration=0,
-                progress=-1
-            )
-            new_war.get_demand()
-            game.clan.war.append(new_war)
-
-            event_type = "trigger_events"
-            find_war_events(event_type, new_war)
-
-def find_war_events(event_type, war, rel_change=None):
-    """
-    Finds and performs a war event for the specified war.
-    """
-    outcome = None
-    if event_type == "conclusion_events":
-        outcome = random.choice(
-            [
-                "offense_wins",
-                "truce",
-                "defense_wins"
-            ]
-        )
-
-    clan = war.get_offense_object()
-    enemy_clan = war.get_defense_object()
-    if rel_change:
-        war_events = WAR_TXT[event_type][rel_change]
-    elif outcome:
-        war_events = WAR_TXT[event_type][outcome] 
-    else:
-        war_events = WAR_TXT[event_type]
-
-    available_med = find_alive_cats_with_rank(Cat, [CatRank.MEDICINE_CAT], working=True)
-
-    if event_type == "trigger_events":
-        if not isinstance(war.demand, str):
-            war.demand.add_event(
-                event_text_adjust(
-                        Cat,
-                        "c_n tried to seize this territory from o_c_n.",
-                        clan=war.get_offense_object(),
-                        other_clan=war.get_defense_object()
-                    )
-                )
-
-    # remove events that mention cat names if the war doesnt involve you
-    for event in war_events.copy():
-        if "lead_name" in event[0]:
-            if not game.clan.leader:
-                war_events.remove(event)
-                continue
-            if war.offense != game.clan.group_ID:
-                war_events.remove(event)
-                continue
-        if "dep_name" in event[0]:
-            if not game.clan.deputy:
-                war_events.remove(event)
-                continue
-            if war.offense != game.clan.group_ID:
-                war_events.remove(event)
-                continue
-        if "med_name" in event[0]:
-            if not available_med:
-                war_events.remove(event)
-                continue
-            if war.offense != game.clan.group_ID:
-                war_events.remove(event)
-                continue
-
-    if not war_events:
-        return
-
-    additional_event_text = ""
-    event_tile = None
-    winner = None
-    if event_type == "conclusion_events":
-        winner_dict = {
-            "offense_wins": war.get_offense_object(),
-            "truce": None,
-            "defense_wins": war.get_defense_object()
-        }
-        winner = winner_dict[outcome]
-        if winner:
-            war.win_war(winner)
-            if war.demand:
-                if not isinstance(war.demand, str):
-                    insert = "a piece of territory."
-                    event_tile = war.demand
-                else:
-                    insert = f"some {war.demand}."
-                additional_event_text = f" {winner.name} wins {insert}"
-        else:
-            additional_event_text = " No Clan walks away the winner."
-
-    initial_event = random.choice(war_events)
-    event = ongoing_event_text_adjust(
-        Cat,
-        initial_event[0] + additional_event_text,
-        other_clan_name=enemy_clan.name,
-        clan=clan,
-    )
-    if not event_tile:
-        if initial_event[1]:
-            possible_tiles = territory_class.get_tiles(
-                initial_event[1],
-                clan,
-                enemy_clan
-                )
-
-            if possible_tiles:
-                event_tile = random.choice(possible_tiles)
-    if event_tile:
-        game.cur_events_list.append(
-            EventInformation(
-                event,
-                ["other_clans"],
-                event_tile=event_tile.tile_string
-                )
-            )
-        event_tile.add_event(event)
-
-        return
-    game.cur_events_list.append(EventInformation(event, ["other_clans"]))
-
+        else:  # try to start a war if no war in progress
+            for other_clan in [game.clan] + game.clan.all_other_clans:
+                if other_clan.group_ID == clan.group_ID:
+                    continue
+                clan_relations = game.clan.get_relations(clan, other_clan)
+                threshold = 5
+                if "bloodthirsty" in other_clan.temperament:
+                    threshold = 10
+                if set(other_clan.temperament).intersection(
+                    {"mellow", "amiable", "gracious"}
+                ):
+                    threshold = 3
+            
+                if int(clan_relations) <= threshold and not int(
+                    random.random() * int(clan_relations)
+                ):
+                    game.clan.war.setdefault(clan.group_ID, {})
+                    war_pair = tuple(sorted((clan.group_ID, other_clan.group_ID)))
+                    processed_wars.add(war_pair)
+                    game.clan.war[clan.group_ID][other_clan.group_ID] = {
+                        "at_war": True,
+                        "enemy": other_clan.prefix,
+                        "duration": 0,
+                    }
+                    war_events = WAR_TXT["trigger_events"]
+                    switch_set_value(Switch.war_rel_change_type, "rel_down")
+                    announce_war_events(clan, other_clan, war_events)
+                    announce_war_events(other_clan, clan, war_events)
+                    break
 
 
 def gain_accessories(cat):
@@ -3534,9 +3454,11 @@ def handle_injuries_or_general_death(cat):
         Condition_Events.handle_injuries(cat)
         return
 
+    clan = cat.status.fetch_clan_object(game.clan)
+    enemies = game.clan.get_wars(clan) if clan else []
     use_war_modifier = (
-        game.clan.get_current_war() is not None
-        and game.clan.get_current_war().progress != 1
+        bool(enemies)
+        and switch_get_value(Switch.war_rel_change_type) != "rel_up"
     )
 
     # chance to kill leader: 1/50 by default
