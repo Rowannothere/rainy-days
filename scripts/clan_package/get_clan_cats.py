@@ -129,8 +129,8 @@ def get_possible_mates(cat) -> Tuple[List["Cat"], List["Cat"]]:
     """
     possible_mates = []
     existing_romance_mates = []
-    for inter_cat in cat.living_clan_cats():
-        if not inter_cat.status.alive_in_player_clan:
+    for inter_cat in cat.all_cats.values():
+        if inter_cat.status.group_ID != cat.status.group_ID or inter_cat.dead:
             continue
         if inter_cat.ID == cat.ID:
             continue

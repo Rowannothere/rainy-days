@@ -28,7 +28,6 @@ import re
 from scripts.cat.cats import Cat, cat_class, BACKSTORIES
 from scripts.cat.pelts import Pelt
 from scripts.cat.sprites.load_sprites import sprites
-from scripts.clan_package.cotc import get_warring_clan
 
 from scripts.clan_resources.freshkill import FreshkillPile
 from scripts.cat_relations.relationship import Relationship
@@ -387,7 +386,7 @@ def _one_moon_impl():
                             ["birth_death", 
                             "relation"],
                             cats,
-                            clan=grieving_cat.status.group_ID
+                            clan=cat.fetch_cat(cat_id).status.group_ID
                         )
                     )
                     Cat.fetch_cat(cat_id).faith -= round(random.uniform(-1, 0), 2)
@@ -835,6 +834,8 @@ def handle_lead_den_event():
         additional_text = ""
         recieved_tile = None
         given_tile = None
+        recieved = None
+        given = None
         if info_dict["success"]:
             if info_dict["interaction_type"] == "trade":
                 recieved = info_dict["recieved"]
@@ -1655,7 +1656,7 @@ def generate_birth_event():
             main_cat=your_parent_1,
             random_cat=your_parent_2,
             clan=game.clan,
-            other_clan=get_warring_clan() if game.clan.war else None,
+            other_clan=game.clan.get_current_war() if game.clan.war else None,
         )
 
         siblings_insert = adjust_list_text([str(i.name) for i in siblings])
@@ -3256,10 +3257,9 @@ def find_war_events(event_type, war, rel_change=None):
                 )
             )
         event_tile.add_event(event)
-
         return
+    
     game.cur_events_list.append(EventInformation(event, ["other_clans"]))
-
 
 
 def gain_accessories(cat):
