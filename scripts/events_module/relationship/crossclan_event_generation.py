@@ -280,7 +280,7 @@ def filter_events(
                     possible_clans.remove(other_clan)
 
         if "war" in chosen_event.sub_type:
-            enemies = game.clan.get_wars(clan)
+            enemies = game.clan.get_current_war()
             for other_clan in possible_clans.copy():
                 if other_clan not in enemies:
                     possible_clans.remove(other_clan)

@@ -235,6 +235,9 @@ class Clan:
         self.herb_supply = HerbSupply()
         self.primary_disaster = None
         self.secondary_disaster = None
+        # CGW
+        self.war = []
+        # -->
         self.future_events = []
         self.last_focus_change = None
         self.clans_in_focus = []
@@ -1098,27 +1101,6 @@ class Clan:
 
         return relation
 
-    def  get_wars(self, clan):
-        wars = []
-
-        clan_id = clan.group_ID
-
-        for other_clan in [self] + self.all_other_clans:
-            if other_clan.group_ID == clan_id:
-                continue
-
-            other_id = other_clan.group_ID
-
-            war_data = self.war.get(clan_id, {}).get(other_id)
-
-            if war_data is None:
-                war_data = self.war.get(other_id, {}).get(clan_id)
-
-            if war_data and war_data.get("at_war"):
-                wars.append(other_id)
-
-        return wars
-
     def set_relations(self, clan, other_clan, relations):
         relation_clan = other_clan if clan == game.clan else clan
         related_clan = clan if clan == game.clan else other_clan
@@ -1331,6 +1313,9 @@ class Clan:
         clan_data["focus"] = self.focus
         clan_data["focus_moons"] = self.focus_moons
         war_json_list = []
+        for war in clan_data["war"]:
+            war_json_list.append(war.get_war_dict())
+        clan_data["war"] = war_json_list
 
         clan_data["poi"] = get_poi_save_dict()
 
