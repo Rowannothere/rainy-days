@@ -86,12 +86,14 @@ def create_short_event(
     # if the war didn't go badly, then we decrease the chance of this event being war-focused
     if switch_get_value(Switch.war_rel_change_type) != "rel_down":
         war_chance = 2
-    
-    current_war = None
-
-    for war in game.clan.war:
-        enemy_clan = get_warring_clan()
-        other_clan = enemy_clan
+    other_clan = None
+    enemies = game.clan.get_wars(clan)
+    if enemies and random.randint(1, war_chance) != 1:
+        enemy_id = random.choice(enemies)
+        for possible_enemy in [game.clan] + game.clan.all_other_clans:
+            if possible_enemy.group_ID == enemy_id:
+                other_clan = possible_enemy
+                break
         sub_types.append("war")
 
     if not other_clan:
@@ -504,7 +506,7 @@ def filter_events(
                 continue
 
             if not event_for_clan_relations(
-                event.other_clan["current_rep"], other_clan
+                event.other_clan["current_rep"], other_clan, clan=clan
             ):
                 continue
 

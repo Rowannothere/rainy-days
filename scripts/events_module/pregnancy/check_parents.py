@@ -1,9 +1,11 @@
-from random import choice, random
+from random import choice, random, randint
 from typing import Optional
+from scripts.game_structure import constants
 
 from scripts.cat.cats import Cat
 from scripts.cat.enums import (
     CatAge,
+    CatSocial,
 )
 from scripts.cat_relations.relationship import Relationship, create_one_relationship
 from scripts.clan_package.settings import get_clan_setting
@@ -15,9 +17,10 @@ from scripts.events_module.event_filters import (
     get_highest_romantic_relation,
 )
 from scripts.config import get_config
+from scripts.events_module.consequences import create_new_cat
 
 
-def check_if_can_have_kits(cat):
+def check_if_can_have_kits(cat, ignore_mate_requirement=False):
     """Check if the given cat can have kits, see for age, birth-cooldown and so on."""
     if not cat:
         return False
@@ -38,26 +41,25 @@ def check_if_can_have_kits(cat):
 
     if not check_parent_rank(cat):
         return False
-
-    # check for mate
-    if cat.mate:
-        for mate_id in cat.mate:
-            if mate_id not in cat.all_cats:
-                print(
-                    f"WARNING: {cat.name}  has an invalid mate # {mate_id}. This has been unset."
-                )
-                cat.mate.remove(mate_id)
-    else:
-        # if the cat has no mate, and we don't allow single parents, unmated parents, or affairs
-        # then they can't have kits
-        if (
-            not get_clan_setting("single parentage")
-            and not get_clan_setting("unmated parentage")
-            and not get_clan_setting("affair")
-        ):
-            return False
-
-    # if function reaches this point, having kits is possible
+    
+    if not ignore_mate_requirement:
+        # check for mate
+        if cat.mate:
+            for mate_id in cat.mate:
+                if mate_id not in cat.all_cats:
+                    print(
+                        f"WARNING: {cat.name}  has an invalid mate # {mate_id}. This has been unset."
+                    )
+                    cat.mate.remove(mate_id)
+        else:
+            # if the cat has no mate, and we don't allow single parents, unmated parents, or affairs
+            # then they can't have kits
+            if (
+                not get_clan_setting("single parentage")
+                and not get_clan_setting("unmated parentage")
+                and not get_clan_setting("affair")
+            ):
+                return False
     return True
 
 
@@ -68,7 +70,7 @@ def check_second_parent(cat: Cat, second_parent: Cat) -> tuple[bool, bool]:
     parent can have kits, kits are adopted
     """
     # Checks for second parent alone:
-    if not check_if_can_have_kits(second_parent):
+    if not check_if_can_have_kits(second_parent, ignore_mate_requirement=True):
         return False, False
 
     # Check to see if the pair can have kits.
@@ -82,8 +84,97 @@ def check_second_parent(cat: Cat, second_parent: Cat) -> tuple[bool, bool]:
 
     return True, False
 
+def get_biological_parent(cat: Cat):
+    """
+    # Creates a biological parent for a cat if they don't have one. 
+    This is used for cats that are adopted or have no known parents.
+    Also used for cats that are the result of other clan relations, or outsiders and loners.
+    """
+    same_sex_birth_allowed = get_clan_setting("same sex birth")
+    possible_parents = [
+            possible_parent
+            for possible_parent in Cat.all_cats_list
+            if possible_parent.is_potential_mate(cat, ignore_outsider_status=True)
+            and (same_sex_birth_allowed or possible_parent.gender != cat.gender)
+            and possible_parent.ID not in cat.mate
+        ]
 
-def get_second_parent(cat: Cat) -> tuple[Optional[Cat], bool]:
+    same_clan_parents = [
+        possible_parent
+        for possible_parent in possible_parents
+        if possible_parent.status.group_ID == cat.status.group_ID
+    ]
+
+    other_clan_parents = [
+        possible_parent
+        for possible_parent in possible_parents
+        if possible_parent.status.group_ID != cat.status.group_ID
+        and possible_parent.status.is_clancat
+    ]
+    
+    outside_parents = [
+        possible_parent
+        for possible_parent in possible_parents
+        if possible_parent.status.is_outsider
+    ]
+    
+    parent_type_roll = randint(1, 100)
+    
+    if parent_type_roll <= 70:
+        preferred_parent_group = same_clan_parents
+    elif parent_type_roll <= 90:
+        preferred_parent_group = other_clan_parents
+    else:
+        preferred_parent_group = outside_parents
+
+    biological_parent = None
+
+    if preferred_parent_group:
+        biological_parent = choice(preferred_parent_group)
+
+    available_parent_groups = []
+    if same_clan_parents:
+        available_parent_groups.append(same_clan_parents)
+    if other_clan_parents:
+        available_parent_groups.append(other_clan_parents)
+    if outside_parents:
+        available_parent_groups.append(outside_parents)
+    
+
+    if biological_parent is None and available_parent_groups:
+        chosen_parent_group = choice(available_parent_groups)
+        biological_parent = choice(chosen_parent_group)
+    elif biological_parent is None and not available_parent_groups:
+        # if there are no available parents, create a new one
+        parent_gender= None
+
+        if not same_sex_birth_allowed:
+            parent_gender = "female" if cat.gender == "male" else "male"
+            
+        age_range = min(
+            constants.CONFIG["mates"]["age_range"],
+            int(cat.moons * 0.4)
+        )
+
+        youngest_age = max(14, cat.moons - age_range)
+        oldest_age = cat.moons + age_range
+
+        parent_age = randint(youngest_age, oldest_age)
+
+        new_parent = create_new_cat(
+            Cat,
+            original_social=choice((CatSocial.LONER, CatSocial.KITTYPET)),
+            moons=parent_age,
+            gender=parent_gender,
+            outside=True,
+        )[0]
+        biological_parent = new_parent
+
+    return biological_parent
+
+
+
+def get_second_parent(cat: Cat) -> tuple[Optional[Cat], bool, Optional[bool]]:
     """
     Return the second parent of a cat, which will have kits.
     Also returns a bool that is true if an affair was triggered.
@@ -108,12 +199,12 @@ def get_second_parent(cat: Cat) -> tuple[Optional[Cat], bool]:
                 chosen_mate = choice(possible_mates)
     elif not coparenting_allowed:
         # if coparenting is OFF, then an unmated cat can't have a kitten
-        return None, False
+        return None, False, None
 
     affair_allowed = get_clan_setting("affair")
     if chosen_mate and not affair_allowed:
         # if affairs setting is OFF, mate will always be the second parent
-        return chosen_mate, False
+        return chosen_mate, False, True
 
     # get relationships to influence the affair chance
     relationship_toward_mate = None
@@ -128,7 +219,8 @@ def get_second_parent(cat: Cat) -> tuple[Optional[Cat], bool]:
         cat, chosen_mate, relationship_toward_mate, same_sex_birth_allowed
     )
     if new_partner:
-        return new_partner, True
+        parent_known = random() > 0.33
+        return new_partner, True, parent_known
 
     # RANDOM AFFAIR & COPARENTING
     if not cat.mate:
@@ -173,11 +265,29 @@ def get_second_parent(cat: Cat) -> tuple[Optional[Cat], bool]:
 
         if len(possible_partners) > 0:
             chosen_affair = choice(possible_partners)
-            return chosen_affair, True
+            parent_known = random() > 0.33
+            return chosen_affair, True, parent_known
+    if chosen_mate is None:
+        biological_parent = get_biological_parent(cat)
+        
+        if biological_parent.status.group_ID == cat.status.group_ID:
+            parent_known = random() > 0.33
+        elif (
+            biological_parent.status.group_ID != cat.status.group_ID 
+            and biological_parent.status.is_clancat
+        ):
+            parent_known = random() > 0.60
+        elif biological_parent.status.is_outsider:
+            parent_known = random() > 0.85
+
+        return biological_parent, False, parent_known
 
     # no affair/coparent was found
-    return chosen_mate, False
+    return chosen_mate, False, True
+        
 
+    # if function reaches this point, having kits is possible
+  
 
 def _determine_highest_romantic_relation(
     cat: Cat,
