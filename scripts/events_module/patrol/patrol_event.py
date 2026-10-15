@@ -25,8 +25,8 @@ NUM_OF_SKILLS = len(SkillPath)
 class PatrolEvent:
     event_id: str
 
-    intro_text: str
-    decline_text: str = ""
+    intro_strings: list[str] = field(default_factory=list)
+    decline_strings: list[str] = field(default_factory=list)
     success_outcomes: list[Union[dict, TextPoolEvent]] = field(default_factory=list)
     fail_outcomes: list[Union[dict, TextPoolEvent]] = field(default_factory=list)
     antag_success_outcomes: list[Union[dict, TextPoolEvent]] = field(
@@ -35,7 +35,7 @@ class PatrolEvent:
     antag_fail_outcomes: list[Union[dict, TextPoolEvent]] = field(default_factory=list)
     options: list[Union[dict, PatrolOption]] = field(default_factory=list)
 
-    types: list[Literal["hunting", "herb_gathering", "border", "training"]] = "border"
+    types: list[Literal["hunting", "herb_gathering", "border", "training"]] = field(default_factory=list)
     frequency: int = 4
     weight: int = 1  # will be increased via code
     chance_of_success: int = 0  # out of 100

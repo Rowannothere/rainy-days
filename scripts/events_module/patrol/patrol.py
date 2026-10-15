@@ -122,7 +122,8 @@ class Patrol:
             self.other_clan = None
 
         # Find valid patrol
-        self.patrol_event = self._get_possible_patrol(patrol_type)
+        patrol_list = get_patrol_list(patrol_type)
+        self.patrol_event = self._filter_and_set_patrol(patrol_list, patrol_type)
         self.available_options = self.patrol_event.options
         self._load_patrols_and_set_patrol(patrol_type)
         self._create_needed_cats()

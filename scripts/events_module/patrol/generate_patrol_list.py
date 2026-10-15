@@ -42,13 +42,13 @@ def get_patrol_list(
 
     # OTHER CLAN
     possible_patrols.extend(_load_file(f"{path}other_clan.json"))
-    if other_clan_rep != "neutral":
+    if other_clan_rep != "neutral" and other_clan_rep is not None:
         possible_patrols.extend(_load_file(f"{path}other_clan_{other_clan_rep}.json"))
 
     # OUTSIDER
     if outsider_rep:
         possible_patrols.extend(_load_file(f"{path}new_cat.json"))
-        if outsider_rep != "neutral":
+        if outsider_rep != "neutral" and outsider_rep is not None:
             possible_patrols.extend(_load_file(f"{path}new_cat_{outsider_rep}.json"))
 
     # DISASTERS

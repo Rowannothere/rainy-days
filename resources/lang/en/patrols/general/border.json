@@ -13,7 +13,9 @@
         },
         "chance_of_success": 50,
         "patrol_art": "cat_sprites/gen_bord_dog_Wr",
-        "intro_text": "p_l catches the scent of a dog along the edge of the Clan's territory and finds a trail of blood alongside its pawprints.",
+        "intro_strings": [
+            "p_l catches the scent of a dog along the edge of the Clan's territory and finds a trail of blood alongside its pawprints."
+        ],
         "options": [
             {
                 "text": "Ambush the dog.",
@@ -98,7 +100,9 @@
                 ]
             }
         ],
-        "decline_text": "Yada yada",
+        "decline_strings": [
+            "Yada yada"
+        ],
         "success_outcomes": [
             {
                 "frequency": 1,
