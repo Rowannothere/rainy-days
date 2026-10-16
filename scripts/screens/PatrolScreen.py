@@ -968,10 +968,13 @@ class PatrolScreen(Screens):
         """Proceeds the patrol - to be run in the separate thread."""
         (
             self.display_text,
-            self.results_text,
+            result_messages,
             self.rel_results,
             self.outcome_art,
         ) = self.patrol_obj.proceed_patrol(user_input, selected_option)
+        self.results_text = "<br>".join(
+            message for message in result_messages.values() if message
+        )
 
     def open_patrol_result_screen(self):
         if self.patrol_obj.available_options:

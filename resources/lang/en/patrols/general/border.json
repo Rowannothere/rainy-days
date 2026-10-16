@@ -1,50 +1,121 @@
-[
+[ 
     {
-        "event_id": "gen_bord_dog",
-        "types": [
-            "border"
-        ],
+        "event_id": "gen_bord_secret_meeting",
+        "types": ["border"],
         "frequency": 1,
         "required_cat_types": {
             "patrol_cats": [
-                1,
-                1
+                1, 2
+            ],
+            "normal adult": [
+                2, 2
             ]
         },
+        "involved_cats": {
+            "r_c0": {}
+        },
         "chance_of_success": 50,
-        "patrol_art": "cat_sprites/gen_bord_dog_Wr",
+        "patrol_art": "cat_sprites/gen_bord_borderchatpos_WrOw",
         "intro_strings": [
-            "p_l catches the scent of a dog along the edge of the Clan's territory and finds a trail of blood alongside its pawprints."
+            "A strange sound catches p_l's attention while patrolling the border. Peering through the undergrowth, {PRONOUN/p_l/subject} spots two cats whispering to one another. One voice belongs to r_c0, but the other is unmistakably a o_c_n cat!"
         ],
         "options": [
             {
-                "text": "Ambush the dog.",
-                "chance_of_success": 30,
+                "text": "Eavesdrop.",
+                "chance_of_success": 65,
                 "success_outcomes": [
                     {
                         "frequency": 1,
                         "strings": [
-                            "p_l ambushes the dog the moment the tracks end. With its injury, the dog doesn't put up much of a fight and eventually flees, leaving behind a very proud p_l for having defended c_n all on {PRONOUN/p_l/poss} own from such a vicious creature!"
+                            "p_l settles into the undergrowth and listens carefully. The two cats are discussing a dangerous animal near the border, and it becomes clear that they have been secretly exchanging information to protect their respective Clans."
                         ],
-                        "exp_gained": 10
+                        "exp_gained": 10,
+                        "options": [
+                            {
+                                "text": "Offer to help.",
+                                "chance_of_success": 70,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l steps out of hiding and offers to help the pair deal with the threat. Relieved that someone is willing to listen, the two cats explain where they have seen the animal. p_l returns to camp with valuable information and a new understanding of the secret meeting."
+                                        ],
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l offers to help, but the stranger suspects a trap and flees across the border. The Clanmate refuses to continue the conversation, leaving p_l with only a vague warning about danger nearby."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "text": "Report them.",
+                                "chance_of_success": 80,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l returns to camp and reports the meeting to the Clan's leadership. Although the Clanmate must explain {PRONOUN/p_l/poss} actions, the warning about the dangerous animal is taken seriously. Patrols are organized to keep the territory safe."
+                                        ],
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l reports the meeting, but the Clan's leadership focuses on the secrecy rather than the warning. The Clanmate is reprimanded, and p_l is left wondering whether reporting the encounter was the right decision."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "fail_outcomes": [
                     {
                         "frequency": 1,
                         "strings": [
-                            "p_l ambushes the dog the moment the tracks end. With its injury, the dog doesn't put up much of a fight and eventually flees... deeper into c_n territory. Startingly, p_l realizes it's headed straight for camp!"
+                            "A twig snaps beneath p_l's paws. The two cats immediately fall silent, and the stranger bolts across the border. The Clanmate turns toward p_l with an angry glare, clearly upset that {PRONOUN/p_l/subject} has been spying on them."
                         ],
                         "exp_gained": 0,
                         "options": [
                             {
-                                "text": "Chase the dog.",
-                                "chance_of_success": 30,
+                                "text": "Demand an explanation.",
+                                "chance_of_success": 60,
                                 "success_outcomes": [
                                     {
                                         "frequency": 1,
                                         "strings": [
-                                            "p_l races to block the dog's path. Thankfully, the dog isn't very fast with its injury, and p_l skids to a stop in front of it, hissing and spitting to drive it back. Frightened by the confident display, the dog turns tail and flees once more, this time across the border. Once it's gone, p_l lets out a sigh of relief and returns to camp to check on everyone, just in case."
+                                            "p_l demands to know what the meeting was about. After a tense silence, the Clanmate admits that the two cats were exchanging information about a dangerous animal. They had feared their Clans would turn the matter into a territorial dispute."
+                                        ],
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "The Clanmate refuses to answer p_l's questions and stalks away. p_l returns to the patrol without learning what the two cats were discussing."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "text": "Apologize for spying.",
+                                "chance_of_success": 75,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l apologizes for eavesdropping and explains that {PRONOUN/p_l/subject} was concerned about the unfamiliar scent. The Clanmate's expression softens, and they reluctantly explain the reason for the meeting."
                                         ],
                                         "exp_gained": 5
                                     }
@@ -53,45 +124,123 @@
                                     {
                                         "frequency": 1,
                                         "strings": [
-                                            "p_l races to block the dog's path, but {PRONOUN/p_l/poss} {VERB/p_l/isn't/aren't} fast enough. The dog runs straight into camp, but thankfully, it's chased right back out by the other warriors. p_l casts a sheepish grin at said warriors as they turn to face {PRONOUN/p_l/object} once the dog is gone. Looks like p_l has some explaining to do..."
+                                            "p_l tries to apologize, but the Clanmate remains furious. They insist that p_l stay out of their private affairs and refuse to discuss the stranger any further."
                                         ],
-                                        "exp_gained": 0,
-                                        "relationship_changes": [
-                                            {
-                                                "cats_from": [
-                                                    "clan"
-                                                ],
-                                                "cats_to": [
-                                                    "p_l"
-                                                ],
-                                                "mutual": false,
-                                                "values": [
-                                                    "trust",
-                                                    "respect"
-                                                ],
-                                                "amount": -10,
-                                                "log": {
-                                                    "cats_from": "cat_from was disappointed in cat_to for leading a dog into camp."
-                                                }
-                                            }
-                                        ]
-                                    },
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "text": "Reveal yourself.",
+                "chance_of_success": 70,
+                "success_outcomes": [
+                    {
+                        "frequency": 1,
+                        "strings": [
+                            "p_l steps into the hollow and demands an explanation. The two cats startle, but after a tense exchange, they admit that they have been meeting to discuss a threat to both territories. Neither wanted their Clanmates to mistake their cooperation for disloyalty."
+                        ],
+                        "exp_gained": 10,
+                        "options": [
+                            {
+                                "text": "Keep their secret.",
+                                "chance_of_success": 70,
+                                "success_outcomes": [
                                     {
                                         "frequency": 1,
                                         "strings": [
-                                            "p_l races to block the dog's path. Thankfully, the dog isn't very fast with its injury, and {PRONOUN/p_l/subject} skids to a stop in front of it, hissing and spitting to drive it back. However, the dog apparently realizes it's much bigger and stronger than {PRONOUN/p_l/object}, even with its injury. p_l barely makes it out of the encounter alive."
+                                            "p_l agrees to keep the meeting private, provided the cats continue sharing information about the danger. The two exchange grateful glances before parting ways. p_l returns to camp knowing that {PRONOUN/p_l/subject} has helped prevent a possible conflict."
                                         ],
-                                        "exp_gained": 0,
-                                        "condition": [
-                                            {
-                                                "cats": [
-                                                    "p_l"
-                                                ],
-                                                "condition": [
-                                                    "major_injury"
-                                                ]
-                                            }
-                                        ]
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l agrees to keep the secret, but the Clanmate later denies that the conversation ever happened. With no proof of the agreement, p_l is left uncertain whether the cats will cooperate again."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "text": "Tell the leaders.",
+                                "chance_of_success": 75,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l explains the situation to the Clan's leadership, emphasizing the danger rather than the secret meeting. The leaders agree to investigate the threat, though they warn that future cooperation with rival Clans must be handled openly."
+                                        ],
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "The leaders interpret the secret meeting as a sign of disloyalty. The Clanmate is reprimanded, and p_l's attempt to prevent trouble only makes the situation more complicated."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fail_outcomes": [
+                    {
+                        "frequency": 1,
+                        "strings": [
+                            "p_l steps into the hollow, but the stranger interprets the sudden appearance as a threat. They hiss and flee across the border, leaving the Clanmate to face p_l alone. The Clanmate refuses to explain what was happening."
+                        ],
+                        "exp_gained": 0,
+                        "options": [
+                            {
+                                "text": "Let them leave.",
+                                "chance_of_success": 80,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l decides not to press the matter further. The Clanmate eventually calms down, and the patrol resumes. Although the mystery remains unsolved, the encounter ends without a fight."
+                                        ],
+                                        "exp_gained": 5
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l tries to move on, but the Clanmate remains suspicious and avoids speaking for the rest of the patrol. The silence makes the journey back to camp uncomfortable."
+                                        ],
+                                        "exp_gained": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "text": "Search for clues.",
+                                "chance_of_success": 65,
+                                "success_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l examines the hollow and discovers fresh tracks leading toward a patch of disturbed earth. Nearby, several enormous pawprints suggest that a large animal has been passing dangerously close to the border."
+                                        ],
+                                        "exp_gained": 10
+                                    }
+                                ],
+                                "fail_outcomes": [
+                                    {
+                                        "frequency": 1,
+                                        "strings": [
+                                            "p_l searches the hollow, but the ground is too disturbed to distinguish one set of tracks from another. With daylight fading, the patrol has to return to camp empty-pawed."
+                                        ],
+                                        "exp_gained": 0
                                     }
                                 ]
                             }
@@ -101,25 +250,7 @@
             }
         ],
         "decline_strings": [
-            "Yada yada"
-        ],
-        "success_outcomes": [
-            {
-                "frequency": 1,
-                "strings": [
-                    "p_l follows the trail of blood and pawprints, but eventually loses the scent. p_l returns to camp, hoping the dog has left c_n's territory."
-                ],
-                "exp_gained": 5
-            }
-        ],
-        "fail_outcomes": [
-            {
-                "frequency": 1,
-                "strings": [
-                    "p_l ends the patrol early, feeling too lazy to mark the rest of the border."
-                ],
-                "exp_gained": 0
-            }
+            "p_l decides that whatever is happening in the hollow is none of {PRONOUN/p_l/poss} business. {PRONOUN/p_l/subject/CAP} returns to the border, though the sight of the two cats continues to bother {PRONOUN/p_l/object}."
         ]
     },
     {

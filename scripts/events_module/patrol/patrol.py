@@ -121,11 +121,9 @@ class Patrol:
         else:
             self.other_clan = None
 
-        # Find valid patrol
-        patrol_list = get_patrol_list(patrol_type)
-        self.patrol_event = self._filter_and_set_patrol(patrol_list, patrol_type)
-        self.available_options = self.patrol_event.options
+        # Select the patrol and its options together.
         self._load_patrols_and_set_patrol(patrol_type)
+        self.available_options = self.patrol_event.options
         self._create_needed_cats()
 
         if self.patrol_event.poi:
@@ -149,7 +147,7 @@ class Patrol:
         self,
         path: PatrolChoice = PatrolChoice.PROCEED,
         selected_option: PatrolOption = None,
-    ) -> Tuple[str, str, list, pygame.Surface | None]:
+    ) -> Tuple[str, dict[str, str], dict, pygame.Surface | None]:
         """Proceed the patrol to the next step."""
 
         if path == PatrolChoice.DECLINE:
@@ -166,12 +164,12 @@ class Patrol:
                         other_clan=self.other_clan,
                         chosen_poi=self.chosen_poi,
                     ),
-                    "",
+                    {},
                     {},
                     None,
                 )
             else:
-                return "Error - no event chosen", "", {}, None
+                return "Error - no event chosen", {}, {}, None
 
         if selected_option is None and self.available_options:
             raise ValueError("A patrol option must be selected before proceeding")
@@ -643,7 +641,7 @@ class Patrol:
         self,
         antagonize=False,
         selected_option: PatrolOption = None,
-    ) -> Tuple[str, str, list, pygame.Surface | None]:
+    ) -> Tuple[str, dict[str, str], dict, pygame.Surface | None]:
         if self.patrol_event is None:
             raise Exception("No patrol event supplied")
 
